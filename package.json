@@ -1,0 +1,22 @@
+{
+  "name": "webprogramming_um_wif2003",
+  "version": "1.0.0",
+  "description": "WIF2003 Assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "console.log(Hello World)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nivleM-ed/WebProgramming_UM_WIF2003.git"
+  },
+  "author": "nivleM",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nivleM-ed/WebProgramming_UM_WIF2003/issues"
+  },
+  "homepage": "https://github.com/nivleM-ed/WebProgramming_UM_WIF2003#readme",
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
+  }
+}
