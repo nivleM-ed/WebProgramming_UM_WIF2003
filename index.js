@@ -5,31 +5,82 @@ var xhr = new XMLHttpRequest();
 var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
 // var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
 var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-var CITY = "Malaysia";
+var CITY = document.getElementById("cityId").value;
+// var CITY = "Malaysia";
 var URL = API_URL.concat(CITY,API_KEY);
-var response;
+var response, myRes;
+var dateArr = new Array();
+var weatherArr = new Array();
+var speedArr = new Array();
 
-run();
-
-function run() {
-    xhr.onload = function () {
+function getWeather() {
+        xhr.onload = function () {
 
         // Process our return data
         if (xhr.status >= 200 && xhr.status < 300) {
             response = xhr.responseText;
-            console.log(response);
+            myRes = JSON.parse(response);
+            console.log(myRes);
+            document.getElementById("response").innerHTML = myRes.city.name;
+            
+            getDataArr();
+            getChart();
         } else {
             console.log('The request failed!');
         }
     };
     
     xhr.open('GET', URL);
-    xhr.send();
-    
-    //delete to run in vs code
-    var myRes = JSON.parse(response);
-    document.getElementById("response").innerHTML = response;
+    xhr.send();   
 }
+
+function getDataArr() {
+    for(var i=0; i<myRes.list.length; i++) {
+        weatherArr[i] = myRes.list[i].weather[0].description;
+        // console.log(weatherArr[i]);
+    }
+
+    for(var i=0; i<myRes.list.length; i++) {
+        dateArr[i] = myRes.list[i].dt_txt;
+        // console.log(dateArr[i]);
+    }
+
+    for(var i=0; i<myRes.list.length; i++) {
+        speedArr[i] = myRes.list[i].wind.speed;
+        // console.log(speedArr[i]);
+    }
+}
+
+function getChart() {
+var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: dateArr,
+        datasets: [{
+            label: 'Wind chart',
+            data: speedArr,
+            backgroundColor: "red",
+            borderColor: "red",
+            fill: false,
+            borderWidth: 0.5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+}
+
+
 
 
 

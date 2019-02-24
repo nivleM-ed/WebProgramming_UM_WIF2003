@@ -18,5 +18,6 @@
   "homepage": "https://github.com/nivleM-ed/WebProgramming_UM_WIF2003#readme",
   "dependencies": {
     "xmlhttprequest": "^1.8.0"
-  }
+  },
+  "devDependencies": {}
 }
