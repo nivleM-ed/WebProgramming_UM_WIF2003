@@ -21,25 +21,25 @@
                 </li>
               </ul>
               <form class="form-inline mt-2 mt-md-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <input class="form-control mr-sm-2" type="text" id="cityId" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit" onclick="getWeather() ">Search</button>
               </form>
             </div>
           </nav>
     </header>
 </head>
 
-<main role="main">
-    <div class="container">
-            <input type="text" id="cityId">
+<!-- <main role="main">
+    <div style="padding: 10px; padding-top: 800px">
+            <input type="text" id="cityI">
             <button onclick="getWeather()">Get the weather</button>
-            <!-- <p id="date">Date</p> -->
+            <p id="date">Date</p>
             <p id="response">This is the country entered</p>
     </div>
-</main>
+</main> -->
 
 <body>
-    <div style="overflow:scroll; height:250px">
+    <div style="padding: 10px">
         <h1>Chart</h1>
         <!-- <button onclick="getChart()">Click here to show chart</button> -->
         <canvas id="myChart"></canvas>

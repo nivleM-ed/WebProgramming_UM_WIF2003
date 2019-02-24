@@ -58,12 +58,12 @@ var myChart = new Chart(ctx, {
     data: {
         labels: dateArr,
         datasets: [{
-            label: 'Wind chart',
+            label: 'Wind speed chart',
             data: speedArr,
             backgroundColor: "red",
             borderColor: "red",
             fill: false,
-            borderWidth: 0.5
+            borderWidth: 1
         }]
     },
     options: {
