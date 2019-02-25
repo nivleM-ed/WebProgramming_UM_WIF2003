@@ -21,7 +21,7 @@ function getWeather() {
             response = xhr.responseText;
             myRes = JSON.parse(response);
             console.log(myRes);
-            document.getElementById("response").innerHTML = myRes.city.name;
+            // document.getElementById("response").innerHTML = myRes.city.name;
             
             getDataArr();
             getChart();
