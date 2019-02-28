@@ -1,25 +1,17 @@
 
-//to be uncommented to use in vscode
-// var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
-// var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
-// // var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
-// var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-// var CITY = document.getElementById("city").value;
-// // var CITY = "Malaysia";
-// var URL = API_URL.concat(CITY,API_KEY);
 var response, myRes;
 var dateArr = new Array();
 var weatherArr = new Array();
 var speedArr = new Array();
 
-function getData() {
+//to get data(city) from user and get api json file 
+function getWeatherData() {
     var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
-// var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
-var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-var CITY = document.getElementById("city").value;
-// var CITY = "Malaysia";
-var URL = API_URL.concat(CITY,API_KEY);
+    // var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
+    var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
+    var CITY = document.getElementById("city").value;
+    var URL = API_URL.concat(CITY,API_KEY);
     getWeather(URL);
 }
 
@@ -31,14 +23,11 @@ function getWeather(URL) {
             response = xhr.responseText;
             myRes = JSON.parse(response);
             console.log(myRes);
-            // document.getElementById("response").innerHTML = myRes.city.name;
-            console.log(document.getElementById("city").value);             
-            // console.log(CITY);
+            console.log(document.getElementById("city").value);  
             getDataArr();
             getChart();
         } else {
             console.log(document.getElementById("city").value);
-            // console.log(CITY);
             console.log('The request failed!');
         }
     };
@@ -47,25 +36,27 @@ function getWeather(URL) {
     xhr.send();   
 }
 
+//change the response file from api endpoint to array
+//weatherArr - list of weather descriptions on the respective date
+//dateArr - date of the weather
+//speedArr - speed of wind on the respective date
 function getDataArr() {
     for(var i=0; i<myRes.list.length; i++) {
         weatherArr[i] = myRes.list[i].weather[0].description;
-        // console.log(weatherArr[i]);
     }
 
     for(var i=0; i<myRes.list.length; i++) {
         dateArr[i] = myRes.list[i].dt_txt;
-        // console.log(dateArr[i]);
     }
 
     for(var i=0; i<myRes.list.length; i++) {
         speedArr[i] = myRes.list[i].wind.speed;
-        // console.log(speedArr[i]);
     }
 }
 
 function getChart() {
 var ctx = document.getElementById("myChart").getContext('2d');
+document.getElementById("myChart").setAttribute("style", "border-style: solid");
 var myChart = new Chart(ctx, {
     type: 'line',
     data: {
