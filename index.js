@@ -26,6 +26,7 @@ function getWeather() {
             getDataArr();
             getChart();
         } else {
+            console.log(document.getElementById("cityId".value));
             console.log('The request failed!');
         }
     };
