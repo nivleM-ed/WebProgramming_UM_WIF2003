@@ -2,18 +2,28 @@
 //to be uncommented to use in vscode
 // var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
-var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
-// var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
-var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-var CITY = document.getElementById("cityId").value;
-// var CITY = "Malaysia";
-var URL = API_URL.concat(CITY,API_KEY);
+// var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
+// // var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
+// var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
+// var CITY = document.getElementById("city").value;
+// // var CITY = "Malaysia";
+// var URL = API_URL.concat(CITY,API_KEY);
 var response, myRes;
 var dateArr = new Array();
 var weatherArr = new Array();
 var speedArr = new Array();
 
-function getWeather() {
+function getData() {
+    var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
+// var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
+var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
+var CITY = document.getElementById("city").value;
+// var CITY = "Malaysia";
+var URL = API_URL.concat(CITY,API_KEY);
+    getWeather(URL);
+}
+
+function getWeather(URL) {
         xhr.onload = function () {
 
         // Process our return data
@@ -22,11 +32,13 @@ function getWeather() {
             myRes = JSON.parse(response);
             console.log(myRes);
             // document.getElementById("response").innerHTML = myRes.city.name;
-            
+            console.log(document.getElementById("city").value);             
+            // console.log(CITY);
             getDataArr();
             getChart();
         } else {
-            console.log(document.getElementById("cityId".value));
+            console.log(document.getElementById("city").value);
+            // console.log(CITY);
             console.log('The request failed!');
         }
     };
