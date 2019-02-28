@@ -5,7 +5,7 @@ var xhr = new XMLHttpRequest();
 var API_KEY = "&appid=1afaa7bb7768fa072efe7edd746a72ae";
 // var API_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
 var API_URL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-var CITY = document.getElementById("cityId").value;
+var CITY = document.getElementById("city").value;
 // var CITY = "Malaysia";
 var URL = API_URL.concat(CITY,API_KEY);
 var response, myRes;
@@ -22,11 +22,12 @@ function getWeather() {
             myRes = JSON.parse(response);
             console.log(myRes);
             // document.getElementById("response").innerHTML = myRes.city.name;
-            
+            console.log(document.getElementById("city").value);
             getDataArr();
             getChart();
         } else {
-            console.log(document.getElementById("cityId".value));
+            console.log(CITY);
+            console.log(document.getElementById("city").value);
             console.log('The request failed!');
         }
     };
