@@ -1,0 +1,24 @@
+    <!-- Footer -->
+    <footer id="footer">
+    <div class="inner">
+        <h2>Get In Touch</h2>
+        <ul class="actions">
+            <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li>
+            <li><span class="icon fa-envelope"></span> <a href="#">information@untitled.tld</a></li>
+            <li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>
+        </ul>
+    </div>
+    <div class="copyright">
+        Copyright &copy; reserved 2019 TripIt.Co
+    </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
+</html>

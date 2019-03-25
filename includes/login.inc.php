@@ -8,13 +8,13 @@ if(isset($_POST['login-submit'])){
     $password = $_POST['pwd'];
 
     if(empty($mailuid) || empty($password)){
-        header("Location: ../index.php?error=emptyfields");
+        header("Location: ../login.php?error=emptyfields");
         exit();
     } else {
-        $sql = "SELECT * FROM users WHERE uidUsers=? OR emailUsers=?"; //placeholders is safer, two options: username OR email
+        $sql = "SELECT * FROM users WHERE emailUsers=? OR uidUsers=?"; //placeholders is safer, two options: username OR email
         $stmt = mysqli_stmt_init($conn); //initiate connection through $dbh.inc.php
         if(!mysqli_stmt_prepare($stmt,$sql)){ //test connection, if failed, generate error
-            header("Location: ../index.php?error=sqlerror"); //check if theres an error with sql
+            header("Location: ../login.php?error=sqlerror"); //check if theres an error with sql
             exit();
         } else {
             mysqli_stmt_bind_param($stmt,"ss",$mailuid,$password); //pass in parameters from users when they log in
@@ -23,20 +23,20 @@ if(isset($_POST['login-submit'])){
             if($row = mysqli_fetch_assoc($result)){//check if actually works
                 $passwordCheck = password_verify($password,$row['pwdUsers']); //check whether the password hashes match
                 if($passwordCheck == false){
-                    header("Location: ../index.php?error=wrongpwd");
+                    header("Location: ../login.php?error=wrongpwd");
                     exit();
                 } else if($passwordCheck == true){ //login sucessfull
                     session_start();
                     $_SESSION['userId'] = $row['idUsers'];
                     $_SESSION['userUid'] = $row['uidUsers'];
-                    header("Location: ../index.php?login=success");
+                    header("Location: ../index2.php?login=success");
                     exit();
                 } else {
-                    header("Location: ../index.php?error=wrongpwd");
+                    header("Location: ../login.php?error=wrongpwd");
                     exit();
                 }
             } else { //if no data from database
-                header("Location: ../index.php?error=nouser");
+                header("Location: ../login.php?error=nouser");
                 exit();
             }
         }

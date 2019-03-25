@@ -17,13 +17,27 @@
         <label>
           <span>Email</span>
           <input type="email" name="mailuid"/>
+          <?php
+            if(isset($_GET['error'])){
+              if($_GET['error'] == "nouser"){
+                  echo '<p style="color:red"><small>Email is not registered!</small></p>';
+              } 
+            }
+          ?>
         </label>
         <label>
           <span>Password</span>
           <input type="password" name="pwd"/>
+          <?php
+            if(isset($_GET['error'])){
+              if($_GET['error'] == "wrongpwd"){
+                  echo '<p style="color:red"><small>Password is incorrect!</small></p>';
+              } 
+            }
+          ?>
         </label>
         <p class="forgot-pass">Forgot password?</p>
-        <button type="button" class="submit" name="login-submit">Sign In</button>
+        <button type="submit" class="submit" name="login-submit">Sign In</button>
         </form>
       </div>
       <div class="sub-cont">
@@ -42,38 +56,47 @@
           </div>
         </div>
         <div class="form sign-up">
+          <form action="includes/signup.inc.php" method="post">
+          
+          <h2>Time to feel like home,</h2>
           <?php  
             if(isset($_GET['error'])){
               if($_GET['error'] == "emptyfields"){
-                  echo '<p style="color:red">Fill in all fields!</p>';
+                  echo '<p style="color:red; text-align:center;">Fill in all fields!</p>';
               } else if($_GET['error'] == "invaliduidemail"){
-                  echo '<p style="color:red">Invalid username and email!</p>';
-              } else if($_GET['error'] == "invaliduid"){
-                  echo '<p style="color:red">Invalid username!</p>';
-              } else if($_GET['error'] == "invalidmail"){
-                  echo '<p style="color:red">Invalid e-mail!</p>';
-              } else if($_GET['error'] == "passwordCheck"){
-                  echo '<p style="color:red">Your passwords do not match!</p>';
-              } else if($_GET['error'] == "usertaken"){
-                  echo '<p style="color:red">Username is already taken!</p>';
-              }
+                  echo '<p style="color:red; text-align:center;">Invalid username and email!</p>';
+              } 
             } else if(isset($_GET['signup'])){
                 if($_GET['signup'] == "success"){
-                    echo '<p style="color:green">Signup successfull!</p>';
+                    echo '<p style="color:green; text-align:center">Signup successfull!</p>';
                 }
             } else {
                 echo '';
             }
           ?>
-          <form action="includes/signup.inc.php" method="post">
-          <h2>Time to feel like home,</h2>
           <label>
             <span>Username</span>
             <input type="text" name="uid"/>
+            <?php
+              if(isset($_GET['error'])){
+                if($_GET['error'] == "invaliduid"){
+                    echo '<p style="color:red; text-align:center;"><small>Invalid username!</small></p>';
+                } 
+              }
+            ?>
           </label>
           <label>
             <span>Email</span>
             <input type="email" name="mail"/>
+            <?php
+              if(isset($_GET['error'])){
+                if($_GET['error'] == "invalidmail"){
+                    echo '<p style="color:red; text-align:center;"><small>Invalid e-mail!</small></p>';
+                } else if($_GET['error'] == "usertaken"){
+                    echo '<p style="color:red; text-align:center;"><small>Username is already taken!</small></p>';
+                }
+              }
+            ?>
           </label>
           <label>
             <span>Password</span>
@@ -82,21 +105,27 @@
           <label>
           <span>Repeat Password</span>
             <input type="password" name="pwd-repeat"/>
+            <?php
+              if(isset($_GET['error'])){
+                if($_GET['error'] == "passwordCheck"){
+                    echo '<p style="color:red; text-align:center;"><small>Your passwords do not match!</small></p>';
+                } 
+              }
+            ?>
           </label>
-          <button type="button" class="submit" name="signup-submit">Sign Up</button>
+          <button type="submit" class="submit" name="signup-submit">Sign Up</button>
           </form>
         </div>
       </div>
     </div>
 
-<!-- Scripts -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/jquery.scrolly.min.js"></script>
-<script src="assets/js/skel.min.js"></script>
-<script src="assets/js/util.js"></script>
-<script src="assets/js/main.js"></script>
-<script src="assets/js/login.js"></script>
+  <!-- Scripts -->
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/jquery.scrolly.min.js"></script>
+  <script src="assets/js/skel.min.js"></script>
+  <script src="assets/js/util.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/login.js"></script>
 
-<?php include 'database.php';?>
 </body>
 </html>
