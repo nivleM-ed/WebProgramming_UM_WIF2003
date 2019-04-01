@@ -1,6 +1,6 @@
 <?php
 
-if(isset($_POST['login-submit'])){
+if(isset($_POST['signin'])){
 
     require 'dbh.inc.php';
 
@@ -29,7 +29,7 @@ if(isset($_POST['login-submit'])){
                     session_start();
                     $_SESSION['userId'] = $row['idUsers'];
                     $_SESSION['userUid'] = $row['uidUsers'];
-                    header("Location: ../index2.php?login=success");
+                    header("Location: ../index.php?login=success");
                     exit();
                 } else {
                     header("Location: ../login.php?error=wrongpwd");
