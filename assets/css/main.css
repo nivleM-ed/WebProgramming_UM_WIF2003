@@ -2810,6 +2810,7 @@
 		visibility: hidden;
 		width: 20em;
 		z-index: 10002;
+		text-decoration:none;
 		
 	}
 
@@ -2820,6 +2821,7 @@
 			#menu > ul.links {
 				list-style: none;
 				padding: 0;
+				text-decoration: none;
 			}
 
 				#menu > ul.links > li {
@@ -2846,6 +2848,7 @@
 
 			#menu > ul.actions {
 				display: none;
+				text-decoration: none;
 			}
 
 		#menu .close {
@@ -2867,6 +2870,7 @@
 			text-align: right;
 			top: 0;
 			vertical-align: middle;
+			text-decoration: none;
 			width: 7em;
 		}
 
@@ -2878,6 +2882,7 @@
 				font-style: normal;
 				font-weight: normal;
 				text-transform: none !important;
+				text-decoration: none;
 			}
 
 			#menu .close:before {
@@ -2886,6 +2891,7 @@
 
 			#menu .close:hover {
 				color: #ffffff;
+				text-decoration: none;
 			}
 
 			@media screen and (max-width: 736px) {
@@ -4065,7 +4071,6 @@ button:focus {
 body
 {
   font-family: 'Roboto', sans-serif;
-  overflow: hidden;
   background: #d22222;;
 }
 
