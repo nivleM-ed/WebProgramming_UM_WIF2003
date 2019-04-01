@@ -1,263 +1,174 @@
-//global variables
-var monthEl = $(".c-main");
-var dataCel = $(".c-cal__cel");
-var dateObj = new Date();
-var month = dateObj.getUTCMonth() + 1;
-var day = dateObj.getUTCDate();
-var year = dateObj.getUTCFullYear();
-var monthText = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-var indexMonth = month;
-var todayBtn = $(".c-today__btn");
-var addBtn = $(".js-event__add");
-var saveBtn = $(".js-event__save");
-var closeBtn = $(".js-event__close");
-var winCreator = $(".js-event__creator");
-var inputDate = $(this).data();
-today = year + "-" + month + "-" + day;
-
-// ------ set default events -------
-function defaultEvents(dataDay, dataName, dataNotes, classTag) {
-  var date = $("*[data-day=" + dataDay + "]");
-  date.attr("data-name", dataName);
-  date.attr("data-notes", dataNotes);
-  date.addClass("event");
-  date.addClass("event--" + classTag);
-}
-
-defaultEvents(today, "YEAH!", "Today is your day", "important");
-defaultEvents(
-  "2017-12-25",
-  "MERRY CHRISTMAS",
-  "A lot of gift!!!!",
-  "festivity"
-);
-defaultEvents("2017-05-04", "LUCA'S BIRTHDAY", "Another gifts...?", "birthday");
-defaultEvents(
-  "2017-03-03",
-  "MY LADY'S BIRTHDAY",
-  "A lot of money to spent!!!!",
-  "birthday"
-);
-
-// ------ functions control -------
-
-//button of the current day
-todayBtn.on("click", function() {
-  if (month < indexMonth) {
-    var step = indexMonth % month;
-    movePrev(step, true);
-  } else if (month > indexMonth) {
-    var step = month - indexMonth;
-    moveNext(step, true);
-  }
-});
-
-//higlight the cel of current day
-dataCel.each(function() {
-  if ($(this).data("day") === today) {
-    $(this).addClass("isToday");
-    fillEventSidebar($(this));
-  }
-});
-
-//window event creator
-addBtn.on("click", function() {
-  winCreator.addClass("isVisible");
-  $("body").addClass("overlay");
-  dataCel.each(function() {
-    if ($(this).hasClass("isSelected")) {
-      today = $(this).data("day");
-      document.querySelector('input[type="date"]').value = today;
-    } else {
-      document.querySelector('input[type="date"]').value = today;
+Vue.component('item-preview', {
+  template: "#item-preview-template",
+  props: [
+    'icon',
+    'title',
+    'subtitle',
+    'date',
+    'qtySummary',
+    'image',
+    'note',
+    'time'
+  ],
+  data: function() {
+    return {
+      
     }
-  });
-});
-closeBtn.on("click", function() {
-  winCreator.removeClass("isVisible");
-  $("body").removeClass("overlay");
-});
-saveBtn.on("click", function() {
-  var inputName = $("input[name=name]").val();
-  var inputDate = $("input[name=date]").val();
-  var inputNotes = $("textarea[name=notes]").val();
-  var inputTag = $("select[name=tags]")
-    .find(":selected")
-    .text();
+  },
+})
 
-  dataCel.each(function() {
-    if ($(this).data("day") === inputDate) {
-      if (inputName != null) {
-        $(this).attr("data-name", inputName);
-      }
-      if (inputNotes != null) {
-        $(this).attr("data-notes", inputNotes);
-      }
-      $(this).addClass("event");
-      if (inputTag != null) {
-        $(this).addClass("event--" + inputTag);
-      }
-      fillEventSidebar($(this));
+Vue.component('item-form', {
+  template: '#item-form-template',
+  props: ['recent'],
+  data: function() {
+    return {
+      $tabs: null,
+      activeTab: 'itinerary'
     }
-  });
-
-  winCreator.removeClass("isVisible");
-  $("body").removeClass("overlay");
-  $("#addEvent")[0].reset();
-});
-
-//fill sidebar event info
-function fillEventSidebar(self) {
-  $(".c-aside__event").remove();
-  var thisName = self.attr("data-name");
-  var thisNotes = self.attr("data-notes");
-  var thisImportant = self.hasClass("event--important");
-  var thisBirthday = self.hasClass("event--birthday");
-  var thisFestivity = self.hasClass("event--festivity");
-  var thisEvent = self.hasClass("event");
-
-  switch (true) {
-    case thisImportant:
-      $(".c-aside__eventList").append(
-        "<p class='c-aside__event c-aside__event--important'>" +
-          thisName +
-          " <span> • " +
-          thisNotes +
-          "</span></p>"
-      );
-      break;
-    case thisBirthday:
-      $(".c-aside__eventList").append(
-        "<p class='c-aside__event c-aside__event--birthday'>" +
-          thisName +
-          " <span> • " +
-          thisNotes +
-          "</span></p>"
-      );
-      break;
-    case thisFestivity:
-      $(".c-aside__eventList").append(
-        "<p class='c-aside__event c-aside__event--festivity'>" +
-          thisName +
-          " <span> • " +
-          thisNotes +
-          "</span></p>"
-      );
-      break;
-    case thisEvent:
-      $(".c-aside__eventList").append(
-        "<p class='c-aside__event'>" +
-          thisName +
-          " <span> • " +
-          thisNotes +
-          "</span></p>"
-      );
-      break;
-  }
-}
-dataCel.on("click", function() {
-  var thisEl = $(this);
-  var thisDay = $(this)
-    .attr("data-day")
-    .slice(8);
-  var thisMonth = $(this)
-    .attr("data-day")
-    .slice(5, 7);
-
-  fillEventSidebar($(this));
-
-  $(".c-aside__num").text(thisDay);
-  $(".c-aside__month").text(monthText[thisMonth - 1]);
-
-  dataCel.removeClass("isSelected");
-  thisEl.addClass("isSelected");
-});
-
-//function for move the months
-function moveNext(fakeClick, indexNext) {
-  for (var i = 0; i < fakeClick; i++) {
-    $(".c-main").css({
-      left: "-=100%"
-    });
-    $(".c-paginator__month").css({
-      left: "-=100%"
-    });
-    switch (true) {
-      case indexNext:
-        indexMonth += 1;
-        break;
+  },
+  mounted: function() {
+    this.$tabs = $(this.$refs.tabs).find('.item');
+    this.$tabs.tab();
+    this.$tabs.tab('change tab', 'itinerary');
+    this.initExtras();
+  },
+  methods: {
+    initExtras: function() {
+      var $pricingList = $(this.$refs.pricing).find('.room-list').first();
+      
+      var template = `
+        <div class="input-delete">
+          <input type="text">
+          <a href="#"><i class="icon trash"></i></a>
+        </div>
+      `
+      
+      $(this.$refs.extrasAdd).on('click',function(){
+        var $newItem = $pricingList.find('.item').first().clone();
+        $newInput = $()
+        $newItem.find('.column').first()
+          .removeClass('transparent').addClass('opaque')
+          .html(template)
+        $pricingList.append($newItem);
+        $newItem.find('.input-delete a').on('click', function() {
+          $newItem.remove();
+        })
+      })
     }
   }
-}
-function movePrev(fakeClick, indexPrev) {
-  for (var i = 0; i < fakeClick; i++) {
-    $(".c-main").css({
-      left: "+=100%"
-    });
-    $(".c-paginator__month").css({
-      left: "+=100%"
-    });
-    switch (true) {
-      case indexPrev:
-        indexMonth -= 1;
-        break;
-    }
-  }
-}
+})
 
-//months paginator
-function buttonsPaginator(buttonId, mainClass, monthClass, next, prev) {
-  switch (true) {
-    case next:
-      $(buttonId).on("click", function() {
-        if (indexMonth >= 2) {
-          $(mainClass).css({
-            left: "+=100%"
-          });
-          $(monthClass).css({
-            left: "+=100%"
-          });
-          indexMonth -= 1;
+new Vue({
+  el: "#app",
+  
+  data: function() {
+    return {
+      $tabs: null,
+      tabs: [
+        {
+          key: "flight",
+          title: "Flight"
+        },
+        {
+          key: "hotel",
+          title: "Hotel"
+        },
+        {
+          key: "car",
+          title: "Car Hire"
+        },
+        {
+          key: "transfer",
+          title: "Transfer"
+        },
+        {
+          key: "other",
+          title: "Other"
         }
-        return indexMonth;
-      });
-      break;
-    case prev:
-      $(buttonId).on("click", function() {
-        if (indexMonth <= 11) {
-          $(mainClass).css({
-            left: "-=100%"
-          });
-          $(monthClass).css({
-            left: "-=100%"
-          });
-          indexMonth += 1;
-        }
-        return indexMonth;
-      });
-      break;
+      ],
+      items: {
+        wireframe1: {
+          type: 'Wireframe',
+          title: 'Title',
+          subtitle: 'Subtitle',
+          qtySummary: 'Quantity summary',
+          note: 'Note / Description',
+          image: 'http://via.placeholder.com/150x150'
+        },
+        wireframe2: {
+          type: 'Wireframe - No image',
+          title: 'Title',
+          subtitle: 'Subtitle',
+          qtySummary: 'Quantity summary',
+          note: 'Note / Description',
+        },
+        flight1: {
+          type: 'Flight - A to B',
+          icon: 'plane',
+          title: 'Dublin to London Heathrow',
+          subtitle: 'Ryanair flight FR123 from DUB to LHR. Economy.',
+          qtySummary: '2 Adults, 2 Young Adults',
+          note: 'Tickets to the departure loung have been included. This flight is ATOL protected.',
+          time: '00:00'
+        },
+        flight2: {
+          type: 'Flight - A to B to C',
+          icon: 'plane',
+          title: 'DUB - LHR - JFK',
+          subtitle: 'Aer Lingus from Dublin (DUB) to London Heathrow (LHR). Continuing on from London Heathrow to John F Kennedy (JFK).',
+          qtySummary: '2 Adults, 2 Young Adults',
+          note: 'Tickets to the departure loung have been included. This flight is ATOL protected.',
+          time: '00:00'
+        },
+        hotel: {
+          type: 'Hotel',
+          icon: 'hotel',
+          title: 'Hilton Garden Inn Veracruz Boca del Rio',
+          subtitle: 'Blvd. Manuel Avila Camacho Lote 5 y 6 Costa de Oro, , Veracruz, Veracruz, 94299, Mexico',
+          qtySummary: '7 nights stay for 2 Adults, 2 Young Adults',
+          note: 'A contemporary hotel, just minutes from gourmet restaurants, lively bars and vibrant nightlife, Hilton Garden Inn Boca del Rio Veracruz features direct access to the inviting soft sands of Boca del Rio Beach. Guests can enjoy easy access to the World Trade Center, just five minutes away, and the airport - only a 25 minute drive from our stylish hotel in Boca del Rio. Visit nearby attractions including the Port of Veracruz, the Aquarium of Veracruz and Isla de Sacrificios.Sip a chilled drink from your refrigerator as you admire beautiful sea views from a spacious guest room or suite at this Boca del Rio hotel. Enjoy amenities including complimentary WiFi, an ergonomic desk, an HDTV, a microwave and an MP3 alarm clock radio.Print documents and surf the web in the complimentary 24-hour business center and hold a business or social event for up to 400 people at this Veracruz hotel with 3160 sq. ft. flexible meeting space. Whether it\'s for a conference, training seminar or wedding reception, our dedicated team will be happy to help ensure the success of your event.',
+          image: 'http://bookabed.ivector.co.uk/Content/DataObjects/ThirdPartyProperty/img/1/001/025/824/396/image_005437a_hb_ba_006.jpg'
+        },
+        car: {
+          type: 'Car',
+          icon: 'car',
+          title: 'Ford Fiesta Pickup',
+          subtitle: 'Ford Fiesta or similar pickup from John F. Kennedy airport',
+          note: 'Only drivers with a valid license will be able to drive this car.',
+          time: '14:25'
+        },
+        transfer: {
+          type: 'Transfer',
+          icon: 'train',
+          title: 'Limo Transfer',
+          subtitle: 'John F. Kennedy Airport to Fitzpatrick Hotel, Manhattan',
+          note: 'The driver will be waiting at the airport with a big sign. Can\'t miss him. Paul, lovely fella.',
+          time: '18:25'
+        },
+        other: {
+          type: 'Other',
+          icon: 'ticket',
+          title: 'Grand Canyon Helicopter Ride',
+          subtitle: 'Trip over the grand canyon in a helicopter',
+          note: 'Must be over 13 years of age',
+          time: '12:25'
+        },
+      }
+    }
+  },
+  
+  mounted: function() {
+    this.$tabs = $(this.$refs.tabs).find('.item');
+    this.$tabs.tab();
+    this.$tabs.tab('change tab', 'transfer');
+    this.flightTab();
+  },
+  
+  methods: {
+    flightTab: function() {
+      $('.toggle-flight-form').on('click', function(){
+        $('#flight-itinerary-type-select, #manual-flight-form').toggleClass('hide')
+      })
+    }
   }
-}
-
-buttonsPaginator("#next", monthEl, ".c-paginator__month", false, true);
-buttonsPaginator("#prev", monthEl, ".c-paginator__month", true, false);
-
-//launch function to set the current month
-moveNext(indexMonth - 1, false);
-
-//fill the sidebar with current day
-$(".c-aside__num").text(day);
-$(".c-aside__month").text(monthText[month - 1]);
+})

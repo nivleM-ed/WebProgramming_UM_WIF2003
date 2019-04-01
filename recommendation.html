@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="assets/css/main.css" />
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
 
 </head>
@@ -75,48 +76,54 @@
             
             <div class="container-contact100">
                 <div class="wrap-contact100">
-                  <form class="contact100-form validate-form">
+                  
                     
-            
-                    <div class="wrap-input100 validate-input bg1">
-                      <span class="label-input100">Country</span>
-                      <input class="input100" type="text" name="country" placeholder="Enter Country">
-                    </div>
+                      <div class="form-group row">
+                          <label for="inputDestination" class="col-sm-2 col-form-label">Destination:</label>
+                          <div class="col-sm-10">
+                            <input class="form-control" type="text" name="city" style="border:1px solid #ccc; border-radius:8px;height:100%;" placeholder="Enter Your Destination">
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                        <label for="inputCity" class="col-sm-2 col-form-label">City:</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" name="city" style="border:1px solid #ccc; border-radius:8px;height:100%;" placeholder="Enter City">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                          <label for="inputCity" class="col-sm-2 col-form-label">Trip Type:</label>
+                          <div class="col-sm-10">
+                              <select class="form-control" name="service">
+                                  <option value="" hidden>--Please chooses--</option>
+                                  <option data-label="#" value="place">Places</option>
+                                  <option data-label="#" value="tours">Tours</option>
+                                  <option data-label="#" value="event">Events</option>
+                                  <option data-label="#" value="hotel">Hotels</option>
+                                  <option data-label="#" value="guide" selected="selected">Guides</option>
+                                </select>
+                                <div class="dropDownSelect2"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-                    <div class="wrap-input100 validate-input bg1">
-                        <span class="label-input100">City</span>
-                        <input class="input100" type="text" name="city" placeholder="Enter City">
-                      </div>
-                                          
-                      <div class="wrap-input100 input100-select bg1">
-                        <span class="label-input100">Trip type</span>
-                        <div>
-                          <select class="js-select2" name="service">
-                            <option value="" hidden>--Please chooses--</option>
-                            <!-- trip type; historical, -->
-                          </select>
-                          <div class="dropDownSelect2"></div>
-                        </div>
-                      </div>
-                                            
-                        <div class="wrap-contact100-form-range">
-                          <span class="label-input100">Price Range</span>
-              
-                          <div class="contact100-form-range-value">
-                            RM<span id="value-lower">0</span> - RM<span id="value-upper">1000</span>
-                            <!-- will use range slider or textbox-->
-                            <input type="text" name="from-value">
-                            <input type="text" name="to-value">
-                          </div>
-              
-                          <div class="contact100-form-range-bar">
-                            <div id="filter-bar"></div>
-                          </div>
-                        </div>
-                      
-                                            
+                        <div class="form-group row">
+                            <label for="inputPrice" class="col-sm-2 col-form-label" style="margin-left:-5px">Price Range:</label>
+                            <div class="col-sm-10">
+                            <div style=" margin-left:-38px">
+                                  <input type="number" min=0 max="9900" oninput="validity.valid||(value='0');" id="min_price" class="price-range-field" />
+                                  <input type="number" min=0 max="10000" oninput="validity.valid||(value='10000');" id="max_price" class="price-range-field" />
+                                </div>
+                                <small id="passwordHelpBlock" class="form-text text-muted" style="float:left; margin-left:40px;">
+                                    Your price range must be from RM0 to RM1000
+                                  </small>
+                              </div>
+                              </div>
+                              </div>
+                            </div>
+         
                       <div class="container-contact100-form-btn">
-                        <button class="contact100-form-btn">
+                        <button class="contact100-form-btn col-sm-2 col-form-label" style=" float:left; margin-left:40px;width:30%;">
                           <span>
                             Search
                           </span>
@@ -149,10 +156,18 @@
 
 <!-- Scripts -->
 <script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/slider.js"></script>
 <script src="assets/js/jquery.scrolly.min.js"></script>
 <script src="assets/js/skel.min.js"></script>
 <script src="assets/js/util.js"></script>
 <script src="assets/js/main.js"></script>
+<script src="assets/jquery/slider.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="freshslider.1.0.js"></script>
+
 
 </body>
 </html>

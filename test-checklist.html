@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <title>Checklist</title>
+  <link rel="stylesheet" href="assets/css/test-checklist.css">
+	<script type="text/javascript" src="jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="test-checklist.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet" type="text/css">
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+	
+</head>
+
+<body >
+    
+<div id="checklist" style="margin: 0 45% 0 65% ;">
+<br><br><br><br><br><br>
+    <div class="cl-header" >
+      <div class="contents clearfix">
+        <span class="header-title">Trip checklist</span>
+        <button class="header-btn add-custom-item large"> + Add item</button>
+      </div>
+    </div>
+
+    <div id="item-cl">
+
+      <div class="item-container">
+        <div class="item-box">
+          <input type="checkbox" class="cl-cb" id="check1"/>
+          <label for="check1"><div><i class="fa fa-check"></i></div>I like Juah!</label>
+          <span class="edit-btn side-btn" for="check1"></span> 
+          <span class="remv-btn side-btn" for="check1"></span>     
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modi-bg modi-edit">
+      <div class="modi-box">
+        <div class="modi-title" title>Edit Item</div>
+        <div class="modi-input">
+          <div class="modi-input-title">Item title</div>
+          <input type="text" name="title" class="modi-input-field" value="">
+        </div>
+        <div class="modi-btn">
+          <button class="btn modi-btn-save">Save</button>
+          <button class="btn modi-btn-cncl">Cancel</button>
+        </div>
+      </div>      
+    </div>
+    
+
+    <div class="modi-bg modi-add">
+      <div class="modi-box">
+        <div class="modi-title" title>Add Item</div>
+        <div class="modi-input">
+          <div class="modi-input-title">Item title</div>
+          <input type="text" name="title" class="modi-input-field" value="">
+        </div>
+        <div class="modi-btn">
+          <button class="btn modi-btn-save">Save</button>
+          <button class="btn modi-btn-cncl">Cancel</button>
+        </div>
+      </div>      
+    </div>
+
+
+
+
+</div>
+</body>
+</html>
