@@ -1,0 +1,289 @@
+.cl-header{
+    height:90px;
+}
+
+.cl-header .contents {
+    top: 24px;
+    position: relative;
+}
+
+.cl-header .contents .header-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #333;
+    width: 297px;
+    float: left;
+    position: relative;
+}
+
+body {
+    font-family: 'Lato',sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.cl-header .contents button {
+    float: right;
+    width: 137px;
+}
+
+.header-btn.large {
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+body .header-btn {
+    background: #f6755e;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    padding: 0 15px;
+    font-style: normal;
+    font-weight: 700;
+    outline: 0;
+    border-radius: 100px;
+    letter-spacing: 0;
+    transition: background-color .3s ease;
+}
+
+body .header-btn {
+    background: #f6755e;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    padding: 0 15px;
+    font-style: normal;
+    font-weight: 700;
+    outline: 0;
+    border-radius: 100px;
+    letter-spacing: 0;
+    transition: background-color .3s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css);
+
+
+.item-container {
+  background: #fff;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  border: solid 1px #f0eded;
+  padding: 10px 0;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.item-box {
+  width:100%;
+  margin: auto;
+  padding: 10px 20px 10px;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/*CHECKBOX*/
+.cl-cb{ display:none; }
+
+label div{
+	width:23px;
+	height:23px;
+	display:inline-block;
+	border:2px solid #ddd;
+	text-align:center;
+	line-height:20px;
+	margin-right:6px;	
+	border-radius:100px;
+  cursor:pointer;
+  float: none;
+}
+
+label{  	
+  font-family: 'Lato',sans-serif;
+  color: #333;
+  font-size: 15px;
+  cursor: pointer; 
+}
+
+label i{ 
+  font-size:16px;	
+  opacity:0; 
+}
+
+input:checked+label i{ 
+  opacity:1; 
+}
+input:checked+label div{ 
+  background:#3bddbd; 
+  border:2px solid #3bddbd;
+  color: #fff;
+}
+
+/* Style buttons */
+.side-btn {
+  background-color: rgba(0, 0, 0, 0); /* Blue background */
+  border: none; /* Remove borders */
+  color: rgb(144, 144, 144); /* White text */
+  font-size: 12px; /* Set a font size */
+  cursor: pointer; /* Mouse pointer on hover */
+  float:right;
+  vertical-align: sub;
+  padding-left: 10px;
+  vertical-align: sub;
+  font-family: 'Lato',sans-serif;
+}
+
+.edit-btn:before{
+  content:"edit";
+}
+
+.remv-btn:before{
+  content:"remove";
+}
+
+.side-btn:focus {outline:0;}
+
+.side-btn:hover {color:#333; font-weight: 200;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css);
+
+body {
+  font-family: 'Lato',sans-serif;
+  color: #333;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.modi-bg{
+  display:none;
+  background:rgb(0, 0, 0, 0.4);
+  position:fixed;
+  left:0;
+  top:0;
+  right:0;
+  bottom:0;
+  
+  overflow:auto;
+  z-index: 50;
+}
+
+.modi-box{
+  margin: 10% auto;
+  background: #ffffff;
+  height: auto;
+  width: 60%;
+  display: block; 
+  padding: 42px 30px 30px;  
+  border: 1px solid #c5c5c5;
+  z-index: 1;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,0.4);
+}
+
+.modi-title {
+  font-size: 26px;
+  font-weight: 900;
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.modi-container{
+  margin-top: 15px;
+  width: 100%;
+}
+
+.modi-input-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.modi-input-field{
+  border: 1px solid #ddd;
+  background-color: #f1f1f1;
+  border-radius:15px;
+  height: 40px;
+  box-shadow: none;
+  font-size: 16px;
+  padding: 0 16px;
+  width: 100%;
+  color: #333;
+  outline: 0;
+}
+
+
+
+
+
+
+
+
+
+.modi-btn{
+  margin: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn  {
+  background: #f6755e;
+  color: #fff;
+  width: 100px;
+  height: 36px;
+
+  text-align: center;
+  cursor: pointer;
+  border: 0;
+  padding: 0 15px;
+  font-weight: 700;
+  border-radius: 100px;
+  letter-spacing: 0;  
+  font-size: 15px;
+  outline: 0;
+}
+
+.modi-btn-cncl {
+  background: #ddd;
+  margin-left:5px;
+}
