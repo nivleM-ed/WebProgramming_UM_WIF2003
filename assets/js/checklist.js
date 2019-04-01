@@ -18,7 +18,7 @@ $(document).ready(function () {
 		$("#item-cl").append('<div class="item-container">' +
 			'<div class="item-box">' +
 			'<input type="checkbox" class="cl-cb" id="check' + count + '"/>' +
-			'<label for="check' + count + '"><div><i class="fa fa-check"></i></div>' + value + '</label>' +
+			'<label for="check' + count + '">' + value + '</label>' +
 			'<span class="edit-btn side-btn" for="check' + count + '"></span>' +
 			'<span class="remv-btn side-btn" for="check' + count + '"></span>' +
 			'</div>' +
@@ -60,36 +60,5 @@ $(document).ready(function () {
 		$(".modi-edit").fadeOut(300);
 		$(".modi-edit .modi-input-field").val("");
 	});
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-$(document).ready(function () {
-
-
-
-
-});
-
-$(document).ready(function () {
 
 });

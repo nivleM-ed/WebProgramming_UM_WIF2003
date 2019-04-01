@@ -4,20 +4,25 @@
 <head>
   <title>Plan It</title>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="assets/css/main.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--CSS-->
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/route.css">
+  <link rel="stylesheet" href="assets/css/test-checklist.css">
+  <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Alex+Brush" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <!--Font Awesome Icons CDN-->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
     integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link rel="stylesheet" href="assets/css/test-checklist.css">
-  <script type="text/javascript" src="assets/js/jquery-3.3.1.js"></script>
-  <script type="text/javascript" src="assets/js/test-checklist.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet" type="text/css">
-  <link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
-
+  <!--Boostrap CDN-->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
 <body>
@@ -35,40 +40,29 @@
 
   <!-- Banner -->
   <section id="banner">
-    <div class="content">
-      <h1>Weather forecast</h1>
+    <div>
+      <h1>Weather Forecast</h1>
       <!-- modal -->
-      <button>view weather</button>
-      <div class="modal-overlay">
-        <div class="modal">
-
-          <a class="close-modal">
-            <svg viewBox="0 0 20 20">
-              <path fill="#000000"
-                d="M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4.711C16.172,4.759,16.172,4.317,15.898,4.045z">
-              </path>
-            </svg>
-          </a><!-- close modal -->
-
+      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
+        Weather</button>
+      <!-- Modal -->
+      <div id="weatherModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <!-- Modal content-->
           <div class="modal-content">
-            <a class="weatherwidget-io" href="https://forecast7.com/en/4d21101d98/malaysia/" data-label_1="MALAYSIA"
-              data-label_2="WEATHER" data-icons="Climacons Animated" data-mode="Forecast" data-days="3"
-              data-theme="pure">MALAYSIA WEATHER</a>
-            <script>
-              ! function (d, s, id) {
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (!d.getElementById(id)) {
-                  js = d.createElement(s);
-                  js.id = id;
-                  js.src = 'https://weatherwidget.io/js/widget.min.js';
-                  fjs.parentNode.insertBefore(js, fjs);
-                }
-              }(document, 'script', 'weatherwidget-io-js');
-            </script>
-          </div><!-- content -->
-
-        </div><!-- modal -->
-      </div><!-- overlay -->
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+              <p>Some text in the modal.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -96,18 +90,14 @@
             </div>
 
             <div id="item-cl">
-
               <div class="item-container">
                 <div class="item-box">
                   <input type="checkbox" class="cl-cb" id="check1" />
-                  <label for="check1">
-                    <div><i class="fa fa-check"></i></div>Buy Ticket
-                  </label>
+                  <label for="check1">Buy Ticket</label>
                   <span class="edit-btn side-btn" for="check1"></span>
                   <span class="remv-btn side-btn" for="check1"></span>
                 </div>
               </div>
-
             </div>
 
             <div class="modi-bg modi-edit">
@@ -123,7 +113,6 @@
                 </div>
               </div>
             </div>
-
 
             <div class="modi-bg modi-add">
               <div class="modi-box">
@@ -150,9 +139,9 @@
       <div class="inner">
         <h2>Contact Us</h2>
         <ul class="actions">
-          <li><span class="icon fa-phone"></span> <a href="#">1300-88-2222</a></li>
-          <li><span class="icon fa-envelope"></span> <a href="#">information@planIt.com</a></li>
-          <li><span class="icon fa-map-marker"> </span>64, Hogwart Street, Neverland</li>
+          <li><span class="icon fa-phone"></span> <a href="#">012-3456789</a></li>
+          <li><span class="icon fa-envelope"></span> <a href="#">planIt.info@gmail.com</a></li>
+          <li><span class="icon fa-map-marker"> </span>69, KK13, University Malaya</li>
         </ul>
       </div>
       <div class="copyright">
@@ -160,25 +149,23 @@
       </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/slider.js"></script>
+    <!--Bootstrap & JQuery-->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"
+      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+    <!--Skel.io skeleton framework-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js"
+      integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
+    <!--Own Scripts-->
     <script src="assets/js/jquery.scrolly.min.js"></script>
-    <script src="assets/js/skel.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="assets/jquery/slider.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
-    </script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
-    </script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="freshslider.1.0.js"></script>
+    <script src="assets/js/checklist.js"></script>
   </main>
 </body>
 
