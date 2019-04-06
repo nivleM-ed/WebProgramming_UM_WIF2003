@@ -379,20 +379,35 @@
                 var name3=obj.results[2].name;
                 var address3=obj.results[2].vicinity;
                 var image3=obj.results[2].photos[0].photo_reference;
+                console.log(image1);
 
                 var name4=obj.results[3].name;
                 var address4=obj.results[3].vicinity;
                 var image4=obj.results[3].photos[0].photo_reference;
 
-                // var name5=obj.results[4].name;
-                // var address5=obj.results[4].vicinity;
+                var name5=obj.results[4].name;
+                var address5=obj.results[4].vicinity;
                 // var image5=obj.results[4].photos[0].photo_reference;
 
                 var name6=obj.results[5].name;
                 var address6=obj.results[5].vicinity;
                 var image6=obj.results[5].photos[0].photo_reference;
 
+                var a="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+image1+"&key=AIzaSyCAgHuErkre9M2HTV65j8bJSYY-zggTI2c";
+                var b="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+image2+"&key=AIzaSyCAgHuErkre9M2HTV65j8bJSYY-zggTI2c";
+                var c="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+image3+"&key=AIzaSyCAgHuErkre9M2HTV65j8bJSYY-zggTI2c";
+                var d="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+image4+"&key=AIzaSyCAgHuErkre9M2HTV65j8bJSYY-zggTI2c";
+                var e="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+image5+"&key=AIzaSyCAgHuErkre9M2HTV65j8bJSYY-zggTI2c";
+                var f="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+image6+"&key=AIzaSyCAgHuErkre9M2HTV65j8bJSYY-zggTI2c";
 
+                console.log(a);
+                // $('#image1').attr('src',a);
+                // $('#image2').attr('src',b);
+                document.getElementById('image3').src = c;
+
+
+                document.getElementById("image1").innerHTML = '<img src = "/images/sydney.jpg" height="100%" width="100%">';
+                document.getElementById("image2").innerHTML = '<img src = "https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.androidcentral.com%2Fsites%2Fandroidcentral.com%2Ffiles%2Fstyles%2Fxlarge%2Fpublic%2Ffield%2Fimage%2F2018%2F06%2Fspider-man-hero-a7bo.jpg%3Fitok%3DnkJ3Oy7u&imgrefurl=https%3A%2F%2Fwww.androidcentral.com%2Fspider-man-which-playstation-4-should-you-buy&docid=5KEfsXbHwFhMjM&tbnid=84yXhVaz7sjdcM%3A&vet=10ahUKEwjU5-TR7LvhAhWt7nMBHYuYAzkQMwhqKAEwAQ..i&w=1600&h=900&bih=706&biw=1536&q=spiderman%20images&ved=0ahUKEwjU5-TR7LvhAhWt7nMBHYuYAzkQMwhqKAEwAQ&iact=mrc&uact=8" height="100%" width="100%">';
 
 
                 document.getElementById("name1").innerHTML=name1;
