@@ -30,17 +30,6 @@ session_start();
       <a href="#" class="#"><?php echo $_SESSION['userUid']?></a>
     </nav>
   </header>
-    <!-- Menu -->
-    <nav id="menu">
-        <ul class="links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="generic.html">Generic</a></li>
-            <li><a href="elements.html">Elements</a></li>
-        </ul>
-        <ul class="actions vertical">
-            <li><a href="#" class="button fit">Login</a></li>
-        </ul>
-    </nav>
     <!-- Banner -->
     <section id="banner">
         <div class="inner flex flex-3">
@@ -54,7 +43,7 @@ session_start();
                 </h5>
 
                 <!--If not logged in, sent to login page-->
-                <form method="POST">
+                <form method="POST" action="route.html">
                     <div class="form-row ">
                         <div class="col-md-3.2 mb-3">
                             <label for="validationDefault03" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Destination</label>

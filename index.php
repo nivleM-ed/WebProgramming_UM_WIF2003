@@ -27,17 +27,6 @@
             <a href="signup.php" class="button alt">Sign Up</a>
         </nav>
     </header>
-    <!-- Menu -->
-    <nav id="menu">
-        <ul class="links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="generic.html">Generic</a></li>
-            <li><a href="elements.html">Elements</a></li>
-        </ul>
-        <ul class="actions vertical">
-            <li><a href="#" class="button fit">Login</a></li>
-        </ul>
-    </nav>
     <!-- Banner -->
     <section id="banner">
         <div class="inner flex flex-3">
@@ -51,23 +40,29 @@
                 </h5>
 
                 <!--If not logged in, sent to login page-->
-                <form method="POST">
+                <form method="POST" action="login.php">
                     <div class="form-row ">
                         <div class="col-md-3.2 mb-3">
-                            <label for="validationDefault03" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Destination</label>
-                            <input type="text" class="form-control" id="inputCity" placeholder="Enter Destination" required style="border:1px solid #f1f1f1; border-radius:8px; background:#fff; opacity:1;">
+                            <label for="inputFrom" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Origin</label>
+                            <input type="text" class="form-control" id="inputFrom" placeholder="Enter Origin" required style="border:1px solid #f1f1f1; border-radius:8px; background:#fff; opacity:1;">
                         </div>
                         <div class="col-md-3.2 mb-3">
+                            <label for="inputTo" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Destination</label>
+                            <input type="text" class="form-control" id="inputTo" placeholder="Enter Destination" required style="border:1px solid #f1f1f1; border-radius:8px; background:#fff; opacity:1;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-3.2 mb-3">
                             <label for="validationDefault04" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Start Date</label>
-                            <input class="form-control" type="date" value="" id="example-date-input" style="height:70%;">
+                            <input class="form-control" type="date" value="" id="date-input" style="height:70% width:50%;">
                         </div>
                         <div class="col-md-3.2 mb-3">
                             <label for="validationDefault05" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">End Date</label>
-                            <input class="form-control" type="date" value="" id="example-date-input2" style="height:70%;">
+                            <input class="form-control" type="date" value="" id="date-input2" style="height:70% width:10%;">
                         </div>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary" style="margin-left:105%; margin-top:-20%; position:left;"><i class="fa fa-search"></i></button>
+                        <div class="col-md-3.2 mb-3">
+                            <button type="submit" class="btn btn-primary" style="margin-top:35%"><i class="fa fa-search"></i></button>
+                        </div>
                     </div>
                 </form>
             </div>
