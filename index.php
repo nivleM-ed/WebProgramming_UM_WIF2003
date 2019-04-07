@@ -20,7 +20,8 @@
     <!-- Header -->
     <header id="header">
         <nav class="left">
-            <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
+            <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt<sup>&copy</sup></a>
+            <a>Plan it with ease!</a>
         </nav>
         <nav class="right">
             <a href="login.php" class="button alt">Log in</a>
@@ -31,9 +32,8 @@
     <section id="banner">
         <div class="inner flex flex-3">
             <div class="align-left">
-
                 <h1 style="margin-top:-60px;text-shadow: 4px 4px 10px #222;">
-                    <bold>PlanIt your <br>next Journey</bold>
+                    <bold>PlanIt<sup>&copy</sup> your <br>next Journey</bold>
                 </h1>
                 <h5 style="margin-top:-20px;color:#fff;text-shadow: 2px 2px 8px #222;">
                     <bold>Create a fully customized day-by-day itinerary for free</bold>
@@ -75,19 +75,31 @@
             <div class="inner">
                 <h1>Trip with ease</h1>
                 <div>
-                    <p>Sign Up/Log In -&gt Insert Details -&gt Drag N Drop</p>
-                    <!-- isi Steps to use TripIt-->
+                    <img src="assets/images/planit_use.png" alt="" width="80%" height="80%">
                 </div>
             </div>
         </section>
 
         <!-- Two -->
         <section id="one" class="wrapper">
+            <div class="inner" style="text-align: center">
+                <h1>Benefits of PlanIt</h1>
+            </div>
+            
             <div class="inner flex flex-3">
-                <div class="flex-item left">
-                    <div>
-                        <h1>Benefits of PlanIt</h1>
-                    </div>
+            <img src="assets/images/one.png" alt="" width="20%" height="20%" style="float: right;">
+                <div class="flex-item right">
+                <img src="assets/images/one.png" alt="" width="10%">
+                    <p>
+                        <h4><br>Recommendation API that helps search the perfect vacation spot for you!</h4>
+                        <ul>
+                            <li>Best places and time to visit</li>
+                            <li>Best reviews</li>
+                            <li>Perfect price range</li>
+                            <li>Hidden spots</li>
+                        </ul>
+                    </p>
+
                 </div>
             </div>
         </section>
@@ -122,4 +134,4 @@
     <script src="assets/js/main.js"></script>
 </body>
 
-</html> 
+</html>

@@ -2804,6 +2804,10 @@ button:disabled,
 	text-align: right;
 }
 
+.flex.flex-3 .flex-item.right {
+	text-align: left;
+}
+
 @media screen and (max-width: 980px) {
 
 	.flex {
