@@ -11,12 +11,9 @@ session_start();
 
   <!--CSS-->
   <link rel="stylesheet" href="assets/css/main.css">
-  <!-- <link rel="stylesheet" href="assets/css/commoncss.css"> -->
-  <link rel="stylesheet" href="assets/css/resultpage.css">
-  <link rel="stylesheet" href="assets/css/editroute.css">
-  <link rel="stylesheet" href="assets/css/addroute.css">
+  <link rel="stylesheet" href="assets/css/menu.css">
   <link rel="stylesheet" href="assets/css/route.css">
-  <!-- <link rel="stylesheet" href="assets/css/route_full.css"> -->
+  <link rel="stylesheet" href="assets/css/route_full.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -26,9 +23,6 @@ session_start();
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <!--Boostrap CDN-->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <!--Imports/Includes-->
-  <!-- <link rel="imports" href="header.html"> -->
-
 </head>
 
 <body>
@@ -38,32 +32,35 @@ session_start();
       <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
-      <a href="#">New Plan</a>
       <a href="route.php">My Plan</a>
-      <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
+      <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
+      <a href="includes/logout.inc.php" class="#">Logout</a>
     </nav>
   </header>
 
   <!-- Banner -->
   <section id="banner">
     <div>
-      <h1 style="margin-top:-10%">Weather Forecast</h1>
-      <section class="wrapper">
-        <div class="align-center">
-          <a class="weatherwidget-io" style="width:70%;left:15%; position:center;" href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5" data-theme="pure">OSAKA WEATHER</a>
+      <h1 style="margin-top:-10%;">Weather Forecast</h1>
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+          <div class="container">
+            <canvas id="myChart" style="border-style: hidden;"></canvas>
+          </div>
         </div>
       </section>
     </div>
   </section>
 
   <main>
-    <ul class="menu">
-      <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
-      <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-      <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
-      <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
-      <li class="slider"></li>
-    </ul>
+    <nav id="nav-top">
+      <ul>
+        <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
+        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+        <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+      </ul>
+    </nav>
   </main>
 
   <main>
@@ -120,21 +117,21 @@ session_start();
                       <div class="line up"></div>
                     </div>
                     <div class="content">
-                      <div class="title">End: <?php echo $_SESSION['country_to'] ?></div>
+                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_to'] ?></div>
                     </div>
                   </div>
                 </div>
               </div>
               <!-- Add destination -->
               <div class="route-right-pane">
-                <button class="routeaddbtn add-destination cta-button large "> + Add destination</button>
+                <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
                 <div class="clearfix" style="background-color: #fff;"></div>
 
                 <div class="dest-rail active" style="display: block;">
                   <div class="see-also">Trip recommendation:</div>
                   <ul style="list-style: none; padding: 0;">
                     <li>
-                      <span class="tour-title">Get from reccomendations.</span>&nbsp;
+                      <span class="tour-title">Get from recomendations.</span>&nbsp;
                     </li>
                   </ul>
                 </div>
@@ -151,14 +148,14 @@ session_start();
                   </button>
                 </div>
 
-                <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto;">
+                <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
                   <input type="text" class="flat ui-autocomplete-input" name="search" id="dest-search" placeholder="Start typing..." autocomplete="off" title="Edit destination">
                 </div>
 
                 <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
                   <div class="ui-dialog-buttonset">
-                    <button type="button" class="editsavebtn ui-button ui-corner-all ui-widget" title="Save edit">Save</button>
-                    <button type="button" class="editremobtn ui-button ui-corner-all ui-widget" title="Remove destination">Remove</button>
+                    <button type="button" style="left: 30%;" class="editsavebtn cta-button large" title="Save edit">Save</button>
+                    <button type="button" style="left: 40%; background-color:red;" class="editremobtn cta-button large" title="Remove destination">Remove</button>
                   </div>
                 </div>
               </div>
@@ -170,17 +167,17 @@ session_start();
                   <span class="ui-dialog-title">Add destination</span>
                   <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="">
                     <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
-                    <span class="ui-button-icon-space"> </span>
+                    <span class="ui-button-icon-space"></span>
                   </button>
                 </div>
 
-                <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto;">
+                <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
                   <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
                 </div>
 
                 <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
                   <div class="ui-dialog-buttonset">
-                    <button type="button" class="addtoplan ui-button ui-corner-all ui-widget">Add to plan</button>
+                    <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
                   </div>
                 </div>
               </div>
@@ -215,22 +212,19 @@ session_start();
   <!--Skel.io skeleton framework-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
   <!--Own Scripts-->
+
   <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/checklist.js"></script>
+  <script src="assets/js/weather.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
   <script>
-    ! function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (!d.getElementById(id)) {
-        js = d.createElement(s);
-        js.id = id;
-        js.src = 'https://weatherwidget.io/js/widget.min.js';
-        fjs.parentNode.insertBefore(js, fjs);
-      }
-    }(document, 'script', 'weatherwidget-io-js');
+    var CITY = "<?php echo $_SESSION['country_to'] ?>";
+    getWeatherData(CITY);
   </script>
   <script type="text/javascript" src="assets/js/addroute.js"></script>
+
 </body>
 
 </html>

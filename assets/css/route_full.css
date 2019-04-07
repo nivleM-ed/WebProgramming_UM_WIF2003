@@ -2,7 +2,7 @@
 
 .ui-widget {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1em
+    font-size: 1em;
 }
 
 .ui-widget .ui-widget {
@@ -13,7 +13,7 @@
 .ui-widget select,
 .ui-widget textarea,
 .ui-widget button {
-    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: Arial, Helvetica, sans-serif; */
     font-size: 1em
 }
 
@@ -1486,7 +1486,6 @@
     min-width: 120px;
     width: auto
 }
-
 .bottom-pane .cta-button:first-child {
     margin-left: 0
 }
@@ -1807,7 +1806,7 @@
 
 .ui-dialog.dlg-add-travel-option .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
     text-transform: capitalize;
-    padding: 10px
+    padding: 10px;
 }
 
 .ui-dialog.dlg-add-travel-option input[type="text"] {
@@ -3485,17 +3484,6 @@
     animation: dialog-animation .3s forwards;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 .ui-widget-header {
     color: #333;
 }
@@ -3537,8 +3525,6 @@
     padding: 58px 85px 12px;
 }
 
-
-
 .ui-helper-clearfix:before,
 .ui-helper-clearfix:after {
     content: "";
@@ -3549,13 +3535,6 @@
 .ui-helper-clearfix:after {
     clear: both;
 }
-
-
-
-
-
-
-
 
 .ui-dialog .ui-dialog-title {
     float: left;
@@ -3604,23 +3583,6 @@
     font-weight: 900;
     line-height: 1.3;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .ui-widget input,
 .ui-widget select,
@@ -3682,13 +3644,6 @@
     width: 18px;
     height: 18px;
 }
-
-
-
-
-
-
-
 
 .ui-icon {
     display: inline-block;
@@ -3761,13 +3716,6 @@
     position: static;
 }
 
-
-
-
-
-
-
-
 .ui-dialog.dlg-route-edit .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon,
 .ui-dialog.dlg-attraction-tickets .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon,
 .ui-dialog.dlg-stay-review .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon,
@@ -3785,16 +3733,6 @@
 .ui-dialog.dlg-recalc .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon:hover {
     color: #009cde;
 }
-
-
-
-
-
-
-
-
-
-
 
 .ui-dialog.mediumx .ui-dialog-titlebar-close .ui-icon-closethick:before {
     width: 100%;
@@ -3832,22 +3770,6 @@
     transform: translate(-50%, 0);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 button,
 input,
 optgroup,
@@ -3883,14 +3805,14 @@ body .destination input[type=text].ui-autocomplete-input {
 }
 
 body .destination .tip.hidden~.ui-autocomplete-input {
-    padding-right: 10px
+    padding-right: 10px;
 }
 
 .ui-widget input,
 .ui-widget select,
 .ui-widget textarea,
 .ui-widget button {
-    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: Arial, Helvetica, sans-serif; */
     font-size: 1em;
 }
 
@@ -3902,7 +3824,7 @@ body .destination .tip.hidden~.ui-autocomplete-input {
 .ui-front textarea,
 .ui-widget button,
 .ui-front button {
-    font-family: 'Lato', sans-serif;
+    /* font-family: 'Lato', sans-serif; */
     font-size: 1.142em;
 }
 
@@ -4039,8 +3961,6 @@ body textarea.flat {
     padding: 58px 85px 12px;
 }
 
-
-
 .ui-helper-clearfix:before,
 .ui-helper-clearfix:after {
     content: "";
@@ -4051,13 +3971,6 @@ body textarea.flat {
 .ui-helper-clearfix:after {
     clear: both;
 }
-
-
-
-
-
-
-
 
 .ui-dialog .ui-dialog-title {
     float: left;
@@ -4102,7 +4015,7 @@ body textarea.flat {
 .ui-dialog.dlg-recalc .ui-dialog-titlebar .ui-dialog-title {
     font-style: normal;
     font-size: 1.714em;
-    font-family: 'Lato', sans-serif;
+    /* font-family: 'Lato', sans-serif; */
     font-weight: 900;
     line-height: 1.3;
 }
@@ -4147,13 +4060,6 @@ body textarea.flat {
     width: 18px;
     height: 18px;
 }
-
-
-
-
-
-
-
 
 .ui-icon {
     display: inline-block;
@@ -4431,3 +4337,53 @@ button.ui-button::-moz-focus-inner {
     border: 0;
     padding: 0
 }
+
+.ui-button,
+.ui-button:link,
+.ui-button:visited,
+.ui-button:hover,
+.ui-button:active {
+    text-decoration: none
+}
+
+.ui-button-icon-only {
+    width: 2em;
+    box-sizing: border-box;
+    text-indent: -9999px;
+    white-space: nowrap
+}
+
+input.ui-button.ui-button-icon-only {
+    text-indent: 0
+}
+
+.ui-button-icon-only .ui-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -8px;
+    margin-left: -8px
+}
+
+.ui-button.ui-icon-notext .ui-icon {
+    padding: 0;
+    width: 2.1em;
+    height: 2.1em;
+    text-indent: -9999px;
+    white-space: nowrap
+}
+
+input.ui-button.ui-icon-notext .ui-icon {
+    width: auto;
+    height: auto;
+    text-indent: 0;
+    white-space: normal;
+    padding: .4em 1em
+}
+
+input.ui-button::-moz-focus-inner,
+button.ui-button::-moz-focus-inner {
+    border: 0;
+    padding: 0
+}
+

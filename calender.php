@@ -11,7 +11,7 @@ session_start();
 
   <!--CSS-->
   <link rel="stylesheet" href="assets/css/main.css" />
-  <link rel="stylesheet" href="assets/css/route.css">
+  <link rel="stylesheet" href="assets/css/menu.css">
   <link rel="stylesheet" href="assets/css/calender.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
@@ -24,43 +24,46 @@ session_start();
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
-<body id="calendar">
+<body>
   <!-- Header -->
   <header id="header">
     <nav class="left">
       <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
-      <a href="#">New Plan</a>
       <a href="route.php">My Plan</a>
-      <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
+      <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
+      <a href="includes/logout.inc.php" class="#">Logout</a>
     </nav>
   </header>
 
   <!-- Banner -->
   <section id="banner">
     <div>
-      <h1 style="margin-top:-10%">Weather Forecast</h1>
-      <section class="wrapper">
-        <div class="align-center">
-          <a class="weatherwidget-io" style="width:70%;left:12%; position:center;" href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5" data-theme="pure">OSAKA WEATHER</a>
+      <h1 style="margin-top:-10%;">Weather Forecast</h1>
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+          <div class="container">
+            <canvas id="myChart" style="border-style: hidden;"></canvas>
+          </div>
         </div>
       </section>
     </div>
   </section>
 
   <main>
-    <ul class="menu">
-      <li><a href="calender.php" class="active" style="text-decoration: none">Calender</a></li>
-      <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-      <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
-      <li><a href="route.php" style="text-decoration: none">Route</a></li>
-      <li class="slider"></li>
-    </ul>
+    <nav id="nav-top">
+      <ul>
+        <li><a href="calender.php" class="active" style="text-decoration: none">Calender</a></li>
+        <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+      </ul>
+    </nav>
     <!-- Two -->
     <section>
       <br>
-      <div id="calendar"></div>
+      <div id='calendar'></div>
 
     </section>
   </main>
@@ -189,16 +192,12 @@ session_start();
       calendar.render();
     });
   </script>
+  <script src="assets/js/weather.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
   <script>
-    ! function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (!d.getElementById(id)) {
-        js = d.createElement(s);
-        js.id = id;
-        js.src = 'https://weatherwidget.io/js/widget.min.js';
-        fjs.parentNode.insertBefore(js, fjs);
-      }
-    }(document, 'script', 'weatherwidget-io-js');
+    var CITY = "<?php echo $_SESSION['country_to'] ?>";
+    getWeatherData(CITY);
   </script>
+</body>
 
 </html>

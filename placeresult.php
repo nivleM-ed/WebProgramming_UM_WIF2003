@@ -11,6 +11,7 @@ session_start();
 
     <!--CSS-->
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/menu.css">
     <!--Google API Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -45,32 +46,35 @@ session_start();
             <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
         </nav>
         <nav class="right">
-            <a href="#">New Plan</a>
             <a href="route.php">My Plan</a> <!-- isi webpage signup-->
-            <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
+            <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
+            <a href="includes/logout.inc.php" class="#">Logout</a>
         </nav>
     </header>
 
     <!-- Banner -->
     <section id="banner">
         <div>
-            <h1 style="margin-top:-10%">Weather Forecast</h1>
-            <section class="wrapper">
-                <div class="align-center">
-                    <a class="weatherwidget-io" style="width:70%;left:12%; position:center;" href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5" data-theme="pure">OSAKA WEATHER</a>
+            <h1 style="margin-top:-10%;">Weather Forecast</h1>
+            <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+                <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+                    <div class="container">
+                        <canvas id="myChart" style="border-style: hidden;"></canvas>
+                    </div>
                 </div>
             </section>
         </div>
     </section>
 
     <main>
-        <ul class="menu">
-            <li><a href="placeresult.php" class="active" style="text-decoration: none">Recommendation</a></li>
-            <li><a href="route.php" style="text-decoration: none">Route</a></li>
-            <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-            <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
-            <li class="slider"></li>
-        </ul>
+        <nav id="nav-top">
+            <ul>
+                <li><a href="placeresult.php" class="active" style="text-decoration: none">Recommendation</a></li>
+                <li><a href="route.php" style="text-decoration: none">Route</a></li>
+                <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+                <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+            </ul>
+        </nav>
         <!-- Two -->
         <main>
             <!-- One -->
@@ -80,7 +84,7 @@ session_start();
                 <div class="align-center">
                     <div>
                     </div>
-                    <h2 style="margin-top:-90px;">Recommendation Result</h2>
+                    <h2 style="margin-top:-20px;">Recommendation Result</h2>
                     <section class="ftco-section ftco-degree-bg" style="margin-top:-150px;"></section>
                     <div class="container">
                         <div class="row">
@@ -445,16 +449,11 @@ session_start();
         <script src="assets/js/util.js"></script>
         <script src="assets/js/main.js"></script>
         <script src="assets/js/checklist.js"></script>
+        <script src="assets/js/weather.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
         <script>
-            ! function(d, s, id) {
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (!d.getElementById(id)) {
-                    js = d.createElement(s);
-                    js.id = id;
-                    js.src = 'https://weatherwidget.io/js/widget.min.js';
-                    fjs.parentNode.insertBefore(js, fjs);
-                }
-            }(document, 'script', 'weatherwidget-io-js');
+            var CITY = "<?php echo $_SESSION['country_to'] ?>";
+            getWeatherData(CITY);
         </script>
         <!--end-->
     </main>
