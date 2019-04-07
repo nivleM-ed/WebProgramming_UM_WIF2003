@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/route.css">
   <link rel="stylesheet" href="assets/css/test-checklist.css">
+  <link rel="stylesheet" href="assets/css/weatherbox.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -32,7 +33,7 @@
       <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
-      <a href="login.html">New Plan</a>
+
       <a href="#">My Plan</a> <!-- isi webpage signup-->
       <a href="#" class="#">*Username*</a>
     </nav>
@@ -40,30 +41,28 @@
 
   <!-- Banner -->
   <section id="banner">
-    <div>
-      <h1>Weather Forecast</h1>
-      <!-- modal -->
-      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
-        Weather</button>
-      <!-- Modal -->
-      <div id="weatherModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+      <div>
+          <h1>Weather Forecast</h1>
+          <!-- modal 
+              <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
+                 Weather</button>
+                 Modal -->
+                  
           <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Modal Header</h4>
-            </div>
-            <div class="modal-body">
-              <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+          <div class="box">
+              <a class="button" href="#popup1">View Weather</a>
           </div>
-        </div>
+                    
+                  <div id="popup1" class="overlay">
+                      <div class="popup">
+                          <h2><strong>Weather Forecast</strong></h2><br>
+                            <a class="close" href="#">&times;</a>
+                          <div class="content">
+                              <a class="weatherwidget-io" href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5" data-theme="pure" >OSAKA WEATHER</a>
+                          </div>
+                      </div>
+                  </div>
       </div>
-    </div>
   </section>
 
   <main>
@@ -166,6 +165,10 @@
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/checklist.js"></script>
+
+    <script>
+        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+        </script>
   </main>
 </body>
 

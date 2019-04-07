@@ -1,0 +1,592 @@
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css);
+@import url(//fonts.googleapis.com/css?family=Lato);
+@import url(//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.cs);
+
+
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+html {
+  font-size: 10px;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+body {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.428571429;
+  color: #333;
+  background-color: #fff;
+}
+
+body {
+  min-width: 1020px;
+  margin: auto;
+  background: #edf1f4;
+  font-family: 'Lato',sans-serif;
+  font-weight: 400;
+  color: #333;
+  height: 100%;
+  position: relative;
+  top: 0!important;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*:before, *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+button {
+  overflow: visible;
+}
+
+button, select {
+  text-transform: none;
+}
+
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+body input, body select, body textarea, body button {
+  font-size: 1.142em;
+}
+
+
+.dialog-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  background: rgba(0,0,0,0);
+  -webkit-transition: background .4s;
+  -o-transition: background .4s;
+  transition: background .4s;
+}
+
+.dialog-container.open {
+  background: rgba(0,0,0,0.4);
+}
+
+
+
+
+
+
+.ui-front {
+  z-index: 100;
+}
+
+.ui-dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: .2em;
+  outline: 0;
+}
+
+.ui-widget {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 1em;
+}
+
+.ui-widget-content {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+}
+
+.ui-dialog-content {
+  height: auto!important;
+}
+
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  border: 0;
+  padding: .5em 1em;
+  background: 0;
+  overflow: auto;
+}
+
+.ui-dialog .ui-dialog-content {
+  box-shadow: none;
+  border: 0;
+  background: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl {
+  border-top-left-radius: 3px;
+}
+
+.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr {
+  border-top-right-radius: 3px;
+}
+
+.ui-corner-all, .ui-corner-bottom, .ui-corner-left, .ui-corner-bl {
+  border-bottom-left-radius: 3px;
+}
+
+.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {
+  border-bottom-right-radius: 3px;
+}
+
+.ui-widget, .ui-front {
+  font-family: 'Lato',sans-serif;
+  font-size: 1em;
+}
+
+.ui-widget-content {
+  color: #333;
+}
+
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 1em;
+}
+
+.ui-widget input, .ui-front input, .ui-widget select, .ui-front select, .ui-widget textarea, .ui-front textarea, .ui-widget button, .ui-front button {
+  font-family: 'Lato',sans-serif;
+  font-size: 1.142em;
+}
+
+.ui-dialog {
+  min-width: 560px;
+  margin: 0;
+  padding: 40px;
+  border-radius: 0;
+  -webkit-box-shadow: 0 5px 15px #333;
+  box-shadow: 0 5px 15px #333;
+  overflow-y: auto;
+}
+
+.ui-widget.ui-widget-content {
+  border: 1px solid #c5c5c5;
+}
+
+.ui-dialog.animated {
+  animation: dialog-close-animation .3s forwards;
+}
+
+.ui-dialog.dlg-reorder-route {
+  padding: 40px 0 0;
+  position: relative;
+}
+
+.ui-dialog.animated.open {
+  animation: dialog-animation .3s forwards;
+}
+
+
+.ui-dialog.dlg-route-edit {
+  max-height: 100%!important;
+}
+
+.ui-dialog.dlg-route-edit, .ui-dialog.dlg-attraction-tickets, .ui-dialog.dlg-stay-review, .ui-dialog.dlg-recalc {
+  min-width: 490px;
+}
+
+
+
+
+
+.ui-widget-header {
+  color: #333;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  padding: .4em 1em;
+  position: relative;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  background: 0;
+  border: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+  position: absolute;
+  right: .3em;
+  top: 50%;
+  width: 20px;
+  margin: -10px 0 0 0;
+  padding: 1px;
+  height: 20px;
+}
+
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+  content: "";
+  display: table;
+  border-collapse: collapse;
+}
+
+
+
+
+.ui-widget .ui-widget {
+  font-size: 1em;
+}
+
+.ui-dialog .ui-dialog-title {
+  float: left;
+  margin: .1em 0;
+  white-space: nowrap;
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-dialog .ui-dialog-title {
+  white-space: normal;
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-title {
+  display: none;
+  margin: 0;
+  width: 100%;
+}
+
+.ui-widget .ui-widget {
+  font-size: 1em;
+}
+
+.ui-widget .ui-button-icon-only, .ui-front .ui-button-icon-only {
+  color: #fff!important;
+  white-space: normal;
+  text-indent: 0;
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close {
+  background: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  width: auto;
+  height: auto;
+  outline: 0;
+  top: 5px;
+  right: 8px;
+}
+
+.ui-dialog.mediumx .ui-dialog-titlebar-close {
+  z-index: 1;
+  top: 20px;
+  right: 29px;
+  width: 18px;
+  height: 18px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.ui-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -.25em;
+  position: relative;
+  text-indent: -99999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+}
+
+.ui-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.ui-icon-closethick {
+  background-position: -96px -128px;
+}
+
+.ui-button-icon-only .ui-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -8px;
+  margin-left: -8px;
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon {
+  color: #4a4a4a;
+  font-size: 1.43em;
+  background: 0;
+  width: 20px;
+  height: 20px;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  transform: translate(0,0);
+  margin-top: 2px;
+  outline: 0;
+}
+
+.ui-dialog.mediumx .ui-dialog-titlebar-close .ui-icon-closethick {
+  width: 22px;
+  height: 22px;
+  margin: -2px;
+  background: 0;
+  position: relative;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close.ui-button-icon-only .ui-icon {
+  position: static;
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon:hover {
+  color: #009cde;
+}
+
+
+.ui-dialog.mediumx .ui-dialog-titlebar-close .ui-icon-closethick:before {
+  width: 100%;
+  background: #bab5bc;
+  height: 2px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  -webkit-transform: translate(0,-50%);
+  -ms-transform: translate(0,-50%);
+  -o-transform: translate(0,-50%);
+  transform: translate(0,-50%);
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close .ui-icon:after {
+  text-indent: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
+  content: "\2715";
+}
+
+.ui-dialog.mediumx .ui-dialog-titlebar-close .ui-icon-closethick:after {
+  width: 2px;
+  background: #bab5bc;
+  height: 100%;
+  content: "";
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translate(-50%,0);
+  -ms-transform: translate(-50%,0);
+  -o-transform: translate(-50%,0);
+  transform: translate(-50%,0);
+}
+
+
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+  content: "";
+  display: table;
+  border-collapse: collapse;
+}
+
+.ui-helper-clearfix:after {
+  clear: both;
+}
+
+
+
+
+.ui-dialog.dlg-reorder-route .ui-dialog-content .title {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 32px;
+  margin-top: 18px;
+  padding: 0 50px;
+  letter-spacing: -0.3px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.ui-dialog .tagline {
+  text-align: center;
+  font-style: italic;
+  letter-spacing: -0.015em;
+  margin: 5px 0 0;
+  color: #666;
+}
+
+.ui-dialog.dlg-reorder-route .ui-dialog-content .edit-route .tagline {
+  font-size: 15px;
+  line-height: 1.47;
+  margin: 6px 0 28px;
+  font-style: normal;
+  padding: 0 50px;
+  text-align: left;
+}
+
+
+
+
+
+
+
+ul, ol {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+ul, ol, li {
+  padding: 0;
+  margin: 0;
+}
+
+.ui-dialog.dlg-reorder-route .ui-dialog-content .edit-route .stops {
+  overflow: auto;
+  border-top: 1px solid #dedede;
+}
+
+.ui-sortable-handle {
+  -ms-touch-action: none;
+  touch-action: none;
+}
+
+.ui-dialog.dlg-reorder-route .ui-dialog-content .edit-route .stops .stay-row {
+  position: relative;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 2;
+  height: 58px;
+  border-bottom: 1px solid #dedede;
+  padding: 0 50px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  cursor: grab;
+}
+
+
+.ui-dialog.dlg-reorder-route .ui-dialog-content .edit-route .stops .stay-row .stay-name {
+  -webkit-box-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -moz-box-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+.ui-dialog.dlg-reorder-route .ui-dialog-content .edit-route .stops .stay-row svg {
+  -webkit-box-flex: 0 0 24px;
+  -webkit-flex: 0 0 24px;
+  -moz-box-flex: 0 0 24px;
+  -ms-flex: 0 0 24px;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  opacity: .6;
+}
+
+
+
+.ui-dialog.dlg-reorder-route .buttons {
+  text-align: center;
+  height: 73px;
+  padding: 15px;
+  box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+}
+
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 1em;
+}
+
+body .cta-button {
+  background: #fa8c00;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  border: 0;
+  padding: 0 15px;
+  font-style: normal;
+  font-weight: 700;
+  outline: 0;
+  border-radius: 100px;
+  letter-spacing: 0;
+  -webkit-transition: background-color .3s ease;
+  -o-transition: background-color .3s ease;
+  transition: background-color .3s ease;
+}
+
+.ui-widget input, .ui-front input, .ui-widget select, .ui-front select, .ui-widget textarea, .ui-front textarea, .ui-widget button, .ui-front button {
+  font-family: 'Lato',sans-serif;
+  font-size: 1.142em;
+}
+
+body .cta-button.large {
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
+}
+
+.ui-dialog.dlg-reorder-route .buttons .cta-button {
+  width: 94px;
+  height: 44px;
+}
+
+
+
+
+
+
