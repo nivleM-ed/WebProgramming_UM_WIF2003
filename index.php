@@ -85,11 +85,11 @@
             <div class="inner" style="text-align: center">
                 <h1>Benefits of PlanIt</h1>
             </div>
-            
+
             <div class="inner flex flex-3">
-            <img src="assets/images/one.png" alt="" width="20%" height="20%" style="float: right;">
+                <img src="assets/images/recommendation.png" alt="" width="50%" height="50%" style="float: right;">
                 <div class="flex-item right">
-                <img src="assets/images/one.png" alt="" width="10%">
+                    <img src="assets/images/one.png" alt="" width="12%" height="15%">
                     <p>
                         <h4><br>Recommendation API that helps search the perfect vacation spot for you!</h4>
                         <ul>
@@ -99,8 +99,22 @@
                             <li>Hidden spots</li>
                         </ul>
                     </p>
-
                 </div>
+            </div>
+            <br><br>
+            <div class="inner flex flex-3">
+                <div class="flex-item right">
+                    <img src="assets/images/two.png" alt="" width="12%" height="13%">
+                    <p>
+                        <h4><br>Customizable calender just for you!</h4>
+                        <ul>
+                            <li>Fully ustomizable calender</li>
+                            <li>Add activites</li>
+                            <li>Delete activities</li>
+                        </ul>
+                    </p>
+                </div>
+                <img src="assets/images/calender.png" alt="" width="50%" height="50%" style="float: right;">
             </div>
         </section>
     </main>

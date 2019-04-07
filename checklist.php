@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<?php
+session_start();
+?>
 
 <head>
   <title>Plan It</title>
@@ -32,46 +35,33 @@
       <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
-      <a href="login.html">New Plan</a>
-      <a href="#">My Plan</a> <!-- isi webpage signup-->
-      <a href="#" class="#">*Username*</a>
+      <a href="#">New Plan</a>
+      <a href="route.php">My Plan</a> <!-- isi webpage signup-->
+      <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
     </nav>
   </header>
 
   <!-- Banner -->
   <section id="banner">
     <div>
-      <h1>Weather Forecast</h1>
-      <!-- modal -->
-      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
-        Weather</button>
-      <!-- Modal -->
-      <div id="weatherModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Modal Header</h4>
-            </div>
-            <div class="modal-body">
-              <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div>
+      <h1 style="margin-top:-10%">Weather Forecast</h1>
+      <section class="wrapper">
+        <div class="align-center">
+          <a class="weatherwidget-io" style="width:70%;left:12%; position:center;"
+            href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER"
+            data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5"
+            data-theme="pure">OSAKA WEATHER</a>
         </div>
-      </div>
+      </section>
     </div>
   </section>
 
   <main>
     <ul class="menu">
-      <li><a href="checklist.html" class="active">Checklist</a></li>
-      <li><a href="route.html">Route</a></li>
-      <li><a href="placeresult.html">Recommendation</a></li>
-      <li><a href="#">Calender</a></li>
+      <li><a href="checklist.php" class="active" style="text-decoration: none">Checklist</a></li>
+      <li><a href="route.php" style="text-decoration: none">Route</a></li>
+      <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+      <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
       <li class="slider"></li>
     </ul>
     <!-- Two -->
@@ -166,6 +156,17 @@
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/checklist.js"></script>
+    <script>
+        ! function (d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://weatherwidget.io/js/widget.min.js';
+            fjs.parentNode.insertBefore(js, fjs);
+          }
+        }(document, 'script', 'weatherwidget-io-js');
+      </script>
   </main>
 </body>
 
