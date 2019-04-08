@@ -60,18 +60,12 @@ session_start();
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
       </ul>
     </nav>
-
-    <div class="container">
+    <!-- Two -->
+    <section>
       <br>
-      <div id='calendar' style="left: 0; display: inline-block;"></div>
-      <div style="right: 0; display: inline-block;">
-        <div>Trip recommendation:</div>
-        <ol>
-          <li>
-            <span>Get from recomendations.</span>
-          </li>
-        </ol>
-      </div>
+      <div id='calendar'></div>
+
+    </section>
   </main>
 
   <!-- Footer -->

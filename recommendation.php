@@ -21,21 +21,6 @@ session_start();
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <!--Boostrap CDN-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    <!--for place recommendation results only-->
-
-    <!-- <link rel="stylesheet" href="/assets/recommendation/css/open-iconic-bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/animate.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/owl.theme.default.min.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/magnific-popup.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/aos.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/ionicons.min.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/jquery.timepicker.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/flaticon.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/icomoon.css">
-    <link rel="stylesheet" href="/assets/recommendation/css/style.css"> -->
 </head>
 
 <body>
@@ -114,7 +99,6 @@ session_start();
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-md-4">
                                         <div class="destination">
                                             <div class="text p-3">
@@ -162,27 +146,6 @@ session_start();
         </script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
         </script>
-
-        <!-- for place recommendation only -->
-        <!-- <script src="/assets/recommendation/js/jquery.min.js"></script>
-        <script src="/assets/recommendation/js/jquery-migrate-3.0.1.min.js"></script>
-        <script src="/assets/recommendation/js/popper.min.js"></script>
-        <script src="/assets/recommendation/js/bootstrap.min.js"></script>
-        <script src="/assets/recommendation/js/jquery.easing.1.3.js"></script>
-        <script src="/assets/recommendation/js/jquery.waypoints.min.js"></script>
-        <script src="/assets/recommendation/js/jquery.stellar.min.js"></script>
-        <script src="/assets/recommendation/js/owl.carousel.min.js"></script>
-        <script src="/assets/recommendation/js/jquery.magnific-popup.min.js"></script>
-        <script src="/assets/recommendation/js/aos.js"></script>
-        <script src="/assets/recommendation/js/jquery.animateNumber.min.js"></script>
-        <script src="/assets/recommendation/js/bootstrap-datepicker.js"></script>
-        <script src="/assets/recommendation/js/jquery.timepicker.min.js"></script>
-        <script src="/assets/recommendation/js/scrollax.min.js"></script>
-        <script src="/assets/recommendation/js/range.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false">
-        </script>
-        <script src="/assets/recommendation/js/google-map.js"></script>
-        <script src="/assets/recommendation/js/main.js"></script> -->
 
         <!--Skel.io skeleton framework-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
