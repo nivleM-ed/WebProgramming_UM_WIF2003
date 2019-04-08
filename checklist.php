@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<?php
+session_start();
+?>
 
 <head>
   <title>Plan It</title>
@@ -8,9 +11,8 @@
 
   <!--CSS-->
   <link rel="stylesheet" href="assets/css/main.css">
-  <link rel="stylesheet" href="assets/css/route.css">
+  <link rel="stylesheet" href="assets/css/menu.css">
   <link rel="stylesheet" href="assets/css/test-checklist.css">
-  <link rel="stylesheet" href="assets/css/weatherbox.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -19,11 +21,9 @@
   <link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
   <!--Font Awesome Icons CDN-->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <!--Boostrap CDN-->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
 <body>
@@ -33,46 +33,35 @@
       <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
-
-      <a href="#">My Plan</a> <!-- isi webpage signup-->
-      <a href="#" class="#">*Username*</a>
+      <a href="route.php">My Plan</a> <!-- isi webpage signup-->
+      <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
+      <a href="includes/logout.inc.php" class="#">Logout</a>
     </nav>
   </header>
 
   <!-- Banner -->
   <section id="banner">
-      <div>
-          <h1>Weather Forecast</h1>
-          <!-- modal 
-              <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
-                 Weather</button>
-                 Modal -->
-                  
-          <!-- Modal content-->
-          <div class="box">
-              <a class="button" href="#popup1">View Weather</a>
+    <div>
+      <h1 style="margin-top:-10%;">Weather Forecast</h1>
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+          <div class="container">
+            <canvas id="myChart" style="border-style: hidden;"></canvas>
           </div>
-                    
-                  <div id="popup1" class="overlay">
-                      <div class="popup">
-                          <h2><strong>Weather Forecast</strong></h2><br>
-                            <a class="close" href="#">&times;</a>
-                          <div class="content">
-                              <a class="weatherwidget-io" href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5" data-theme="pure" >OSAKA WEATHER</a>
-                          </div>
-                      </div>
-                  </div>
-      </div>
+        </div>
+      </section>
+    </div>
   </section>
 
   <main>
-    <ul class="menu">
-      <li><a href="checklist.html" class="active">Checklist</a></li>
-      <li><a href="route.html">Route</a></li>
-      <li><a href="placeresult.html">Recommendation</a></li>
-      <li><a href="#">Calender</a></li>
-      <li class="slider"></li>
-    </ul>
+    <nav id="nav-top">
+      <ul>
+        <li><a href="checklist.php" class="active" style="text-decoration: none">Checklist</a></li>
+        <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+      </ul>
+    </nav>
     <!-- Two -->
     <main>
       <!-- One -->
@@ -149,26 +138,24 @@
     </footer>
 
     <!--Bootstrap & JQuery-->
-    <script src="https://code.jquery.com/jquery-3.3.1.js"
-      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
     </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
     <!--Skel.io skeleton framework-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js"
-      integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
     <!--Own Scripts-->
     <script src="assets/js/jquery.scrolly.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/checklist.js"></script>
-
+    <script src="assets/js/weather.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
     <script>
-        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
-        </script>
+      var CITY = "<?php echo $_SESSION['country_to'] ?>";
+      getWeatherData(CITY);
+    </script>
   </main>
 </body>
 

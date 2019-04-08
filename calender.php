@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<?php
+session_start();
+?>
 
 <head>
   <title>Plan It</title>
@@ -8,76 +11,74 @@
 
   <!--CSS-->
   <link rel="stylesheet" href="assets/css/main.css" />
-  <link rel="stylesheet" href="assets/css/route.css">
+  <link rel="stylesheet" href="assets/css/menu.css">
   <link rel="stylesheet" href="assets/css/calender.css">
+  <link rel="stylesheet" href="assets/css/route.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Alex+Brush" rel="stylesheet">
   <!--Font Awesome Icons CDN-->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <!--Boostrap CDN-->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <!--Imports/Includes-->
-  <link rel="imports" href="header.html">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
-<body id"calendar">
+<body>
   <!-- Header -->
   <header id="header">
     <nav class="left">
-      <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
+      <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
-      <a href="login.html">New Plan</a>
-      <a href="#">My Plan</a>
-      <a href="#" class="#">*Username*</a>
+      <a href="route.php">My Plan</a>
+      <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
+      <a href="includes/logout.inc.php" class="#">Logout</a>
     </nav>
   </header>
 
   <!-- Banner -->
   <section id="banner">
     <div>
-      <h1>Weather Forecast</h1>
-      <!-- modal -->
-      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
-        Weather</button>
-      <!-- Modal -->
-      <div id="weatherModal" class="modal fade bg-dark" role="dialog">
-        <div class="modal-dialog">
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Modal Header</h4>
-            </div>
-            <div class="modal-body">
-              <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+      <h1 style="margin-top:-10%;">Weather Forecast</h1>
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+          <div class="container">
+            <canvas id="myChart" style="border-style: hidden;"></canvas>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   </section>
 
   <main>
-    <ul class="menu">
-      <li><a href="route.html" class="active">Route</a></li>
-      <li><a href="checklist.html">Checklist</a></li>
-      <li><a href="placeresult.html">Recommendation</a></li>
-      <li><a href="#">Calender</a></li>
-      <li class="slider"></li>
-    </ul>
+    <nav id="nav-top">
+      <ul>
+        <li><a href="calender.php" class="active" style="text-decoration: none">Calender</a></li>
+        <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+      </ul>
+    </nav>
     <!-- Two -->
     <section>
+    <div style="margin-top:5%; padding:25px; border-left:1px solid #f1f1f1;" class="route-right-pane">
+                
+                <div class="clearfix" style="background-color: #fff;"></div>
+                  <br>
+                <div class="dest-rail active" style="display: block;">
+                  <div class="see-also">Trip recommendation:</div>
+                  <ul style="list-style: none; padding: 0;">
+                    <li>
+                      <span class="tour-title">Get from recomendations.</span>&nbsp;
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
       <br>
-      <div id='calendar'></div>
+      <div style="margin-right:26%;" id='calendar'></div>
 
     </section>
   </main>
@@ -98,17 +99,13 @@
   </footer>
 
   <!--Bootstrap & JQuery-->
-  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
   </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
   </script>
   <!--Skel.io skeleton framework-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js"
-    integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
   <!--Own Scripts-->
   <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/util.js"></script>
@@ -116,12 +113,11 @@
   <script src="assets/js/checklist.js"></script>
   <script src="assets/js/calendar.js"></script>
   <script>
-
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
-  
+
       var calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: [ 'interaction', 'dayGrid', 'timeGrid' ],
+        plugins: ['interaction', 'dayGrid', 'timeGrid'],
         header: {
           left: 'prev,next',
           center: 'title',
@@ -143,11 +139,10 @@
           }
           calendar.unselect()
         },
-        
+
         editable: true,
         eventLimit: true, // allow "more" link when too many events
-        events: [
-          {
+        events: [{
             title: 'All Day Event',
             start: '2019-04-01'
           },
@@ -201,17 +196,22 @@
             url: 'http://google.com/',
             start: '2019-04-28'
           }
-          ],
-      eventClick: function(arg) {
-        if (confirm('delete event?')) {
-          arg.event.remove()
+        ],
+        eventClick: function(arg) {
+          if (confirm('delete event?')) {
+            arg.event.remove()
+          }
         }
-      }
-    });
-      
+      });
+
       calendar.render();
     });
-  
+  </script>
+  <script src="assets/js/weather.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
+  <script>
+    var CITY = "<?php echo $_SESSION['country_to'] ?>";
+    getWeatherData(CITY);
   </script>
 </body>
 

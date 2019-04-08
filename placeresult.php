@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<?php
+session_start();
+?>
 
 <head>
     <title>Plan It</title>
@@ -8,14 +11,14 @@
 
     <!--CSS-->
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/menu.css">
     <!--Google API Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Alex+Brush" rel="stylesheet">
     <!--Font Awesome Icons CDN-->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <!--Boostrap CDN-->
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
@@ -34,7 +37,6 @@
     <link rel="stylesheet" href="/assets/recommendation/css/flaticon.css">
     <link rel="stylesheet" href="/assets/recommendation/css/icomoon.css">
     <link rel="stylesheet" href="/assets/recommendation/css/style.css">
-    <link rel="stylesheet" href="assets/css/weatherbox.css">
 </head>
 
 <body>
@@ -44,46 +46,35 @@
             <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
         </nav>
         <nav class="right">
-
-            <a href="#">My Plan</a> <!-- isi webpage signup-->
-            <a href="#" class="#">*Username*</a>
+            <a href="route.php">My Plan</a> <!-- isi webpage signup-->
+            <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
+            <a href="includes/logout.inc.php" class="#">Logout</a>
         </nav>
     </header>
 
     <!-- Banner -->
     <section id="banner">
         <div>
-            <h1>Weather Forecast</h1>
-            <!-- modal 
-                <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#weatherModal">View
-                   Weather</button>
-                   Modal -->
-                    
-            <!-- Modal content-->
-            <div class="box">
-                <a class="button" href="#popup1">View Weather</a>
-            </div>
-                      
-                    <div id="popup1" class="overlay">
-                        <div class="popup">
-                            <h2><strong>Weather Forecast</strong></h2><br>
-                              <a class="close" href="#">&times;</a>
-                            <div class="content">
-                                <a class="weatherwidget-io" href="https://forecast7.com/en/34d69135d50/osaka/" data-label_1="OSAKA" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-mode="Forecast" data-days="5" data-theme="pure" >OSAKA WEATHER</a>
-                            </div>
-                        </div>
+            <h1 style="margin-top:-10%;">Weather Forecast</h1>
+            <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+                <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+                    <div class="container">
+                        <canvas id="myChart" style="border-style: hidden;"></canvas>
                     </div>
+                </div>
+            </section>
         </div>
     </section>
 
     <main>
-        <ul class="menu">
-            <li><a href="placeresult.html" class="active">Recommendation</a></li>
-            <li><a href="route.html">Route</a></li>
-            <li><a href="checklist.html">Checklist</a></li>
-            <li><a href="#">Calender</a></li>
-            <li class="slider"></li>
-        </ul>
+        <nav id="nav-top">
+            <ul>
+                <li><a href="placeresult.php" class="active" style="text-decoration: none">Recommendation</a></li>
+                <li><a href="route.php" style="text-decoration: none">Route</a></li>
+                <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+                <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+            </ul>
+        </nav>
         <!-- Two -->
         <main>
             <!-- One -->
@@ -93,7 +84,7 @@
                 <div class="align-center">
                     <div>
                     </div>
-                    <h2 style="margin-top:-90px;">Recommendation Result</h2>
+                    <h2 style="margin-top:-20px;">Recommendation Result</h2>
                     <section class="ftco-section ftco-degree-bg" style="margin-top:-150px;"></section>
                     <div class="container">
                         <div class="row">
@@ -108,8 +99,7 @@
                                             <div class="form-group">
                                                 <div class="select-wrap one-third">
                                                     <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-                                                    <select name="" id="" class="form-control"
-                                                        placeholder="Keyword search">
+                                                    <select name="" id="" class="form-control" placeholder="Keyword search">
                                                         <!--change according to api-->
                                                         <option value="">Select Location</option>
                                                         <option value="">San Francisco USA</option>
@@ -120,12 +110,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" id="checkin_date" class="form-control"
-                                                    placeholder="Date from">
+                                                <input type="text" id="checkin_date" class="form-control" placeholder="Date from">
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" id="checkin_date" class="form-control"
-                                                    placeholder="Date to">
+                                                <input type="text" id="checkin_date" class="form-control" placeholder="Date to">
                                             </div>
                                             <div class="form-group">
                                                 <div class="range-slider">
@@ -150,43 +138,33 @@
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="exampleCheck1">
                                             <label class="form-check-label" for="exampleCheck1">
-                                                <p class="rate"><span><i class="icon-star"></i><i
-                                                            class="icon-star"></i><i class="icon-star"></i><i
-                                                            class="icon-star"></i><i class="icon-star"></i></span></p>
+                                                <p class="rate"><span><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i></span></p>
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="exampleCheck1">
                                             <label class="form-check-label" for="exampleCheck1">
-                                                <p class="rate"><span><i class="icon-star"></i><i
-                                                            class="icon-star"></i><i class="icon-star"></i><i
-                                                            class="icon-star"></i><i class="icon-star-o"></i></span></p>
+                                                <p class="rate"><span><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star-o"></i></span></p>
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="exampleCheck1">
                                             <label class="form-check-label" for="exampleCheck1">
-                                                <p class="rate"><span><i class="icon-star"></i><i
-                                                            class="icon-star"></i><i class="icon-star"></i><i
-                                                            class="icon-star-o"></i><i class="icon-star-o"></i></span>
+                                                <p class="rate"><span><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star-o"></i><i class="icon-star-o"></i></span>
                                                 </p>
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="exampleCheck1">
                                             <label class="form-check-label" for="exampleCheck1">
-                                                <p class="rate"><span><i class="icon-star"></i><i
-                                                            class="icon-star"></i><i class="icon-star-o"></i><i
-                                                            class="icon-star-o"></i><i class="icon-star-o"></i></span>
+                                                <p class="rate"><span><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star-o"></i><i class="icon-star-o"></i><i class="icon-star-o"></i></span>
                                                 </p>
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="exampleCheck1">
                                             <label class="form-check-label" for="exampleCheck1">
-                                                <p class="rate"><span><i class="icon-star"></i><i
-                                                            class="icon-star-o"></i><i class="icon-star-o"></i><i
-                                                            class="icon-star-o"></i><i class="icon-star-o"></i></span>
+                                                <p class="rate"><span><i class="icon-star"></i><i class="icon-star-o"></i><i class="icon-star-o"></i><i class="icon-star-o"></i><i class="icon-star-o"></i></span>
                                                 </p>
                                             </label>
                                         </div>
@@ -197,9 +175,7 @@
                                 <div class="row">
                                     <div class="col-md-4 ftco-animate">
                                         <div class="destination">
-                                            <a href="#"
-                                                class="img img-2 d-flex justify-content-center align-items-center"
-                                                style="background-image: url(images/destination-1.jpg);">
+                                            <a href="#" class="img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/destination-1.jpg);">
                                                 <div class="icon d-flex justify-content-center align-items-center">
                                                     <span class="icon-search2"></span>
                                                 </div>
@@ -233,9 +209,7 @@
                                     </div>
                                     <div class="col-md-4 ftco-animate">
                                         <div class="destination">
-                                            <a href="#"
-                                                class="img img-2 d-flex justify-content-center align-items-center"
-                                                style="background-image: url(images/destination-2.jpg);">
+                                            <a href="#" class="img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/destination-2.jpg);">
                                                 <div class="icon d-flex justify-content-center align-items-center">
                                                     <span class="icon-search2"></span>
                                                 </div>
@@ -269,9 +243,7 @@
                                     </div>
                                     <div class="col-md-4 ftco-animate">
                                         <div class="destination">
-                                            <a href="#"
-                                                class="img img-2 d-flex justify-content-center align-items-center"
-                                                style="background-image: url(images/destination-3.jpg);">
+                                            <a href="#" class="img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/destination-3.jpg);">
                                                 <div class="icon d-flex justify-content-center align-items-center">
                                                     <span class="icon-search2"></span>
                                                 </div>
@@ -305,9 +277,7 @@
                                     </div>
                                     <div class="col-md-4 ftco-animate">
                                         <div class="destination">
-                                            <a href="#"
-                                                class="img img-2 d-flex justify-content-center align-items-center"
-                                                style="background-image: url(images/destination-4.jpg);">
+                                            <a href="#" class="img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/destination-4.jpg);">
                                                 <div class="icon d-flex justify-content-center align-items-center">
                                                     <span class="icon-search2"></span>
                                                 </div>
@@ -341,9 +311,7 @@
                                     </div>
                                     <div class="col-md-4 ftco-animate">
                                         <div class="destination">
-                                            <a href="#"
-                                                class="img img-2 d-flex justify-content-center align-items-center"
-                                                style="background-image: url(images/destination-5.jpg);">
+                                            <a href="#" class="img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/destination-5.jpg);">
                                                 <div class="icon d-flex justify-content-center align-items-center">
                                                     <span class="icon-search2"></span>
                                                 </div>
@@ -377,9 +345,7 @@
                                     </div>
                                     <div class="col-md-4 ftco-animate">
                                         <div class="destination">
-                                            <a href="#"
-                                                class="img img-2 d-flex justify-content-center align-items-center"
-                                                style="background-image: url(images/destination-6.jpg);">
+                                            <a href="#" class="img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/destination-6.jpg);">
                                                 <div class="icon d-flex justify-content-center align-items-center">
                                                     <span class="icon-search2"></span>
                                                 </div>
@@ -454,14 +420,6 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
         </script> -->
-        <!--Skel.io skeleton framework-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js"
-            integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
-        <!--Own Scripts-->
-        <script src="assets/js/jquery.scrolly.min.js"></script>
-        <script src="assets/js/util.js"></script>
-        <script src="assets/js/main.js"></script>
-        <script src="assets/js/checklist.js"></script>
 
         <!-- for place recommendation only -->
         <script src="/assets/recommendation/js/jquery.min.js"></script>
@@ -484,9 +442,19 @@
         <script src="/assets/recommendation/js/google-map.js"></script>
         <script src="/assets/recommendation/js/main.js"></script>
 
+        <!--Skel.io skeleton framework-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
+        <!--Own Scripts-->
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+        <script src="assets/js/checklist.js"></script>
+        <script src="assets/js/weather.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
         <script>
-                !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
-                </script>
+            var CITY = "<?php echo $_SESSION['country_to'] ?>";
+            getWeatherData(CITY);
+        </script>
         <!--end-->
     </main>
 </body>
