@@ -58,7 +58,7 @@ session_start();
       <ul>
         <li><a href="checklist.php" class="active" style="text-decoration: none">Checklist</a></li>
         <li><a href="route.php" style="text-decoration: none">Route</a></li>
-        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
       </ul>
     </nav>

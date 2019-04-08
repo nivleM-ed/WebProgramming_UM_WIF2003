@@ -21,7 +21,7 @@
     <header id="header">
         <nav class="left">
             <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt<sup>&copy</sup></a>
-            <a>Plan it with ease!</a>
+            <a>Plan with ease!</a>
         </nav>
         <nav class="right">
             <a href="login.php" class="button alt">Log in</a>
@@ -108,7 +108,7 @@
                     <p>
                         <h4><br>Customizable calender just for you!</h4>
                         <ul>
-                            <li>Fully ustomizable calender</li>
+                            <li>Fully customizable calender</li>
                             <li>Add activites</li>
                             <li>Delete activities</li>
                         </ul>

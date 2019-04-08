@@ -56,16 +56,22 @@ session_start();
       <ul>
         <li><a href="calender.php" class="active" style="text-decoration: none">Calender</a></li>
         <li><a href="route.php" style="text-decoration: none">Route</a></li>
-        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
       </ul>
     </nav>
-    <!-- Two -->
-    <section>
-      <br>
-      <div id='calendar'></div>
 
-    </section>
+    <div class="container">
+      <br>
+      <div id='calendar' style="left: 0; display: inline-block;"></div>
+      <div style="right: 0; display: inline-block;">
+        <div>Trip recommendation:</div>
+        <ol>
+          <li>
+            <span>Get from recomendations.</span>
+          </li>
+        </ol>
+      </div>
   </main>
 
   <!-- Footer -->

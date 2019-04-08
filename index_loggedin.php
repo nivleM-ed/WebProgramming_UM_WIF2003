@@ -39,12 +39,12 @@ if (isset($_POST["input_country"])) {
     <header id="header">
         <nav class="left">
             <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
-            <a>Plan it with ease!</a>
+            <a>Plan with ease!</a>
         </nav>
         <nav class="right">
             <a href="#">New Plan</a>
             <a href="route.php">My Plan</a>
-            <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
+            <a href="#" class="#">Hi, <?php echo $_SESSION['userUid'] ?></a>
         </nav>
     </header>
     <!-- Banner -->
@@ -126,7 +126,7 @@ if (isset($_POST["input_country"])) {
                     <p>
                         <h4><br>Customizable calender just for you!</h4>
                         <ul>
-                            <li>Fully ustomizable calender</li>
+                            <li>Fully customizable calender</li>
                             <li>Add activites</li>
                             <li>Delete activities</li>
                         </ul>
