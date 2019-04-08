@@ -13,6 +13,7 @@ session_start();
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="stylesheet" href="assets/css/menu.css">
   <link rel="stylesheet" href="assets/css/calender.css">
+  <link rel="stylesheet" href="assets/css/route.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -41,10 +42,20 @@ session_start();
   <section id="banner">
     <div>
       <h1 style="margin-top:-10%;">Weather Forecast</h1>
-      <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
         <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
           <div class="container">
             <canvas id="myChart" style="border-style: hidden;"></canvas>
+          </div>
+          <div class="container">
+            <table style="margin-top:10px">
+              <tr id="dates">
+                <td>Date</td>
+              </tr>
+              <tr id="weather">
+                <td>Weather</td>
+              </tr>
+            </table>
           </div>
         </div>
       </section>
@@ -62,8 +73,21 @@ session_start();
     </nav>
     <!-- Two -->
     <section>
+      <div style="margin-top:5%;margin-right:-5%; padding:25px; border-left:1px solid #f1f1f1;" class="route-right-pane">
+        <div class="clearfix" style="background-color: #fff;"></div>
+        <br>
+        <div class="dest-rail active" style="display: block;">
+          <div class="see-also">Trip recommendation:</div>
+          <ul style="list-style: none; padding: 0;">
+            <li>
+              <span class="tour-title">Get from recomendations.</span>&nbsp;
+            </li>
+          </ul>
+        </div>
+      </div>
+      </div>
       <br>
-      <div id='calendar'></div>
+      <div style="margin-right:23%;" id='calendar'></div>
 
     </section>
   </main>
@@ -104,9 +128,9 @@ session_start();
       var calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: ['interaction', 'dayGrid', 'timeGrid'],
         header: {
-          left: 'prev,next',
+          left: 'prev,next, today',
           center: 'title',
-          right: 'dayGridMonth'
+          right: 'dayGridMonth, dayGridWeek, dayGridDay'
         },
         defaultDate: '2019-04-12',
         navLinks: true, // can click day/week names to navigate views
@@ -152,7 +176,7 @@ session_start();
             end: '2019-04-13'
           },
           {
-            title: 'Meeting',
+            title: 'Visit Seoul',
             start: '2019-04-12T10:30:00',
             end: '2019-04-12T12:30:00'
           },
@@ -161,7 +185,7 @@ session_start();
             start: '2019-04-12T12:00:00'
           },
           {
-            title: 'Meeting',
+            title: 'Visit Seoul Tower',
             start: '2019-04-12T14:30:00'
           },
           {
@@ -173,7 +197,7 @@ session_start();
             start: '2019-04-12T20:00:00'
           },
           {
-            title: 'Birthday Party',
+            title: 'Visit Myeondong',
             start: '2019-04-13T07:00:00'
           },
           {

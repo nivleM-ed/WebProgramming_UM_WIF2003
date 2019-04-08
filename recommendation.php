@@ -39,17 +39,27 @@ session_start();
 
     <!-- Banner -->
     <section id="banner">
-        <div>
-            <h1 style="margin-top:-10%;">Weather Forecast</h1>
-            <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
-                <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
-                    <div class="container">
-                        <canvas id="myChart" style="border-style: hidden;"></canvas>
-                    </div>
-                </div>
-            </section>
+    <div>
+      <h1 style="margin-top:-10%;">Weather Forecast</h1>
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
+        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
+          <div class="container">
+            <canvas id="myChart" style="border-style: hidden;"></canvas>
+          </div>
+          <div class="container">
+            <table style="margin-top:10px">
+              <tr id="dates">
+                <td>Date</td>
+              </tr>
+              <tr id="weather">
+                <td>Weather</td>
+              </tr>
+            </table>
+          </div>
         </div>
-    </section>
+      </section>
+    </div>
+  </section>
 
     <main>
         <nav id="nav-top">
@@ -83,24 +93,22 @@ session_start();
                             <div class="col-lg-9">
                                 <div class="row" id="item-cl">
                                     <!-- item append below this -->
-                                    <!-- <div class="col-md-4">
+                                    <div class="col-md-4">
                                         <div class="destination">
                                             <div class="text p-3">
                                                 <div class="d-flex">
                                                     <div class="one">
-                                                        <h3>Seoul Tower, Korea</h3>
+                                                        <h3 id="result1">Place Name</h3>
                                                     </div>
                                                 </div>
-                                                <p>One of the nicest views in Korea</p>
+                                                <p>Something written here</p>
+                                                <label for="result1"></label>
                                                 <hr>
-                                                <p class="bottom-area d-flex">
-                                                    <span><i class="icon-map-o"></i> Seoul, Korea</span>
-                                                    <span class="ml-auto"><a href="#">Add</a></span>
-                                                </p>
+                                                <span class="add-button" style="cursor: pointer;" for="result' + count + '">Add</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <!-- <div class="col-md-4">
                                         <div class="destination">
                                             <div class="text p-3">
                                                 <div class="d-flex">
@@ -163,11 +171,12 @@ session_start();
             getWeatherData(CITY);
         </script>
         <script>
-            
+            console.log("script on");
 		$(".add-button").click(function () {
 			itemId = $(this).attr('id');
 			var value = $("h3[id='" + itemId + "']").text();
-			console.log(value);
+            console.log(value);
+            console.log("button works");
 		});
 	
         </script>

@@ -28,8 +28,7 @@ $(document).ready(function () {
                 '<p>' + search_results[count].desc + '</p>' +
                 '<label for="result' + count + '">' + value + '</label>' +
                 '<hr>' +
-                '<span for="result' + count + '">'+ search_results[count].map + '</span>' +
-                '<span class="ml-auto add-button" style="cursor: pointer;" for="result' + count + '">Add</span>' +
+                '<span class="add-button" style="cursor: pointer;" for="result' + count + '">Add</span>' +
                 '</div>' +
                 '</div>' +
                 '</div>');
