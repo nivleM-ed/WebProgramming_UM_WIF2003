@@ -95,7 +95,6 @@ video {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	bottom: 0;
 	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
@@ -2805,10 +2804,6 @@ button:disabled,
 	text-align: right;
 }
 
-.flex.flex-3 .flex-item.right {
-	text-align: left;
-}
-
 @media screen and (max-width: 980px) {
 
 	.flex {
@@ -3029,7 +3024,7 @@ body {
 	top: 0;
 	visibility: hidden;
 	width: 20em;
-	z-index: -1;
+	z-index: 10002;
 	text-decoration: none;
 
 }
@@ -3153,7 +3148,6 @@ body {
 	padding: 14em 0 12em 0;
 	background-image: url(../../assets/images/home_slider.jpg);
 	background-size: cover;
-	/* height: 150%;	 */
 	background-position: center top;
 	background-repeat: no-repeat;
 	text-align: center;
@@ -3176,8 +3170,8 @@ body {
 	text-shadow: 2px 2px 5px rgb(46, 46, 46);
 	color: #fff;
 	line-height: 1em;
-	margin: 0 0 1em 0;
-	padding: -5em;
+	margin: 0 0 0.5em 0;
+	padding: 0;
 }
 
 #banner p {

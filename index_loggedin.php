@@ -1,24 +1,8 @@
 <!DOCTYPE html>
 <html>
-<?php
+<?php 
 session_start();
-
-if (isset($_POST["input_country"])) {
-    $inputFrom = $_POST['inputFrom'];
-    $inputTo = $_POST['inputTo'];
-    if (empty($inputFrom) || empty($inputTo)) {
-        header("Location: ../index_loggedin.php?error=emptyfields");
-        exit();
-    } else {
-        $_SESSION['country_from'] = $inputFrom;
-        $_SESSION['country_to'] = $inputTo;
-        header("Location: route.php?input=success");
-        exit();
-    }
-}
-
 ?>
-
 <head>
     <title>PlanIt</title>
     <meta charset="utf-8" />
@@ -37,20 +21,31 @@ if (isset($_POST["input_country"])) {
 <body>
     <!-- Header -->
     <header id="header">
-        <nav class="left">
-            <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
-            <a>Plan it with ease!</a>
-        </nav>
-        <nav class="right">
-            <a href="#">New Plan</a>
-            <a href="route.php">My Plan</a>
-            <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
-        </nav>
-    </header>
+    <nav class="left">
+      <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
+    </nav>
+    <nav class="right">
+      <a href="login.html">New Plan</a>
+      <a href="#">My Plan</a>
+      <a href="#" class="#"><?php echo $_SESSION['userUid']?></a>
+    </nav>
+  </header>
+    <!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="generic.html">Generic</a></li>
+            <li><a href="elements.html">Elements</a></li>
+        </ul>
+        <ul class="actions vertical">
+            <li><a href="#" class="button fit">Login</a></li>
+        </ul>
+    </nav>
     <!-- Banner -->
     <section id="banner">
         <div class="inner flex flex-3">
             <div class="align-left">
+
                 <h1 style="margin-top:-60px;text-shadow: 4px 4px 10px #222;">
                     <bold>PlanIt your <br>next Journey</bold>
                 </h1>
@@ -58,29 +53,24 @@ if (isset($_POST["input_country"])) {
                     <bold>Create a fully customized day-by-day itinerary for free</bold>
                 </h5>
 
-                <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                <!--If not logged in, sent to login page-->
+                <form method="POST">
                     <div class="form-row ">
                         <div class="col-md-3.2 mb-3">
-                            <label for="inputFrom" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Origin</label>
-                            <input type="text" class="form-control" name="inputFrom" placeholder="Enter Origin" required style="border:1px solid #f1f1f1; border-radius:8px; background:#fff; opacity:1;">
+                            <label for="validationDefault03" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Destination</label>
+                            <input type="text" class="form-control" id="inputCity" placeholder="Enter Destination" required style="border:1px solid #f1f1f1; border-radius:8px; background:#fff; opacity:1;">
                         </div>
-                        <div class="col-md-3.2 mb-3">
-                            <label for="inputTo" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Destination</label>
-                            <input type="text" class="form-control" name="inputTo" placeholder="Enter Destination" required style="border:1px solid #f1f1f1; border-radius:8px; background:#fff; opacity:1;">
-                        </div>
-                    </div>
-                    <div class="form-row">
                         <div class="col-md-3.2 mb-3">
                             <label for="validationDefault04" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">Start Date</label>
-                            <input class="form-control" type="date" value="" name="date1" style="height:70% width:50%;">
+                            <input class="form-control" type="date" value="" id="example-date-input" style="height:70%;">
                         </div>
                         <div class="col-md-3.2 mb-3">
                             <label for="validationDefault05" style="text-shadow: 2px 2px 8px #222;color:white;text-align: left;">End Date</label>
-                            <input class="form-control" type="date" value="" name="date2" style="height:70% width:10%;">
+                            <input class="form-control" type="date" value="" id="example-date-input2" style="height:70%;">
                         </div>
-                        <div class="col-md-3.2 mb-3">
-                            <button type="submit" class="btn btn-primary" name="input_country" style="margin-top:35%"><i class="fa fa-search"></i></button>
-                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary" style="margin-left:105%; margin-top:-20%; position:left;"><i class="fa fa-search"></i></button>
                     </div>
                 </form>
             </div>
@@ -93,46 +83,21 @@ if (isset($_POST["input_country"])) {
             <div class="inner">
                 <h1>Trip with ease</h1>
                 <div>
-                    <img src="assets/images/planit_use.png" alt="" width="80%" height="80%">
+                    <p>Sign Up/Log In -&gt Insert Details -&gt Drag N Drop</p>
+                    <!-- isi Steps to use TripIt-->
                 </div>
             </div>
         </section>
 
         <!-- Two -->
         <section id="one" class="wrapper">
-            <div class="inner" style="text-align: center">
-                <h1>Benefits of PlanIt</h1>
-            </div>
+            <div class="inner flex flex-3">
+                <div class="flex-item left">
+                    <div>
+                        <h1>Benefits of PlanIt</h1>
 
-            <div class="inner flex flex-3">
-                <img src="assets/images/recommendation.png" alt="" width="50%" height="50%" style="float: right;">
-                <div class="flex-item right">
-                    <img src="assets/images/one.png" alt="" width="12%" height="15%">
-                    <p>
-                        <h4><br>Recommendation API that helps search the perfect vacation spot for you!</h4>
-                        <ul>
-                            <li>Best places and time to visit</li>
-                            <li>Best reviews</li>
-                            <li>Perfect price range</li>
-                            <li>Hidden spots</li>
-                        </ul>
-                    </p>
+                    </div>
                 </div>
-            </div>
-            <br><br>
-            <div class="inner flex flex-3">
-                <div class="flex-item right">
-                    <img src="assets/images/two.png" alt="" width="12%" height="13%">
-                    <p>
-                        <h4><br>Customizable calender just for you!</h4>
-                        <ul>
-                            <li>Fully ustomizable calender</li>
-                            <li>Add activites</li>
-                            <li>Delete activities</li>
-                        </ul>
-                    </p>
-                </div>
-                <img src="assets/images/calender.png" alt="" width="50%" height="50%" style="float: right;">
             </div>
         </section>
     </main>
@@ -166,4 +131,4 @@ if (isset($_POST["input_country"])) {
     <script src="assets/js/main.js"></script>
 </body>
 
-</html>
+</html> 

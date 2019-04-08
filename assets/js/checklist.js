@@ -55,11 +55,10 @@ $(document).ready(function () {
 
 	$(".modi-edit .modi-btn-save").click(function () {
 		var value = $(".modi-input-field:text").val();
-		$("label[for='" + itemId + "']").text(value);
-		// $(".modi-edit label[for='" + itemId + "']").prepend("<div><i class='fa fa-check'></i></div>");
+		$(".modi-edit label[for='" + itemId + "']").text(value);
+		$(".modi-edit label[for='" + itemId + "']").prepend("<div><i class='fa fa-check'></i></div>");
 		$(".modi-edit").fadeOut(300);
 		$(".modi-edit .modi-input-field").val("");
-		console.log(value);
 	});
 
 });
