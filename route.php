@@ -103,7 +103,7 @@ session_start();
                       <div class="line"></div>
                     </div>
                     <div class="content">
-                      <div class="title">Seoul</div>
+                      <div class="title"><?php echo $_SESSION['country_to']?></div>
                       <span class="line-hr"></span>
                       <svg class="edit stay-icon" for="r1" title="Edit destination">
                         <use xlink:href="#icon-edit"></use>
@@ -117,7 +117,7 @@ session_start();
                       <div class="line up"></div>
                     </div>
                     <div class="content">
-                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_to'] ?></div>
+                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_from'] ?></div>
                     </div>
                   </div>
                 </div>
@@ -130,7 +130,13 @@ session_start();
                 <div class="dest-rail active" style="display: block;">
                   <div class="see-also">Trip recommendation:</div>
                   <ul style="list-style: none; padding: 0;">
-                    <li>
+                    <li id="recommend_list">
+                      <script>
+                        var recommend = <?php $_SESSION['result_arr']?>;
+                        for(var i=0; i<recommend.length; i++) {
+                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
+                        }
+                      </script>
                       <span class="tour-title">Get from recomendations.</span>&nbsp;
                     </li>
                   </ul>

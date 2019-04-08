@@ -12,6 +12,7 @@ session_start();
     <!--CSS-->
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/menu.css">
+    <!-- <link rel="stylesheet" href="assets/css/test-checklist.css"> -->
     <!--Google API Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -160,6 +161,15 @@ session_start();
         <script>
             var CITY = "<?php echo $_SESSION['country_to'] ?>";
             getWeatherData(CITY);
+        </script>
+        <script>
+            
+		$(".add-button").click(function () {
+			itemId = $(this).attr('id');
+			var value = $("h3[id='" + itemId + "']").text();
+			console.log(value);
+		});
+	
         </script>
         <!--end-->
     </main>

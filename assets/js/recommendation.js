@@ -22,20 +22,29 @@ $(document).ready(function () {
                 '<div class="text p-3">' +
                 '<div class="d-flex">' +
                 '<div class="one">' +
-                '<h3>' + search_results[count].place + '</h3>' +
+                '<h3 id="result'+ count+'">' + search_results[count].place + '</h3>' +
                 '</div>' +
                 '</div>' +
                 '<p>' + search_results[count].desc + '</p>' +
-                '<label for="check' + count + '">' + value + '</label>' +
+                '<label for="result' + count + '">' + value + '</label>' +
                 '<hr>' +
-                '<p class="bottom-area d-flex"><span><i class="icon-map-o"</i>' + search_results[count].map + '</span>' +
-                '<span class="ml-auto"><a href="#">Add</a></span>' +
-                '</p>' +
+                '<span for="result' + count + '">'+ search_results[count].map + '</span>' +
+                '<span class="ml-auto add-button" style="cursor: pointer;" for="result' + count + '">Add</span>' +
                 '</div>' +
                 '</div>' +
                 '</div>');
         }
     });
+
+    function clEdit() {
+		$(".edit-btn").click(function () {
+			$(".modi-edit").fadeIn(300);
+			itemId = $(this).attr('for');
+			var value = $("label[for='" + itemId + "']").text();
+			$(".modi-edit .modi-input-field").val(value);
+			console.log(value);
+		});
+	}
 
     $(".modi-edit .modi-btn-save").click(function () {
         var value = $(".modi-input-field:text").val();
