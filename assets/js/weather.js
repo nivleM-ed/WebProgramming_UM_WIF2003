@@ -1,7 +1,9 @@
 var xhr = new XMLHttpRequest();
 var response, myRes;
 var dateArr = new Array();
+var skyArr = new Array();
 var weatherArr = new Array();
+var weatherArrSky = new Array();
 var weatherArrTemp = new Array();
 var tempArr = new Array();
 
@@ -25,6 +27,7 @@ function getWeather(URL) {
             // console.log(document.getElementById("city").value);  
             getDataArr();
             getChart();
+            setSky();
         } else {
             // console.log(document.getElementById("c   ity").value);
             console.log('The request failed!');
@@ -33,6 +36,13 @@ function getWeather(URL) {
 
     xhr.open('GET', URL);
     xhr.send();
+}
+function setSky() {
+    for(var i=0; i<weatherArrSky.length; i++) {
+        $("#dates").append('<td>'+weatherArr[i]+'</td>');
+        $("#weather").append('<td>'+weatherArrSky[i]+'</td>');
+    }
+    
 }
 
 //change the response file from api endpoint to array
@@ -49,12 +59,17 @@ function getDataArr() {
         tempArr[i] = parseInt(myRes.list[i].main.temp) - 273.15;
     }
 
+    for (var i = 0; i < myRes.list.length; i++) {
+        skyArr[i] = myRes.list[i].weather[0].description;
+    }
+
     for (var i = 0; i < dateArr.length; i++) {
         if (weatherArr.includes(dateArr[i])) {
             // console.log(dateArr[i]);
         } else {
             weatherArr.push(dateArr[i]);
             weatherArrTemp.push(tempArr[i]);
+            weatherArrSky.push(skyArr[i]);
         }
     }
 }

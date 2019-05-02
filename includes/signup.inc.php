@@ -48,7 +48,7 @@ if(isset($_POST['signup'])){
                     $hashedPwd = password_hash($password,PASSWORD_DEFAULT); //hashing the password
                     mysqli_stmt_bind_param($stmt,"sss",$username,$email,$hashedPwd); //3 s because 3 parameters
                     mysqli_stmt_execute($stmt);
-                    header("Location: ../signup.php?signup=success");
+                    header("Location: ../login.php?signup=success");
                     exit();
                 }
             }

@@ -1,4 +1,6 @@
-
+/*!
+Core
+*/
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4041,6 +4043,8 @@
         */
         // Hit System
         // -----------------------------------------------------------------------------------------------------------------
+        DateComponent.prototype.buildPositionCaches = function () {
+        };
         DateComponent.prototype.queryHit = function (positionLeft, positionTop, elWidth, elHeight) {
             return null; // this should be abstract
         };
@@ -4793,39 +4797,25 @@
     }());
     registerCalendarSystem('gregory', GregorianCalendarSystem);
 
-    var ISO_START = /^\s*\d{4}-\d\d-\d\d([T ]\d)?/;
-    var ISO_TZO_RE = /(?:(Z)|([-+])(\d\d)(?::(\d\d))?)$/;
+    var ISO_RE = /^\s*(\d{4})(-(\d{2})(-(\d{2})([T ](\d{2}):(\d{2})(:(\d{2})(\.(\d+))?)?(Z|(([-+])(\d{2})(:?(\d{2}))?))?)?)?)?$/;
     function parse(str) {
-        var timeZoneOffset = null;
-        var isTimeUnspecified = false;
-        var m = ISO_START.exec(str);
+        var m = ISO_RE.exec(str);
         if (m) {
-            isTimeUnspecified = !m[1];
-            if (isTimeUnspecified) {
-                str += 'T00:00:00Z';
-            }
-            else {
-                str = str.replace(ISO_TZO_RE, function (whole, z, sign, minutes, seconds) {
-                    if (z) {
-                        timeZoneOffset = 0;
-                    }
-                    else {
-                        timeZoneOffset = (parseInt(minutes, 10) * 60 +
-                            parseInt(seconds || 0, 10)) * (sign === '-' ? -1 : 1);
-                    }
-                    return '';
-                }) + 'Z'; // otherwise will parse in local
+            var marker = new Date(Date.UTC(Number(m[1]), m[3] ? Number(m[3]) - 1 : 0, Number(m[5] || 1), Number(m[7] || 0), Number(m[8] || 0), Number(m[10] || 0), m[12] ? Number('0.' + m[12]) * 1000 : 0));
+            if (isValidDate(marker)) {
+                var timeZoneOffset = null;
+                if (m[13]) {
+                    timeZoneOffset = (m[15] === '-' ? -1 : 1) * (Number(m[16] || 0) * 60 +
+                        Number(m[18] || 0));
+                }
+                return {
+                    marker: marker,
+                    isTimeUnspecified: !m[6],
+                    timeZoneOffset: timeZoneOffset
+                };
             }
         }
-        var marker = new Date(str);
-        if (!isValidDate(marker)) {
-            return null;
-        }
-        return {
-            marker: marker,
-            isTimeUnspecified: isTimeUnspecified,
-            timeZoneOffset: timeZoneOffset
-        };
+        return null;
     }
 
     var DateEnv = /** @class */ (function () {
@@ -6473,7 +6463,6 @@
     /*
     Detects when the user clicks on an event within a DateComponent
     */
-   
     var EventClicking = /** @class */ (function (_super) {
         __extends(EventClicking, _super);
         function EventClicking(settings) {
@@ -7139,11 +7128,17 @@
         // Given a duration singular unit, like "week" or "day", finds a matching view spec.
         // Preference is given to views that have corresponding buttons.
         Calendar.prototype.getUnitViewSpec = function (unit) {
-            var viewTypes;
+            var component = this.component;
+            var viewTypes = [];
             var i;
             var spec;
-            // put views that have buttons first. there will be duplicates, but oh well
-            viewTypes = this.component.header.viewsWithButtons; // TODO: include footer as well?
+            // put views that have buttons first. there will be duplicates, but oh
+            if (component.header) {
+                viewTypes.push.apply(viewTypes, component.header.viewsWithButtons);
+            }
+            if (component.footer) {
+                viewTypes.push.apply(viewTypes, component.footer.viewsWithButtons);
+            }
             for (var viewType in this.viewSpecs) {
                 viewTypes.push(viewType);
             }
@@ -7500,6 +7495,14 @@
         Calendar.prototype.refetchEvents = function () {
             this.dispatch({ type: 'FETCH_EVENT_SOURCES' });
         };
+        // Scroll
+        // -----------------------------------------------------------------------------------------------------------------
+        Calendar.prototype.scrollToTime = function (timeInput) {
+            var time = createDuration(timeInput);
+            if (time) {
+                this.component.view.scrollToTime(time);
+            }
+        };
         return Calendar;
     }());
     EmitterMixin.mixInto(Calendar);
@@ -7628,7 +7631,9 @@
         // -----------------------------------------------------------------------------------------------------------------
         View.prototype.renderDatesWrap = function (dateProfile) {
             this.renderDates(dateProfile);
-            this.addScroll({ isDateInit: true });
+            this.addScroll({
+                timeMs: createDuration(this.opt('scrollTime')).milliseconds
+            });
             this.startNowIndicator(dateProfile); // shouldn't render yet because updateSize will be called soon
         };
         View.prototype.unrenderDatesWrap = function () {
@@ -7800,17 +7805,18 @@
             return scroll;
         };
         View.prototype.applyScroll = function (scroll, isResize) {
-            if (scroll.isDateInit) {
-                delete scroll.isDateInit;
+            var timeMs = scroll.timeMs;
+            if (timeMs != null) {
+                delete scroll.timeMs;
                 if (this.props.dateProfile) { // dates rendered yet?
-                    __assign(scroll, this.computeInitialDateScroll());
+                    __assign(scroll, this.computeDateScroll(timeMs));
                 }
             }
             if (this.props.dateProfile) { // dates rendered yet?
                 this.applyDateScroll(scroll);
             }
         };
-        View.prototype.computeInitialDateScroll = function () {
+        View.prototype.computeDateScroll = function (timeMs) {
             return {}; // subclasses must implement
         };
         View.prototype.queryDateScroll = function () {
@@ -7818,6 +7824,12 @@
         };
         View.prototype.applyDateScroll = function (scroll) {
             // subclasses must implement
+        };
+        // for API
+        View.prototype.scrollToTime = function (time) {
+            this.applyScroll({
+                timeMs: time.milliseconds
+            }, false);
         };
         return View;
     }(DateComponent));
@@ -8628,7 +8640,7 @@
 
     // exports
     // --------------------------------------------------------------------------------------------------
-    var version = '4.0.2';
+    var version = '4.1.0';
 
     exports.Calendar = Calendar;
     exports.Component = Component;
@@ -8788,7 +8800,3014 @@
 }));
 
 /*!
-FullCalendar Interaction Plugin v4.0.2
+Day Grid
+*/
+
+/*!
+FullCalendar Day Grid Plugin v4.1.0
+Docs & License: https://fullcalendar.io/
+(c) 2019 Adam Shaw
+*/
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@fullcalendar/core')) :
+    typeof define === 'function' && define.amd ? define(['exports', '@fullcalendar/core'], factory) :
+    (global = global || self, factory(global.FullCalendarDayGrid = {}, global.FullCalendar));
+}(this, function (exports, core) { 'use strict';
+
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+    /* global Reflect, Promise */
+
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    var __assign = function() {
+        __assign = Object.assign || function __assign(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
+
+    var DayGridDateProfileGenerator = /** @class */ (function (_super) {
+        __extends(DayGridDateProfileGenerator, _super);
+        function DayGridDateProfileGenerator() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        // Computes the date range that will be rendered.
+        DayGridDateProfileGenerator.prototype.buildRenderRange = function (currentRange, currentRangeUnit, isRangeAllDay) {
+            var dateEnv = this.dateEnv;
+            var renderRange = _super.prototype.buildRenderRange.call(this, currentRange, currentRangeUnit, isRangeAllDay);
+            var start = renderRange.start;
+            var end = renderRange.end;
+            var endOfWeek;
+            // year and month views should be aligned with weeks. this is already done for week
+            if (/^(year|month)$/.test(currentRangeUnit)) {
+                start = dateEnv.startOfWeek(start);
+                // make end-of-week if not already
+                endOfWeek = dateEnv.startOfWeek(end);
+                if (endOfWeek.valueOf() !== end.valueOf()) {
+                    end = core.addWeeks(endOfWeek, 1);
+                }
+            }
+            // ensure 6 weeks
+            if (this.options.monthMode &&
+                this.options.fixedWeekCount) {
+                var rowCnt = Math.ceil(// could be partial weeks due to hiddenDays
+                core.diffWeeks(start, end));
+                end = core.addWeeks(end, 6 - rowCnt);
+            }
+            return { start: start, end: end };
+        };
+        return DayGridDateProfileGenerator;
+    }(core.DateProfileGenerator));
+
+    /* A rectangular panel that is absolutely positioned over other content
+    ------------------------------------------------------------------------------------------------------------------------
+    Options:
+      - className (string)
+      - content (HTML string, element, or element array)
+      - parentEl
+      - top
+      - left
+      - right (the x coord of where the right edge should be. not a "CSS" right)
+      - autoHide (boolean)
+      - show (callback)
+      - hide (callback)
+    */
+    var Popover = /** @class */ (function () {
+        function Popover(options) {
+            var _this = this;
+            this.isHidden = true;
+            this.margin = 10; // the space required between the popover and the edges of the scroll container
+            // Triggered when the user clicks *anywhere* in the document, for the autoHide feature
+            this.documentMousedown = function (ev) {
+                // only hide the popover if the click happened outside the popover
+                if (_this.el && !_this.el.contains(ev.target)) {
+                    _this.hide();
+                }
+            };
+            this.options = options;
+        }
+        // Shows the popover on the specified position. Renders it if not already
+        Popover.prototype.show = function () {
+            if (this.isHidden) {
+                if (!this.el) {
+                    this.render();
+                }
+                this.el.style.display = '';
+                this.position();
+                this.isHidden = false;
+                this.trigger('show');
+            }
+        };
+        // Hides the popover, through CSS, but does not remove it from the DOM
+        Popover.prototype.hide = function () {
+            if (!this.isHidden) {
+                this.el.style.display = 'none';
+                this.isHidden = true;
+                this.trigger('hide');
+            }
+        };
+        // Creates `this.el` and renders content inside of it
+        Popover.prototype.render = function () {
+            var _this = this;
+            var options = this.options;
+            var el = this.el = core.createElement('div', {
+                className: 'fc-popover ' + (options.className || ''),
+                style: {
+                    top: '0',
+                    left: '0'
+                }
+            });
+            if (typeof options.content === 'function') {
+                options.content(el);
+            }
+            options.parentEl.appendChild(el);
+            // when a click happens on anything inside with a 'fc-close' className, hide the popover
+            core.listenBySelector(el, 'click', '.fc-close', function (ev) {
+                _this.hide();
+            });
+            if (options.autoHide) {
+                document.addEventListener('mousedown', this.documentMousedown);
+            }
+        };
+        // Hides and unregisters any handlers
+        Popover.prototype.destroy = function () {
+            this.hide();
+            if (this.el) {
+                core.removeElement(this.el);
+                this.el = null;
+            }
+            document.removeEventListener('mousedown', this.documentMousedown);
+        };
+        // Positions the popover optimally, using the top/left/right options
+        Popover.prototype.position = function () {
+            var options = this.options;
+            var el = this.el;
+            var elDims = el.getBoundingClientRect(); // only used for width,height
+            var origin = core.computeRect(el.offsetParent);
+            var clippingRect = core.computeClippingRect(options.parentEl);
+            var top; // the "position" (not "offset") values for the popover
+            var left; //
+            // compute top and left
+            top = options.top || 0;
+            if (options.left !== undefined) {
+                left = options.left;
+            }
+            else if (options.right !== undefined) {
+                left = options.right - elDims.width; // derive the left value from the right value
+            }
+            else {
+                left = 0;
+            }
+            // constrain to the view port. if constrained by two edges, give precedence to top/left
+            top = Math.min(top, clippingRect.bottom - elDims.height - this.margin);
+            top = Math.max(top, clippingRect.top + this.margin);
+            left = Math.min(left, clippingRect.right - elDims.width - this.margin);
+            left = Math.max(left, clippingRect.left + this.margin);
+            core.applyStyle(el, {
+                top: top - origin.top,
+                left: left - origin.left
+            });
+        };
+        // Triggers a callback. Calls a function in the option hash of the same name.
+        // Arguments beyond the first `name` are forwarded on.
+        // TODO: better code reuse for this. Repeat code
+        // can kill this???
+        Popover.prototype.trigger = function (name) {
+            if (this.options[name]) {
+                this.options[name].apply(this, Array.prototype.slice.call(arguments, 1));
+            }
+        };
+        return Popover;
+    }());
+
+    /* Event-rendering methods for the DayGrid class
+    ----------------------------------------------------------------------------------------------------------------------*/
+    // "Simple" is bad a name. has nothing to do with SimpleDayGrid
+    var SimpleDayGridEventRenderer = /** @class */ (function (_super) {
+        __extends(SimpleDayGridEventRenderer, _super);
+        function SimpleDayGridEventRenderer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        // Builds the HTML to be used for the default element for an individual segment
+        SimpleDayGridEventRenderer.prototype.renderSegHtml = function (seg, mirrorInfo) {
+            var options = this.context.options;
+            var eventRange = seg.eventRange;
+            var eventDef = eventRange.def;
+            var eventUi = eventRange.ui;
+            var allDay = eventDef.allDay;
+            var isDraggable = eventUi.startEditable;
+            var isResizableFromStart = allDay && seg.isStart && eventUi.durationEditable && options.eventResizableFromStart;
+            var isResizableFromEnd = allDay && seg.isEnd && eventUi.durationEditable;
+            var classes = this.getSegClasses(seg, isDraggable, isResizableFromStart || isResizableFromEnd, mirrorInfo);
+            var skinCss = core.cssToStr(this.getSkinCss(eventUi));
+            var timeHtml = '';
+            var timeText;
+            var titleHtml;
+            classes.unshift('fc-day-grid-event', 'fc-h-event');
+            // Only display a timed events time if it is the starting segment
+            if (seg.isStart) {
+                timeText = this.getTimeText(eventRange);
+                if (timeText) {
+                    timeHtml = '<span class="fc-time">' + core.htmlEscape(timeText) + '</span>';
+                }
+            }
+            titleHtml =
+                '<span class="fc-title">' +
+                    (core.htmlEscape(eventDef.title || '') || '&nbsp;') + // we always want one line of height
+                    '</span>';
+            return '<a class="' + classes.join(' ') + '"' +
+                (eventDef.url ?
+                    ' href="' + core.htmlEscape(eventDef.url) + '"' :
+                    '') +
+                (skinCss ?
+                    ' style="' + skinCss + '"' :
+                    '') +
+                '>' +
+                '<div class="fc-content">' +
+                (options.dir === 'rtl' ?
+                    titleHtml + ' ' + timeHtml : // put a natural space in between
+                    timeHtml + ' ' + titleHtml //
+                ) +
+                '</div>' +
+                (isResizableFromStart ?
+                    '<div class="fc-resizer fc-start-resizer"></div>' :
+                    '') +
+                (isResizableFromEnd ?
+                    '<div class="fc-resizer fc-end-resizer"></div>' :
+                    '') +
+                '</a>';
+        };
+        // Computes a default event time formatting string if `eventTimeFormat` is not explicitly defined
+        SimpleDayGridEventRenderer.prototype.computeEventTimeFormat = function () {
+            return {
+                hour: 'numeric',
+                minute: '2-digit',
+                omitZeroMinute: true,
+                meridiem: 'narrow'
+            };
+        };
+        SimpleDayGridEventRenderer.prototype.computeDisplayEventEnd = function () {
+            return false; // TODO: somehow consider the originating DayGrid's column count
+        };
+        return SimpleDayGridEventRenderer;
+    }(core.FgEventRenderer));
+
+    /* Event-rendering methods for the DayGrid class
+    ----------------------------------------------------------------------------------------------------------------------*/
+    var DayGridEventRenderer = /** @class */ (function (_super) {
+        __extends(DayGridEventRenderer, _super);
+        function DayGridEventRenderer(dayGrid) {
+            var _this = _super.call(this, dayGrid.context) || this;
+            _this.dayGrid = dayGrid;
+            return _this;
+        }
+        // Renders the given foreground event segments onto the grid
+        DayGridEventRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
+            var rowStructs = this.rowStructs = this.renderSegRows(segs);
+            // append to each row's content skeleton
+            this.dayGrid.rowEls.forEach(function (rowNode, i) {
+                rowNode.querySelector('.fc-content-skeleton > table').appendChild(rowStructs[i].tbodyEl);
+            });
+            // removes the "more.." events popover
+            if (!mirrorInfo) {
+                this.dayGrid.removeSegPopover();
+            }
+        };
+        // Unrenders all currently rendered foreground event segments
+        DayGridEventRenderer.prototype.detachSegs = function () {
+            var rowStructs = this.rowStructs || [];
+            var rowStruct;
+            while ((rowStruct = rowStructs.pop())) {
+                core.removeElement(rowStruct.tbodyEl);
+            }
+            this.rowStructs = null;
+        };
+        // Uses the given events array to generate <tbody> elements that should be appended to each row's content skeleton.
+        // Returns an array of rowStruct objects (see the bottom of `renderSegRow`).
+        // PRECONDITION: each segment shoud already have a rendered and assigned `.el`
+        DayGridEventRenderer.prototype.renderSegRows = function (segs) {
+            var rowStructs = [];
+            var segRows;
+            var row;
+            segRows = this.groupSegRows(segs); // group into nested arrays
+            // iterate each row of segment groupings
+            for (row = 0; row < segRows.length; row++) {
+                rowStructs.push(this.renderSegRow(row, segRows[row]));
+            }
+            return rowStructs;
+        };
+        // Given a row # and an array of segments all in the same row, render a <tbody> element, a skeleton that contains
+        // the segments. Returns object with a bunch of internal data about how the render was calculated.
+        // NOTE: modifies rowSegs
+        DayGridEventRenderer.prototype.renderSegRow = function (row, rowSegs) {
+            var dayGrid = this.dayGrid;
+            var colCnt = dayGrid.colCnt, isRtl = dayGrid.isRtl;
+            var segLevels = this.buildSegLevels(rowSegs); // group into sub-arrays of levels
+            var levelCnt = Math.max(1, segLevels.length); // ensure at least one level
+            var tbody = document.createElement('tbody');
+            var segMatrix = []; // lookup for which segments are rendered into which level+col cells
+            var cellMatrix = []; // lookup for all <td> elements of the level+col matrix
+            var loneCellMatrix = []; // lookup for <td> elements that only take up a single column
+            var i;
+            var levelSegs;
+            var col;
+            var tr;
+            var j;
+            var seg;
+            var td;
+            // populates empty cells from the current column (`col`) to `endCol`
+            function emptyCellsUntil(endCol) {
+                while (col < endCol) {
+                    // try to grab a cell from the level above and extend its rowspan. otherwise, create a fresh cell
+                    td = (loneCellMatrix[i - 1] || [])[col];
+                    if (td) {
+                        td.rowSpan = (td.rowSpan || 1) + 1;
+                    }
+                    else {
+                        td = document.createElement('td');
+                        tr.appendChild(td);
+                    }
+                    cellMatrix[i][col] = td;
+                    loneCellMatrix[i][col] = td;
+                    col++;
+                }
+            }
+            for (i = 0; i < levelCnt; i++) { // iterate through all levels
+                levelSegs = segLevels[i];
+                col = 0;
+                tr = document.createElement('tr');
+                segMatrix.push([]);
+                cellMatrix.push([]);
+                loneCellMatrix.push([]);
+                // levelCnt might be 1 even though there are no actual levels. protect against this.
+                // this single empty row is useful for styling.
+                if (levelSegs) {
+                    for (j = 0; j < levelSegs.length; j++) { // iterate through segments in level
+                        seg = levelSegs[j];
+                        var leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol;
+                        var rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol;
+                        emptyCellsUntil(leftCol);
+                        // create a container that occupies or more columns. append the event element.
+                        td = core.createElement('td', { className: 'fc-event-container' }, seg.el);
+                        if (leftCol !== rightCol) {
+                            td.colSpan = rightCol - leftCol + 1;
+                        }
+                        else { // a single-column segment
+                            loneCellMatrix[i][col] = td;
+                        }
+                        while (col <= rightCol) {
+                            cellMatrix[i][col] = td;
+                            segMatrix[i][col] = seg;
+                            col++;
+                        }
+                        tr.appendChild(td);
+                    }
+                }
+                emptyCellsUntil(colCnt); // finish off the row
+                var introHtml = dayGrid.renderProps.renderIntroHtml();
+                if (introHtml) {
+                    if (dayGrid.isRtl) {
+                        core.appendToElement(tr, introHtml);
+                    }
+                    else {
+                        core.prependToElement(tr, introHtml);
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            return {
+                row: row,
+                tbodyEl: tbody,
+                cellMatrix: cellMatrix,
+                segMatrix: segMatrix,
+                segLevels: segLevels,
+                segs: rowSegs
+            };
+        };
+        // Stacks a flat array of segments, which are all assumed to be in the same row, into subarrays of vertical levels.
+        // NOTE: modifies segs
+        DayGridEventRenderer.prototype.buildSegLevels = function (segs) {
+            var _a = this.dayGrid, isRtl = _a.isRtl, colCnt = _a.colCnt;
+            var levels = [];
+            var i;
+            var seg;
+            var j;
+            // Give preference to elements with certain criteria, so they have
+            // a chance to be closer to the top.
+            segs = this.sortEventSegs(segs);
+            for (i = 0; i < segs.length; i++) {
+                seg = segs[i];
+                // loop through levels, starting with the topmost, until the segment doesn't collide with other segments
+                for (j = 0; j < levels.length; j++) {
+                    if (!isDaySegCollision(seg, levels[j])) {
+                        break;
+                    }
+                }
+                // `j` now holds the desired subrow index
+                seg.level = j;
+                seg.leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol; // for sorting only
+                seg.rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol // for sorting only
+                ;
+                (levels[j] || (levels[j] = [])).push(seg);
+            }
+            // order segments left-to-right. very important if calendar is RTL
+            for (j = 0; j < levels.length; j++) {
+                levels[j].sort(compareDaySegCols);
+            }
+            return levels;
+        };
+        // Given a flat array of segments, return an array of sub-arrays, grouped by each segment's row
+        DayGridEventRenderer.prototype.groupSegRows = function (segs) {
+            var segRows = [];
+            var i;
+            for (i = 0; i < this.dayGrid.rowCnt; i++) {
+                segRows.push([]);
+            }
+            for (i = 0; i < segs.length; i++) {
+                segRows[segs[i].row].push(segs[i]);
+            }
+            return segRows;
+        };
+        // Computes a default `displayEventEnd` value if one is not expliclty defined
+        DayGridEventRenderer.prototype.computeDisplayEventEnd = function () {
+            return this.dayGrid.colCnt === 1; // we'll likely have space if there's only one day
+        };
+        return DayGridEventRenderer;
+    }(SimpleDayGridEventRenderer));
+    // Computes whether two segments' columns collide. They are assumed to be in the same row.
+    function isDaySegCollision(seg, otherSegs) {
+        var i;
+        var otherSeg;
+        for (i = 0; i < otherSegs.length; i++) {
+            otherSeg = otherSegs[i];
+            if (otherSeg.firstCol <= seg.lastCol &&
+                otherSeg.lastCol >= seg.firstCol) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // A cmp function for determining the leftmost event
+    function compareDaySegCols(a, b) {
+        return a.leftCol - b.leftCol;
+    }
+
+    var DayGridMirrorRenderer = /** @class */ (function (_super) {
+        __extends(DayGridMirrorRenderer, _super);
+        function DayGridMirrorRenderer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        DayGridMirrorRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
+            var sourceSeg = mirrorInfo.sourceSeg;
+            var rowStructs = this.rowStructs = this.renderSegRows(segs);
+            // inject each new event skeleton into each associated row
+            this.dayGrid.rowEls.forEach(function (rowNode, row) {
+                var skeletonEl = core.htmlToElement('<div class="fc-mirror-skeleton"><table></table></div>'); // will be absolutely positioned
+                var skeletonTopEl;
+                var skeletonTop;
+                // If there is an original segment, match the top position. Otherwise, put it at the row's top level
+                if (sourceSeg && sourceSeg.row === row) {
+                    skeletonTopEl = sourceSeg.el;
+                }
+                else {
+                    skeletonTopEl = rowNode.querySelector('.fc-content-skeleton tbody');
+                    if (!skeletonTopEl) { // when no events
+                        skeletonTopEl = rowNode.querySelector('.fc-content-skeleton table');
+                    }
+                }
+                skeletonTop = skeletonTopEl.getBoundingClientRect().top -
+                    rowNode.getBoundingClientRect().top; // the offsetParent origin
+                skeletonEl.style.top = skeletonTop + 'px';
+                skeletonEl.querySelector('table').appendChild(rowStructs[row].tbodyEl);
+                rowNode.appendChild(skeletonEl);
+            });
+        };
+        return DayGridMirrorRenderer;
+    }(DayGridEventRenderer));
+
+    var DayGridFillRenderer = /** @class */ (function (_super) {
+        __extends(DayGridFillRenderer, _super);
+        function DayGridFillRenderer(dayGrid) {
+            var _this = _super.call(this, dayGrid.context) || this;
+            _this.fillSegTag = 'td'; // override the default tag name
+            _this.dayGrid = dayGrid;
+            return _this;
+        }
+        DayGridFillRenderer.prototype.renderSegs = function (type, segs) {
+            // don't render timed background events
+            if (type === 'bgEvent') {
+                segs = segs.filter(function (seg) {
+                    return seg.eventRange.def.allDay;
+                });
+            }
+            _super.prototype.renderSegs.call(this, type, segs);
+        };
+        DayGridFillRenderer.prototype.attachSegs = function (type, segs) {
+            var els = [];
+            var i;
+            var seg;
+            var skeletonEl;
+            for (i = 0; i < segs.length; i++) {
+                seg = segs[i];
+                skeletonEl = this.renderFillRow(type, seg);
+                this.dayGrid.rowEls[seg.row].appendChild(skeletonEl);
+                els.push(skeletonEl);
+            }
+            return els;
+        };
+        // Generates the HTML needed for one row of a fill. Requires the seg's el to be rendered.
+        DayGridFillRenderer.prototype.renderFillRow = function (type, seg) {
+            var dayGrid = this.dayGrid;
+            var colCnt = dayGrid.colCnt, isRtl = dayGrid.isRtl;
+            var leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol;
+            var rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol;
+            var startCol = leftCol;
+            var endCol = rightCol + 1;
+            var className;
+            var skeletonEl;
+            var trEl;
+            if (type === 'businessHours') {
+                className = 'bgevent';
+            }
+            else {
+                className = type.toLowerCase();
+            }
+            skeletonEl = core.htmlToElement('<div class="fc-' + className + '-skeleton">' +
+                '<table><tr></tr></table>' +
+                '</div>');
+            trEl = skeletonEl.getElementsByTagName('tr')[0];
+            if (startCol > 0) {
+                core.appendToElement(trEl, 
+                // will create (startCol + 1) td's
+                new Array(startCol + 1).join('<td></td>'));
+            }
+            seg.el.colSpan = endCol - startCol;
+            trEl.appendChild(seg.el);
+            if (endCol < colCnt) {
+                core.appendToElement(trEl, 
+                // will create (colCnt - endCol) td's
+                new Array(colCnt - endCol + 1).join('<td></td>'));
+            }
+            var introHtml = dayGrid.renderProps.renderIntroHtml();
+            if (introHtml) {
+                if (dayGrid.isRtl) {
+                    core.appendToElement(trEl, introHtml);
+                }
+                else {
+                    core.prependToElement(trEl, introHtml);
+                }
+            }
+            return skeletonEl;
+        };
+        return DayGridFillRenderer;
+    }(core.FillRenderer));
+
+    var DayTile = /** @class */ (function (_super) {
+        __extends(DayTile, _super);
+        function DayTile(context, el) {
+            var _this = _super.call(this, context, el) || this;
+            var eventRenderer = _this.eventRenderer = new DayTileEventRenderer(_this);
+            var renderFrame = _this.renderFrame = core.memoizeRendering(_this._renderFrame);
+            _this.renderFgEvents = core.memoizeRendering(eventRenderer.renderSegs.bind(eventRenderer), eventRenderer.unrender.bind(eventRenderer), [renderFrame]);
+            _this.renderEventSelection = core.memoizeRendering(eventRenderer.selectByInstanceId.bind(eventRenderer), eventRenderer.unselectByInstanceId.bind(eventRenderer), [_this.renderFgEvents]);
+            _this.renderEventDrag = core.memoizeRendering(eventRenderer.hideByHash.bind(eventRenderer), eventRenderer.showByHash.bind(eventRenderer), [renderFrame]);
+            _this.renderEventResize = core.memoizeRendering(eventRenderer.hideByHash.bind(eventRenderer), eventRenderer.showByHash.bind(eventRenderer), [renderFrame]);
+            context.calendar.registerInteractiveComponent(_this, {
+                el: _this.el,
+                useEventCenter: false
+            });
+            return _this;
+        }
+        DayTile.prototype.render = function (props) {
+            this.renderFrame(props.date);
+            this.renderFgEvents(props.fgSegs);
+            this.renderEventSelection(props.eventSelection);
+            this.renderEventDrag(props.eventDragInstances);
+            this.renderEventResize(props.eventResizeInstances);
+        };
+        DayTile.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.renderFrame.unrender(); // should unrender everything else
+            this.calendar.unregisterInteractiveComponent(this);
+        };
+        DayTile.prototype._renderFrame = function (date) {
+            var _a = this, theme = _a.theme, dateEnv = _a.dateEnv;
+            var title = dateEnv.format(date, core.createFormatter(this.opt('dayPopoverFormat')) // TODO: cache
+            );
+            this.el.innerHTML =
+                '<div class="fc-header ' + theme.getClass('popoverHeader') + '">' +
+                    '<span class="fc-title">' +
+                    core.htmlEscape(title) +
+                    '</span>' +
+                    '<span class="fc-close ' + theme.getIconClass('close') + '"></span>' +
+                    '</div>' +
+                    '<div class="fc-body ' + theme.getClass('popoverContent') + '">' +
+                    '<div class="fc-event-container"></div>' +
+                    '</div>';
+            this.segContainerEl = this.el.querySelector('.fc-event-container');
+        };
+        DayTile.prototype.queryHit = function (positionLeft, positionTop, elWidth, elHeight) {
+            var date = this.props.date; // HACK
+            if (positionLeft < elWidth && positionTop < elHeight) {
+                return {
+                    component: this,
+                    dateSpan: {
+                        allDay: true,
+                        range: { start: date, end: core.addDays(date, 1) }
+                    },
+                    dayEl: this.el,
+                    rect: {
+                        left: 0,
+                        top: 0,
+                        right: elWidth,
+                        bottom: elHeight
+                    },
+                    layer: 1
+                };
+            }
+        };
+        return DayTile;
+    }(core.DateComponent));
+    var DayTileEventRenderer = /** @class */ (function (_super) {
+        __extends(DayTileEventRenderer, _super);
+        function DayTileEventRenderer(dayTile) {
+            var _this = _super.call(this, dayTile.context) || this;
+            _this.dayTile = dayTile;
+            return _this;
+        }
+        DayTileEventRenderer.prototype.attachSegs = function (segs) {
+            for (var _i = 0, segs_1 = segs; _i < segs_1.length; _i++) {
+                var seg = segs_1[_i];
+                this.dayTile.segContainerEl.appendChild(seg.el);
+            }
+        };
+        DayTileEventRenderer.prototype.detachSegs = function (segs) {
+            for (var _i = 0, segs_2 = segs; _i < segs_2.length; _i++) {
+                var seg = segs_2[_i];
+                core.removeElement(seg.el);
+            }
+        };
+        return DayTileEventRenderer;
+    }(SimpleDayGridEventRenderer));
+
+    var DayBgRow = /** @class */ (function () {
+        function DayBgRow(context) {
+            this.context = context;
+        }
+        DayBgRow.prototype.renderHtml = function (props) {
+            var parts = [];
+            if (props.renderIntroHtml) {
+                parts.push(props.renderIntroHtml());
+            }
+            for (var _i = 0, _a = props.cells; _i < _a.length; _i++) {
+                var cell = _a[_i];
+                parts.push(renderCellHtml(cell.date, props.dateProfile, this.context, cell.htmlAttrs));
+            }
+            if (!props.cells.length) {
+                parts.push('<td class="fc-day ' + this.context.theme.getClass('widgetContent') + '"></td>');
+            }
+            if (this.context.options.dir === 'rtl') {
+                parts.reverse();
+            }
+            return '<tr>' + parts.join('') + '</tr>';
+        };
+        return DayBgRow;
+    }());
+    function renderCellHtml(date, dateProfile, context, otherAttrs) {
+        var dateEnv = context.dateEnv, theme = context.theme;
+        var isDateValid = core.rangeContainsMarker(dateProfile.activeRange, date); // TODO: called too frequently. cache somehow.
+        var classes = core.getDayClasses(date, dateProfile, context);
+        classes.unshift('fc-day', theme.getClass('widgetContent'));
+        return '<td class="' + classes.join(' ') + '"' +
+            (isDateValid ?
+                ' data-date="' + dateEnv.formatIso(date, { omitTime: true }) + '"' :
+                '') +
+            (otherAttrs ?
+                ' ' + otherAttrs :
+                '') +
+            '></td>';
+    }
+
+    var DAY_NUM_FORMAT = core.createFormatter({ day: 'numeric' });
+    var WEEK_NUM_FORMAT = core.createFormatter({ week: 'numeric' });
+    var DayGrid = /** @class */ (function (_super) {
+        __extends(DayGrid, _super);
+        function DayGrid(context, el, renderProps) {
+            var _this = _super.call(this, context, el) || this;
+            _this.bottomCoordPadding = 0; // hack for extending the hit area for the last row of the coordinate grid
+            _this.isCellSizesDirty = false;
+            var eventRenderer = _this.eventRenderer = new DayGridEventRenderer(_this);
+            var fillRenderer = _this.fillRenderer = new DayGridFillRenderer(_this);
+            _this.mirrorRenderer = new DayGridMirrorRenderer(_this);
+            var renderCells = _this.renderCells = core.memoizeRendering(_this._renderCells, _this._unrenderCells);
+            _this.renderBusinessHours = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'businessHours'), fillRenderer.unrender.bind(fillRenderer, 'businessHours'), [renderCells]);
+            _this.renderDateSelection = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'highlight'), fillRenderer.unrender.bind(fillRenderer, 'highlight'), [renderCells]);
+            _this.renderBgEvents = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'bgEvent'), fillRenderer.unrender.bind(fillRenderer, 'bgEvent'), [renderCells]);
+            _this.renderFgEvents = core.memoizeRendering(eventRenderer.renderSegs.bind(eventRenderer), eventRenderer.unrender.bind(eventRenderer), [renderCells]);
+            _this.renderEventSelection = core.memoizeRendering(eventRenderer.selectByInstanceId.bind(eventRenderer), eventRenderer.unselectByInstanceId.bind(eventRenderer), [_this.renderFgEvents]);
+            _this.renderEventDrag = core.memoizeRendering(_this._renderEventDrag, _this._unrenderEventDrag, [renderCells]);
+            _this.renderEventResize = core.memoizeRendering(_this._renderEventResize, _this._unrenderEventResize, [renderCells]);
+            _this.renderProps = renderProps;
+            return _this;
+        }
+        DayGrid.prototype.render = function (props) {
+            var cells = props.cells;
+            this.rowCnt = cells.length;
+            this.colCnt = cells[0].length;
+            this.renderCells(cells, props.isRigid);
+            this.renderBusinessHours(props.businessHourSegs);
+            this.renderDateSelection(props.dateSelectionSegs);
+            this.renderBgEvents(props.bgEventSegs);
+            this.renderFgEvents(props.fgEventSegs);
+            this.renderEventSelection(props.eventSelection);
+            this.renderEventDrag(props.eventDrag);
+            this.renderEventResize(props.eventResize);
+            if (this.segPopoverTile) {
+                this.updateSegPopoverTile();
+            }
+        };
+        DayGrid.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.renderCells.unrender(); // will unrender everything else
+        };
+        DayGrid.prototype.getCellRange = function (row, col) {
+            var start = this.props.cells[row][col].date;
+            var end = core.addDays(start, 1);
+            return { start: start, end: end };
+        };
+        DayGrid.prototype.updateSegPopoverTile = function (date, segs) {
+            var ownProps = this.props;
+            this.segPopoverTile.receiveProps({
+                date: date || this.segPopoverTile.props.date,
+                fgSegs: segs || this.segPopoverTile.props.fgSegs,
+                eventSelection: ownProps.eventSelection,
+                eventDragInstances: ownProps.eventDrag ? ownProps.eventDrag.affectedInstances : null,
+                eventResizeInstances: ownProps.eventResize ? ownProps.eventResize.affectedInstances : null
+            });
+        };
+        /* Date Rendering
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype._renderCells = function (cells, isRigid) {
+            var _a = this, view = _a.view, dateEnv = _a.dateEnv;
+            var _b = this, rowCnt = _b.rowCnt, colCnt = _b.colCnt;
+            var html = '';
+            var row;
+            var col;
+            for (row = 0; row < rowCnt; row++) {
+                html += this.renderDayRowHtml(row, isRigid);
+            }
+            this.el.innerHTML = html;
+            this.rowEls = core.findElements(this.el, '.fc-row');
+            this.cellEls = core.findElements(this.el, '.fc-day, .fc-disabled-day');
+            if (this.isRtl) {
+                this.cellEls.reverse();
+            }
+            this.rowPositions = new core.PositionCache(this.el, this.rowEls, false, true // vertical
+            );
+            this.colPositions = new core.PositionCache(this.el, this.cellEls.slice(0, colCnt), // only the first row
+            true, false // horizontal
+            );
+            // trigger dayRender with each cell's element
+            for (row = 0; row < rowCnt; row++) {
+                for (col = 0; col < colCnt; col++) {
+                    this.publiclyTrigger('dayRender', [
+                        {
+                            date: dateEnv.toDate(cells[row][col].date),
+                            el: this.getCellEl(row, col),
+                            view: view
+                        }
+                    ]);
+                }
+            }
+            this.isCellSizesDirty = true;
+        };
+        DayGrid.prototype._unrenderCells = function () {
+            this.removeSegPopover();
+        };
+        // Generates the HTML for a single row, which is a div that wraps a table.
+        // `row` is the row number.
+        DayGrid.prototype.renderDayRowHtml = function (row, isRigid) {
+            var theme = this.theme;
+            var classes = ['fc-row', 'fc-week', theme.getClass('dayRow')];
+            if (isRigid) {
+                classes.push('fc-rigid');
+            }
+            var bgRow = new DayBgRow(this.context);
+            return '' +
+                '<div class="' + classes.join(' ') + '">' +
+                '<div class="fc-bg">' +
+                '<table class="' + theme.getClass('tableGrid') + '">' +
+                bgRow.renderHtml({
+                    cells: this.props.cells[row],
+                    dateProfile: this.props.dateProfile,
+                    renderIntroHtml: this.renderProps.renderBgIntroHtml
+                }) +
+                '</table>' +
+                '</div>' +
+                '<div class="fc-content-skeleton">' +
+                '<table>' +
+                (this.getIsNumbersVisible() ?
+                    '<thead>' +
+                        this.renderNumberTrHtml(row) +
+                        '</thead>' :
+                    '') +
+                '</table>' +
+                '</div>' +
+                '</div>';
+        };
+        DayGrid.prototype.getIsNumbersVisible = function () {
+            return this.getIsDayNumbersVisible() ||
+                this.renderProps.cellWeekNumbersVisible ||
+                this.renderProps.colWeekNumbersVisible;
+        };
+        DayGrid.prototype.getIsDayNumbersVisible = function () {
+            return this.rowCnt > 1;
+        };
+        /* Grid Number Rendering
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype.renderNumberTrHtml = function (row) {
+            var intro = this.renderProps.renderNumberIntroHtml(row, this);
+            return '' +
+                '<tr>' +
+                (this.isRtl ? '' : intro) +
+                this.renderNumberCellsHtml(row) +
+                (this.isRtl ? intro : '') +
+                '</tr>';
+        };
+        DayGrid.prototype.renderNumberCellsHtml = function (row) {
+            var htmls = [];
+            var col;
+            var date;
+            for (col = 0; col < this.colCnt; col++) {
+                date = this.props.cells[row][col].date;
+                htmls.push(this.renderNumberCellHtml(date));
+            }
+            if (this.isRtl) {
+                htmls.reverse();
+            }
+            return htmls.join('');
+        };
+        // Generates the HTML for the <td>s of the "number" row in the DayGrid's content skeleton.
+        // The number row will only exist if either day numbers or week numbers are turned on.
+        DayGrid.prototype.renderNumberCellHtml = function (date) {
+            var _a = this, view = _a.view, dateEnv = _a.dateEnv;
+            var html = '';
+            var isDateValid = core.rangeContainsMarker(this.props.dateProfile.activeRange, date); // TODO: called too frequently. cache somehow.
+            var isDayNumberVisible = this.getIsDayNumbersVisible() && isDateValid;
+            var classes;
+            var weekCalcFirstDow;
+            if (!isDayNumberVisible && !this.renderProps.cellWeekNumbersVisible) {
+                // no numbers in day cell (week number must be along the side)
+                return '<td></td>'; //  will create an empty space above events :(
+            }
+            classes = core.getDayClasses(date, this.props.dateProfile, this.context);
+            classes.unshift('fc-day-top');
+            if (this.renderProps.cellWeekNumbersVisible) {
+                weekCalcFirstDow = dateEnv.weekDow;
+            }
+            html += '<td class="' + classes.join(' ') + '"' +
+                (isDateValid ?
+                    ' data-date="' + dateEnv.formatIso(date, { omitTime: true }) + '"' :
+                    '') +
+                '>';
+            if (this.renderProps.cellWeekNumbersVisible && (date.getUTCDay() === weekCalcFirstDow)) {
+                html += core.buildGotoAnchorHtml(view, { date: date, type: 'week' }, { 'class': 'fc-week-number' }, dateEnv.format(date, WEEK_NUM_FORMAT) // inner HTML
+                );
+            }
+            if (isDayNumberVisible) {
+                html += core.buildGotoAnchorHtml(view, date, { 'class': 'fc-day-number' }, dateEnv.format(date, DAY_NUM_FORMAT) // inner HTML
+                );
+            }
+            html += '</td>';
+            return html;
+        };
+        /* Sizing
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype.updateSize = function (isResize) {
+            var _a = this, fillRenderer = _a.fillRenderer, eventRenderer = _a.eventRenderer, mirrorRenderer = _a.mirrorRenderer;
+            if (isResize ||
+                this.isCellSizesDirty ||
+                this.view.calendar.isEventsUpdated // hack
+            ) {
+                this.buildPositionCaches();
+                this.isCellSizesDirty = false;
+            }
+            fillRenderer.computeSizes(isResize);
+            eventRenderer.computeSizes(isResize);
+            mirrorRenderer.computeSizes(isResize);
+            fillRenderer.assignSizes(isResize);
+            eventRenderer.assignSizes(isResize);
+            mirrorRenderer.assignSizes(isResize);
+        };
+        DayGrid.prototype.buildPositionCaches = function () {
+            this.buildColPositions();
+            this.buildRowPositions();
+        };
+        DayGrid.prototype.buildColPositions = function () {
+            this.colPositions.build();
+        };
+        DayGrid.prototype.buildRowPositions = function () {
+            this.rowPositions.build();
+            this.rowPositions.bottoms[this.rowCnt - 1] += this.bottomCoordPadding; // hack
+        };
+        /* Hit System
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype.positionToHit = function (leftPosition, topPosition) {
+            var _a = this, colPositions = _a.colPositions, rowPositions = _a.rowPositions;
+            var col = colPositions.leftToIndex(leftPosition);
+            var row = rowPositions.topToIndex(topPosition);
+            if (row != null && col != null) {
+                return {
+                    row: row,
+                    col: col,
+                    dateSpan: {
+                        range: this.getCellRange(row, col),
+                        allDay: true
+                    },
+                    dayEl: this.getCellEl(row, col),
+                    relativeRect: {
+                        left: colPositions.lefts[col],
+                        right: colPositions.rights[col],
+                        top: rowPositions.tops[row],
+                        bottom: rowPositions.bottoms[row]
+                    }
+                };
+            }
+        };
+        /* Cell System
+        ------------------------------------------------------------------------------------------------------------------*/
+        // FYI: the first column is the leftmost column, regardless of date
+        DayGrid.prototype.getCellEl = function (row, col) {
+            return this.cellEls[row * this.colCnt + col];
+        };
+        /* Event Drag Visualization
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype._renderEventDrag = function (state) {
+            if (state) {
+                this.eventRenderer.hideByHash(state.affectedInstances);
+                this.fillRenderer.renderSegs('highlight', state.segs);
+            }
+        };
+        DayGrid.prototype._unrenderEventDrag = function (state) {
+            if (state) {
+                this.eventRenderer.showByHash(state.affectedInstances);
+                this.fillRenderer.unrender('highlight');
+            }
+        };
+        /* Event Resize Visualization
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype._renderEventResize = function (state) {
+            if (state) {
+                this.eventRenderer.hideByHash(state.affectedInstances);
+                this.fillRenderer.renderSegs('highlight', state.segs);
+                this.mirrorRenderer.renderSegs(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
+            }
+        };
+        DayGrid.prototype._unrenderEventResize = function (state) {
+            if (state) {
+                this.eventRenderer.showByHash(state.affectedInstances);
+                this.fillRenderer.unrender('highlight');
+                this.mirrorRenderer.unrender(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
+            }
+        };
+        /* More+ Link Popover
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGrid.prototype.removeSegPopover = function () {
+            if (this.segPopover) {
+                this.segPopover.hide(); // in handler, will call segPopover's removeElement
+            }
+        };
+        // Limits the number of "levels" (vertically stacking layers of events) for each row of the grid.
+        // `levelLimit` can be false (don't limit), a number, or true (should be computed).
+        DayGrid.prototype.limitRows = function (levelLimit) {
+            var rowStructs = this.eventRenderer.rowStructs || [];
+            var row; // row #
+            var rowLevelLimit;
+            for (row = 0; row < rowStructs.length; row++) {
+                this.unlimitRow(row);
+                if (!levelLimit) {
+                    rowLevelLimit = false;
+                }
+                else if (typeof levelLimit === 'number') {
+                    rowLevelLimit = levelLimit;
+                }
+                else {
+                    rowLevelLimit = this.computeRowLevelLimit(row);
+                }
+                if (rowLevelLimit !== false) {
+                    this.limitRow(row, rowLevelLimit);
+                }
+            }
+        };
+        // Computes the number of levels a row will accomodate without going outside its bounds.
+        // Assumes the row is "rigid" (maintains a constant height regardless of what is inside).
+        // `row` is the row number.
+        DayGrid.prototype.computeRowLevelLimit = function (row) {
+            var rowEl = this.rowEls[row]; // the containing "fake" row div
+            var rowBottom = rowEl.getBoundingClientRect().bottom; // relative to viewport!
+            var trEls = core.findChildren(this.eventRenderer.rowStructs[row].tbodyEl);
+            var i;
+            var trEl;
+            // Reveal one level <tr> at a time and stop when we find one out of bounds
+            for (i = 0; i < trEls.length; i++) {
+                trEl = trEls[i];
+                trEl.classList.remove('fc-limited'); // reset to original state (reveal)
+                if (trEl.getBoundingClientRect().bottom > rowBottom) {
+                    return i;
+                }
+            }
+            return false; // should not limit at all
+        };
+        // Limits the given grid row to the maximum number of levels and injects "more" links if necessary.
+        // `row` is the row number.
+        // `levelLimit` is a number for the maximum (inclusive) number of levels allowed.
+        DayGrid.prototype.limitRow = function (row, levelLimit) {
+            var _this = this;
+            var _a = this, colCnt = _a.colCnt, isRtl = _a.isRtl;
+            var rowStruct = this.eventRenderer.rowStructs[row];
+            var moreNodes = []; // array of "more" <a> links and <td> DOM nodes
+            var col = 0; // col #, left-to-right (not chronologically)
+            var levelSegs; // array of segment objects in the last allowable level, ordered left-to-right
+            var cellMatrix; // a matrix (by level, then column) of all <td> elements in the row
+            var limitedNodes; // array of temporarily hidden level <tr> and segment <td> DOM nodes
+            var i;
+            var seg;
+            var segsBelow; // array of segment objects below `seg` in the current `col`
+            var totalSegsBelow; // total number of segments below `seg` in any of the columns `seg` occupies
+            var colSegsBelow; // array of segment arrays, below seg, one for each column (offset from segs's first column)
+            var td;
+            var rowSpan;
+            var segMoreNodes; // array of "more" <td> cells that will stand-in for the current seg's cell
+            var j;
+            var moreTd;
+            var moreWrap;
+            var moreLink;
+            // Iterates through empty level cells and places "more" links inside if need be
+            var emptyCellsUntil = function (endCol) {
+                while (col < endCol) {
+                    segsBelow = _this.getCellSegs(row, col, levelLimit);
+                    if (segsBelow.length) {
+                        td = cellMatrix[levelLimit - 1][col];
+                        moreLink = _this.renderMoreLink(row, col, segsBelow);
+                        moreWrap = core.createElement('div', null, moreLink);
+                        td.appendChild(moreWrap);
+                        moreNodes.push(moreWrap);
+                    }
+                    col++;
+                }
+            };
+            if (levelLimit && levelLimit < rowStruct.segLevels.length) { // is it actually over the limit?
+                levelSegs = rowStruct.segLevels[levelLimit - 1];
+                cellMatrix = rowStruct.cellMatrix;
+                limitedNodes = core.findChildren(rowStruct.tbodyEl).slice(levelLimit); // get level <tr> elements past the limit
+                limitedNodes.forEach(function (node) {
+                    node.classList.add('fc-limited'); // hide elements and get a simple DOM-nodes array
+                });
+                // iterate though segments in the last allowable level
+                for (i = 0; i < levelSegs.length; i++) {
+                    seg = levelSegs[i];
+                    var leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol;
+                    var rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol;
+                    emptyCellsUntil(leftCol); // process empty cells before the segment
+                    // determine *all* segments below `seg` that occupy the same columns
+                    colSegsBelow = [];
+                    totalSegsBelow = 0;
+                    while (col <= rightCol) {
+                        segsBelow = this.getCellSegs(row, col, levelLimit);
+                        colSegsBelow.push(segsBelow);
+                        totalSegsBelow += segsBelow.length;
+                        col++;
+                    }
+                    if (totalSegsBelow) { // do we need to replace this segment with one or many "more" links?
+                        td = cellMatrix[levelLimit - 1][leftCol]; // the segment's parent cell
+                        rowSpan = td.rowSpan || 1;
+                        segMoreNodes = [];
+                        // make a replacement <td> for each column the segment occupies. will be one for each colspan
+                        for (j = 0; j < colSegsBelow.length; j++) {
+                            moreTd = core.createElement('td', { className: 'fc-more-cell', rowSpan: rowSpan });
+                            segsBelow = colSegsBelow[j];
+                            moreLink = this.renderMoreLink(row, leftCol + j, [seg].concat(segsBelow) // count seg as hidden too
+                            );
+                            moreWrap = core.createElement('div', null, moreLink);
+                            moreTd.appendChild(moreWrap);
+                            segMoreNodes.push(moreTd);
+                            moreNodes.push(moreTd);
+                        }
+                        td.classList.add('fc-limited');
+                        core.insertAfterElement(td, segMoreNodes);
+                        limitedNodes.push(td);
+                    }
+                }
+                emptyCellsUntil(this.colCnt); // finish off the level
+                rowStruct.moreEls = moreNodes; // for easy undoing later
+                rowStruct.limitedEls = limitedNodes; // for easy undoing later
+            }
+        };
+        // Reveals all levels and removes all "more"-related elements for a grid's row.
+        // `row` is a row number.
+        DayGrid.prototype.unlimitRow = function (row) {
+            var rowStruct = this.eventRenderer.rowStructs[row];
+            if (rowStruct.moreEls) {
+                rowStruct.moreEls.forEach(core.removeElement);
+                rowStruct.moreEls = null;
+            }
+            if (rowStruct.limitedEls) {
+                rowStruct.limitedEls.forEach(function (limitedEl) {
+                    limitedEl.classList.remove('fc-limited');
+                });
+                rowStruct.limitedEls = null;
+            }
+        };
+        // Renders an <a> element that represents hidden event element for a cell.
+        // Responsible for attaching click handler as well.
+        DayGrid.prototype.renderMoreLink = function (row, col, hiddenSegs) {
+            var _this = this;
+            var _a = this, view = _a.view, dateEnv = _a.dateEnv;
+            var a = core.createElement('a', { className: 'fc-more' });
+            a.innerText = this.getMoreLinkText(hiddenSegs.length);
+            a.addEventListener('click', function (ev) {
+                var clickOption = _this.opt('eventLimitClick');
+                var _col = _this.isRtl ? _this.colCnt - col - 1 : col; // HACK: props.cells has different dir system?
+                var date = _this.props.cells[row][_col].date;
+                var moreEl = ev.currentTarget;
+                var dayEl = _this.getCellEl(row, col);
+                var allSegs = _this.getCellSegs(row, col);
+                // rescope the segments to be within the cell's date
+                var reslicedAllSegs = _this.resliceDaySegs(allSegs, date);
+                var reslicedHiddenSegs = _this.resliceDaySegs(hiddenSegs, date);
+                if (typeof clickOption === 'function') {
+                    // the returned value can be an atomic option
+                    clickOption = _this.publiclyTrigger('eventLimitClick', [
+                        {
+                            date: dateEnv.toDate(date),
+                            allDay: true,
+                            dayEl: dayEl,
+                            moreEl: moreEl,
+                            segs: reslicedAllSegs,
+                            hiddenSegs: reslicedHiddenSegs,
+                            jsEvent: ev,
+                            view: view
+                        }
+                    ]);
+                }
+                if (clickOption === 'popover') {
+                    _this.showSegPopover(row, col, moreEl, reslicedAllSegs);
+                }
+                else if (typeof clickOption === 'string') { // a view name
+                    view.calendar.zoomTo(date, clickOption);
+                }
+            });
+            return a;
+        };
+        // Reveals the popover that displays all events within a cell
+        DayGrid.prototype.showSegPopover = function (row, col, moreLink, segs) {
+            var _this = this;
+            var _a = this, calendar = _a.calendar, view = _a.view, theme = _a.theme;
+            var _col = this.isRtl ? this.colCnt - col - 1 : col; // HACK: props.cells has different dir system?
+            var moreWrap = moreLink.parentNode; // the <div> wrapper around the <a>
+            var topEl; // the element we want to match the top coordinate of
+            var options;
+            if (this.rowCnt === 1) {
+                topEl = view.el; // will cause the popover to cover any sort of header
+            }
+            else {
+                topEl = this.rowEls[row]; // will align with top of row
+            }
+            options = {
+                className: 'fc-more-popover ' + theme.getClass('popover'),
+                parentEl: view.el,
+                top: core.computeRect(topEl).top,
+                autoHide: true,
+                content: function (el) {
+                    _this.segPopoverTile = new DayTile(_this.context, el);
+                    _this.updateSegPopoverTile(_this.props.cells[row][_col].date, segs);
+                },
+                hide: function () {
+                    _this.segPopoverTile.destroy();
+                    _this.segPopoverTile = null;
+                    _this.segPopover.destroy();
+                    _this.segPopover = null;
+                }
+            };
+            // Determine horizontal coordinate.
+            // We use the moreWrap instead of the <td> to avoid border confusion.
+            if (this.isRtl) {
+                options.right = core.computeRect(moreWrap).right + 1; // +1 to be over cell border
+            }
+            else {
+                options.left = core.computeRect(moreWrap).left - 1; // -1 to be over cell border
+            }
+            this.segPopover = new Popover(options);
+            this.segPopover.show();
+            calendar.releaseAfterSizingTriggers(); // hack for eventPositioned
+        };
+        // Given the events within an array of segment objects, reslice them to be in a single day
+        DayGrid.prototype.resliceDaySegs = function (segs, dayDate) {
+            var dayStart = dayDate;
+            var dayEnd = core.addDays(dayStart, 1);
+            var dayRange = { start: dayStart, end: dayEnd };
+            var newSegs = [];
+            for (var _i = 0, segs_1 = segs; _i < segs_1.length; _i++) {
+                var seg = segs_1[_i];
+                var eventRange = seg.eventRange;
+                var origRange = eventRange.range;
+                var slicedRange = core.intersectRanges(origRange, dayRange);
+                if (slicedRange) {
+                    newSegs.push(__assign({}, seg, { eventRange: {
+                            def: eventRange.def,
+                            ui: __assign({}, eventRange.ui, { durationEditable: false }),
+                            instance: eventRange.instance,
+                            range: slicedRange
+                        }, isStart: seg.isStart && slicedRange.start.valueOf() === origRange.start.valueOf(), isEnd: seg.isEnd && slicedRange.end.valueOf() === origRange.end.valueOf() }));
+                }
+            }
+            return newSegs;
+        };
+        // Generates the text that should be inside a "more" link, given the number of events it represents
+        DayGrid.prototype.getMoreLinkText = function (num) {
+            var opt = this.opt('eventLimitText');
+            if (typeof opt === 'function') {
+                return opt(num);
+            }
+            else {
+                return '+' + num + ' ' + opt;
+            }
+        };
+        // Returns segments within a given cell.
+        // If `startLevel` is specified, returns only events including and below that level. Otherwise returns all segs.
+        DayGrid.prototype.getCellSegs = function (row, col, startLevel) {
+            var segMatrix = this.eventRenderer.rowStructs[row].segMatrix;
+            var level = startLevel || 0;
+            var segs = [];
+            var seg;
+            while (level < segMatrix.length) {
+                seg = segMatrix[level][col];
+                if (seg) {
+                    segs.push(seg);
+                }
+                level++;
+            }
+            return segs;
+        };
+        return DayGrid;
+    }(core.DateComponent));
+
+    var WEEK_NUM_FORMAT$1 = core.createFormatter({ week: 'numeric' });
+    /* An abstract class for the daygrid views, as well as month view. Renders one or more rows of day cells.
+    ----------------------------------------------------------------------------------------------------------------------*/
+    // It is a manager for a DayGrid subcomponent, which does most of the heavy lifting.
+    // It is responsible for managing width/height.
+    var DayGridView = /** @class */ (function (_super) {
+        __extends(DayGridView, _super);
+        function DayGridView(context, viewSpec, dateProfileGenerator, parentEl) {
+            var _this = _super.call(this, context, viewSpec, dateProfileGenerator, parentEl) || this;
+            /* Header Rendering
+            ------------------------------------------------------------------------------------------------------------------*/
+            // Generates the HTML that will go before the day-of week header cells
+            _this.renderHeadIntroHtml = function () {
+                var theme = _this.theme;
+                if (_this.colWeekNumbersVisible) {
+                    return '' +
+                        '<th class="fc-week-number ' + theme.getClass('widgetHeader') + '" ' + _this.weekNumberStyleAttr() + '>' +
+                        '<span>' + // needed for matchCellWidths
+                        core.htmlEscape(_this.opt('weekLabel')) +
+                        '</span>' +
+                        '</th>';
+                }
+                return '';
+            };
+            /* Day Grid Rendering
+            ------------------------------------------------------------------------------------------------------------------*/
+            // Generates the HTML that will go before content-skeleton cells that display the day/week numbers
+            _this.renderDayGridNumberIntroHtml = function (row, dayGrid) {
+                var dateEnv = _this.dateEnv;
+                var weekStart = dayGrid.props.cells[row][0].date;
+                if (_this.colWeekNumbersVisible) {
+                    return '' +
+                        '<td class="fc-week-number" ' + _this.weekNumberStyleAttr() + '>' +
+                        core.buildGotoAnchorHtml(// aside from link, important for matchCellWidths
+                        _this, { date: weekStart, type: 'week', forceOff: dayGrid.colCnt === 1 }, dateEnv.format(weekStart, WEEK_NUM_FORMAT$1) // inner HTML
+                        ) +
+                        '</td>';
+                }
+                return '';
+            };
+            // Generates the HTML that goes before the day bg cells for each day-row
+            _this.renderDayGridBgIntroHtml = function () {
+                var theme = _this.theme;
+                if (_this.colWeekNumbersVisible) {
+                    return '<td class="fc-week-number ' + theme.getClass('widgetContent') + '" ' + _this.weekNumberStyleAttr() + '></td>';
+                }
+                return '';
+            };
+            // Generates the HTML that goes before every other type of row generated by DayGrid.
+            // Affects mirror-skeleton and highlight-skeleton rows.
+            _this.renderDayGridIntroHtml = function () {
+                if (_this.colWeekNumbersVisible) {
+                    return '<td class="fc-week-number" ' + _this.weekNumberStyleAttr() + '></td>';
+                }
+                return '';
+            };
+            _this.el.classList.add('fc-dayGrid-view');
+            _this.el.innerHTML = _this.renderSkeletonHtml();
+            _this.scroller = new core.ScrollComponent('hidden', // overflow x
+            'auto' // overflow y
+            );
+            var dayGridContainerEl = _this.scroller.el;
+            _this.el.querySelector('.fc-body > tr > td').appendChild(dayGridContainerEl);
+            dayGridContainerEl.classList.add('fc-day-grid-container');
+            var dayGridEl = core.createElement('div', { className: 'fc-day-grid' });
+            dayGridContainerEl.appendChild(dayGridEl);
+            var cellWeekNumbersVisible;
+            if (_this.opt('weekNumbers')) {
+                if (_this.opt('weekNumbersWithinDays')) {
+                    cellWeekNumbersVisible = true;
+                    _this.colWeekNumbersVisible = false;
+                }
+                else {
+                    cellWeekNumbersVisible = false;
+                    _this.colWeekNumbersVisible = true;
+                }
+            }
+            else {
+                _this.colWeekNumbersVisible = false;
+                cellWeekNumbersVisible = false;
+            }
+            _this.dayGrid = new DayGrid(_this.context, dayGridEl, {
+                renderNumberIntroHtml: _this.renderDayGridNumberIntroHtml,
+                renderBgIntroHtml: _this.renderDayGridBgIntroHtml,
+                renderIntroHtml: _this.renderDayGridIntroHtml,
+                colWeekNumbersVisible: _this.colWeekNumbersVisible,
+                cellWeekNumbersVisible: cellWeekNumbersVisible
+            });
+            return _this;
+        }
+        DayGridView.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.dayGrid.destroy();
+            this.scroller.destroy();
+        };
+        // Builds the HTML skeleton for the view.
+        // The day-grid component will render inside of a container defined by this HTML.
+        DayGridView.prototype.renderSkeletonHtml = function () {
+            var theme = this.theme;
+            return '' +
+                '<table class="' + theme.getClass('tableGrid') + '">' +
+                (this.opt('columnHeader') ?
+                    '<thead class="fc-head">' +
+                        '<tr>' +
+                        '<td class="fc-head-container ' + theme.getClass('widgetHeader') + '">&nbsp;</td>' +
+                        '</tr>' +
+                        '</thead>' :
+                    '') +
+                '<tbody class="fc-body">' +
+                '<tr>' +
+                '<td class="' + theme.getClass('widgetContent') + '"></td>' +
+                '</tr>' +
+                '</tbody>' +
+                '</table>';
+        };
+        // Generates an HTML attribute string for setting the width of the week number column, if it is known
+        DayGridView.prototype.weekNumberStyleAttr = function () {
+            if (this.weekNumberWidth != null) {
+                return 'style="width:' + this.weekNumberWidth + 'px"';
+            }
+            return '';
+        };
+        // Determines whether each row should have a constant height
+        DayGridView.prototype.hasRigidRows = function () {
+            var eventLimit = this.opt('eventLimit');
+            return eventLimit && typeof eventLimit !== 'number';
+        };
+        /* Dimensions
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGridView.prototype.updateSize = function (isResize, viewHeight, isAuto) {
+            _super.prototype.updateSize.call(this, isResize, viewHeight, isAuto); // will call updateBaseSize. important that executes first
+            this.dayGrid.updateSize(isResize);
+        };
+        // Refreshes the horizontal dimensions of the view
+        DayGridView.prototype.updateBaseSize = function (isResize, viewHeight, isAuto) {
+            var dayGrid = this.dayGrid;
+            var eventLimit = this.opt('eventLimit');
+            var headRowEl = this.header ? this.header.el : null; // HACK
+            var scrollerHeight;
+            var scrollbarWidths;
+            // hack to give the view some height prior to dayGrid's columns being rendered
+            // TODO: separate setting height from scroller VS dayGrid.
+            if (!dayGrid.rowEls) {
+                if (!isAuto) {
+                    scrollerHeight = this.computeScrollerHeight(viewHeight);
+                    this.scroller.setHeight(scrollerHeight);
+                }
+                return;
+            }
+            if (this.colWeekNumbersVisible) {
+                // Make sure all week number cells running down the side have the same width.
+                this.weekNumberWidth = core.matchCellWidths(core.findElements(this.el, '.fc-week-number'));
+            }
+            // reset all heights to be natural
+            this.scroller.clear();
+            if (headRowEl) {
+                core.uncompensateScroll(headRowEl);
+            }
+            dayGrid.removeSegPopover(); // kill the "more" popover if displayed
+            // is the event limit a constant level number?
+            if (eventLimit && typeof eventLimit === 'number') {
+                dayGrid.limitRows(eventLimit); // limit the levels first so the height can redistribute after
+            }
+            // distribute the height to the rows
+            // (viewHeight is a "recommended" value if isAuto)
+            scrollerHeight = this.computeScrollerHeight(viewHeight);
+            this.setGridHeight(scrollerHeight, isAuto);
+            // is the event limit dynamically calculated?
+            if (eventLimit && typeof eventLimit !== 'number') {
+                dayGrid.limitRows(eventLimit); // limit the levels after the grid's row heights have been set
+            }
+            if (!isAuto) { // should we force dimensions of the scroll container?
+                this.scroller.setHeight(scrollerHeight);
+                scrollbarWidths = this.scroller.getScrollbarWidths();
+                if (scrollbarWidths.left || scrollbarWidths.right) { // using scrollbars?
+                    if (headRowEl) {
+                        core.compensateScroll(headRowEl, scrollbarWidths);
+                    }
+                    // doing the scrollbar compensation might have created text overflow which created more height. redo
+                    scrollerHeight = this.computeScrollerHeight(viewHeight);
+                    this.scroller.setHeight(scrollerHeight);
+                }
+                // guarantees the same scrollbar widths
+                this.scroller.lockOverflow(scrollbarWidths);
+            }
+        };
+        // given a desired total height of the view, returns what the height of the scroller should be
+        DayGridView.prototype.computeScrollerHeight = function (viewHeight) {
+            return viewHeight -
+                core.subtractInnerElHeight(this.el, this.scroller.el); // everything that's NOT the scroller
+        };
+        // Sets the height of just the DayGrid component in this view
+        DayGridView.prototype.setGridHeight = function (height, isAuto) {
+            if (this.opt('monthMode')) {
+                // if auto, make the height of each row the height that it would be if there were 6 weeks
+                if (isAuto) {
+                    height *= this.dayGrid.rowCnt / 6;
+                }
+                core.distributeHeight(this.dayGrid.rowEls, height, !isAuto); // if auto, don't compensate for height-hogging rows
+            }
+            else {
+                if (isAuto) {
+                    core.undistributeHeight(this.dayGrid.rowEls); // let the rows be their natural height with no expanding
+                }
+                else {
+                    core.distributeHeight(this.dayGrid.rowEls, height, true); // true = compensate for height-hogging rows
+                }
+            }
+        };
+        /* Scroll
+        ------------------------------------------------------------------------------------------------------------------*/
+        DayGridView.prototype.computeDateScroll = function (timeMs) {
+            return { top: 0 };
+        };
+        DayGridView.prototype.queryDateScroll = function () {
+            return { top: this.scroller.getScrollTop() };
+        };
+        DayGridView.prototype.applyDateScroll = function (scroll) {
+            if (scroll.top !== undefined) {
+                this.scroller.setScrollTop(scroll.top);
+            }
+        };
+        return DayGridView;
+    }(core.View));
+    DayGridView.prototype.dateProfileGeneratorClass = DayGridDateProfileGenerator;
+
+    var SimpleDayGrid = /** @class */ (function (_super) {
+        __extends(SimpleDayGrid, _super);
+        function SimpleDayGrid(context, dayGrid) {
+            var _this = _super.call(this, context, dayGrid.el) || this;
+            _this.slicer = new DayGridSlicer();
+            _this.dayGrid = dayGrid;
+            context.calendar.registerInteractiveComponent(_this, { el: _this.dayGrid.el });
+            return _this;
+        }
+        SimpleDayGrid.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.calendar.unregisterInteractiveComponent(this);
+        };
+        SimpleDayGrid.prototype.render = function (props) {
+            var dayGrid = this.dayGrid;
+            var dateProfile = props.dateProfile, dayTable = props.dayTable;
+            dayGrid.receiveProps(__assign({}, this.slicer.sliceProps(props, dateProfile, props.nextDayThreshold, dayGrid, dayTable), { dateProfile: dateProfile, cells: dayTable.cells, isRigid: props.isRigid }));
+        };
+        SimpleDayGrid.prototype.buildPositionCaches = function () {
+            this.dayGrid.buildPositionCaches();
+        };
+        SimpleDayGrid.prototype.queryHit = function (positionLeft, positionTop) {
+            var rawHit = this.dayGrid.positionToHit(positionLeft, positionTop);
+            if (rawHit) {
+                return {
+                    component: this.dayGrid,
+                    dateSpan: rawHit.dateSpan,
+                    dayEl: rawHit.dayEl,
+                    rect: {
+                        left: rawHit.relativeRect.left,
+                        right: rawHit.relativeRect.right,
+                        top: rawHit.relativeRect.top,
+                        bottom: rawHit.relativeRect.bottom
+                    },
+                    layer: 0
+                };
+            }
+        };
+        return SimpleDayGrid;
+    }(core.DateComponent));
+    var DayGridSlicer = /** @class */ (function (_super) {
+        __extends(DayGridSlicer, _super);
+        function DayGridSlicer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        DayGridSlicer.prototype.sliceRange = function (dateRange, dayTable) {
+            return dayTable.sliceRange(dateRange);
+        };
+        return DayGridSlicer;
+    }(core.Slicer));
+
+    var DayGridView$1 = /** @class */ (function (_super) {
+        __extends(DayGridView, _super);
+        function DayGridView(_context, viewSpec, dateProfileGenerator, parentEl) {
+            var _this = _super.call(this, _context, viewSpec, dateProfileGenerator, parentEl) || this;
+            _this.buildDayTable = core.memoize(buildDayTable);
+            if (_this.opt('columnHeader')) {
+                _this.header = new core.DayHeader(_this.context, _this.el.querySelector('.fc-head-container'));
+            }
+            _this.simpleDayGrid = new SimpleDayGrid(_this.context, _this.dayGrid);
+            return _this;
+        }
+        DayGridView.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            if (this.header) {
+                this.header.destroy();
+            }
+            this.simpleDayGrid.destroy();
+        };
+        DayGridView.prototype.render = function (props) {
+            _super.prototype.render.call(this, props);
+            var dateProfile = this.props.dateProfile;
+            var dayTable = this.dayTable =
+                this.buildDayTable(dateProfile, this.dateProfileGenerator);
+            if (this.header) {
+                this.header.receiveProps({
+                    dateProfile: dateProfile,
+                    dates: dayTable.headerDates,
+                    datesRepDistinctDays: dayTable.rowCnt === 1,
+                    renderIntroHtml: this.renderHeadIntroHtml
+                });
+            }
+            this.simpleDayGrid.receiveProps({
+                dateProfile: dateProfile,
+                dayTable: dayTable,
+                businessHours: props.businessHours,
+                dateSelection: props.dateSelection,
+                eventStore: props.eventStore,
+                eventUiBases: props.eventUiBases,
+                eventSelection: props.eventSelection,
+                eventDrag: props.eventDrag,
+                eventResize: props.eventResize,
+                isRigid: this.hasRigidRows(),
+                nextDayThreshold: this.nextDayThreshold
+            });
+        };
+        return DayGridView;
+    }(DayGridView));
+    function buildDayTable(dateProfile, dateProfileGenerator) {
+        var daySeries = new core.DaySeries(dateProfile.renderRange, dateProfileGenerator);
+        return new core.DayTable(daySeries, /year|month|week/.test(dateProfile.currentRangeUnit));
+    }
+
+    var main = core.createPlugin({
+        defaultView: 'dayGridMonth',
+        views: {
+            dayGrid: DayGridView$1,
+            dayGridDay: {
+                type: 'dayGrid',
+                duration: { days: 1 }
+            },
+            dayGridWeek: {
+                type: 'dayGrid',
+                duration: { weeks: 1 }
+            },
+            dayGridMonth: {
+                type: 'dayGrid',
+                duration: { months: 1 },
+                monthMode: true,
+                fixedWeekCount: true
+            }
+        }
+    });
+
+    exports.AbstractDayGridView = DayGridView;
+    exports.DayBgRow = DayBgRow;
+    exports.DayGrid = DayGrid;
+    exports.DayGridSlicer = DayGridSlicer;
+    exports.DayGridView = DayGridView$1;
+    exports.SimpleDayGrid = SimpleDayGrid;
+    exports.buildBasicDayTable = buildDayTable;
+    exports.default = main;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+}));
+
+/*!
+Time Grid
+*/
+
+/*!
+FullCalendar Time Grid Plugin v4.1.0
+Docs & License: https://fullcalendar.io/
+(c) 2019 Adam Shaw
+*/
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@fullcalendar/core'), require('@fullcalendar/daygrid')) :
+    typeof define === 'function' && define.amd ? define(['exports', '@fullcalendar/core', '@fullcalendar/daygrid'], factory) :
+    (global = global || self, factory(global.FullCalendarTimeGrid = {}, global.FullCalendar, global.FullCalendarDayGrid));
+}(this, function (exports, core, daygrid) { 'use strict';
+
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+    /* global Reflect, Promise */
+
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    var __assign = function() {
+        __assign = Object.assign || function __assign(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
+
+    /*
+    Only handles foreground segs.
+    Does not own rendering. Use for low-level util methods by TimeGrid.
+    */
+    var TimeGridEventRenderer = /** @class */ (function (_super) {
+        __extends(TimeGridEventRenderer, _super);
+        function TimeGridEventRenderer(timeGrid) {
+            var _this = _super.call(this, timeGrid.context) || this;
+            _this.timeGrid = timeGrid;
+            _this.fullTimeFormat = core.createFormatter({
+                hour: 'numeric',
+                minute: '2-digit',
+                separator: _this.context.options.defaultRangeSeparator
+            });
+            return _this;
+        }
+        // Given an array of foreground segments, render a DOM element for each, computes position,
+        // and attaches to the column inner-container elements.
+        TimeGridEventRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
+            var segsByCol = this.timeGrid.groupSegsByCol(segs);
+            // order the segs within each column
+            // TODO: have groupSegsByCol do this?
+            for (var col = 0; col < segsByCol.length; col++) {
+                segsByCol[col] = this.sortEventSegs(segsByCol[col]);
+            }
+            this.segsByCol = segsByCol;
+            this.timeGrid.attachSegsByCol(segsByCol, this.timeGrid.fgContainerEls);
+        };
+        TimeGridEventRenderer.prototype.detachSegs = function (segs) {
+            segs.forEach(function (seg) {
+                core.removeElement(seg.el);
+            });
+            this.segsByCol = null;
+        };
+        TimeGridEventRenderer.prototype.computeSegSizes = function (allSegs) {
+            var _a = this, timeGrid = _a.timeGrid, segsByCol = _a.segsByCol;
+            var colCnt = timeGrid.colCnt;
+            timeGrid.computeSegVerticals(allSegs); // horizontals relies on this
+            if (segsByCol) {
+                for (var col = 0; col < colCnt; col++) {
+                    this.computeSegHorizontals(segsByCol[col]); // compute horizontal coordinates, z-index's, and reorder the array
+                }
+            }
+        };
+        TimeGridEventRenderer.prototype.assignSegSizes = function (allSegs) {
+            var _a = this, timeGrid = _a.timeGrid, segsByCol = _a.segsByCol;
+            var colCnt = timeGrid.colCnt;
+            timeGrid.assignSegVerticals(allSegs); // horizontals relies on this
+            if (segsByCol) {
+                for (var col = 0; col < colCnt; col++) {
+                    this.assignSegCss(segsByCol[col]);
+                }
+            }
+        };
+        // Computes a default event time formatting string if `eventTimeFormat` is not explicitly defined
+        TimeGridEventRenderer.prototype.computeEventTimeFormat = function () {
+            return {
+                hour: 'numeric',
+                minute: '2-digit',
+                meridiem: false
+            };
+        };
+        // Computes a default `displayEventEnd` value if one is not expliclty defined
+        TimeGridEventRenderer.prototype.computeDisplayEventEnd = function () {
+            return true;
+        };
+        // Renders the HTML for a single event segment's default rendering
+        TimeGridEventRenderer.prototype.renderSegHtml = function (seg, mirrorInfo) {
+            var eventRange = seg.eventRange;
+            var eventDef = eventRange.def;
+            var eventUi = eventRange.ui;
+            var allDay = eventDef.allDay;
+            var isDraggable = eventUi.startEditable;
+            var isResizableFromStart = seg.isStart && eventUi.durationEditable && this.context.options.eventResizableFromStart;
+            var isResizableFromEnd = seg.isEnd && eventUi.durationEditable;
+            var classes = this.getSegClasses(seg, isDraggable, isResizableFromStart || isResizableFromEnd, mirrorInfo);
+            var skinCss = core.cssToStr(this.getSkinCss(eventUi));
+            var timeText;
+            var fullTimeText; // more verbose time text. for the print stylesheet
+            var startTimeText; // just the start time text
+            classes.unshift('fc-time-grid-event');
+            // if the event appears to span more than one day...
+            if (core.isMultiDayRange(eventRange.range)) {
+                // Don't display time text on segments that run entirely through a day.
+                // That would appear as midnight-midnight and would look dumb.
+                // Otherwise, display the time text for the *segment's* times (like 6pm-midnight or midnight-10am)
+                if (seg.isStart || seg.isEnd) {
+                    var unzonedStart = seg.start;
+                    var unzonedEnd = seg.end;
+                    timeText = this._getTimeText(unzonedStart, unzonedEnd, allDay); // TODO: give the timezones
+                    fullTimeText = this._getTimeText(unzonedStart, unzonedEnd, allDay, this.fullTimeFormat);
+                    startTimeText = this._getTimeText(unzonedStart, unzonedEnd, allDay, null, false); // displayEnd=false
+                }
+            }
+            else {
+                // Display the normal time text for the *event's* times
+                timeText = this.getTimeText(eventRange);
+                fullTimeText = this.getTimeText(eventRange, this.fullTimeFormat);
+                startTimeText = this.getTimeText(eventRange, null, false); // displayEnd=false
+            }
+            return '<a class="' + classes.join(' ') + '"' +
+                (eventDef.url ?
+                    ' href="' + core.htmlEscape(eventDef.url) + '"' :
+                    '') +
+                (skinCss ?
+                    ' style="' + skinCss + '"' :
+                    '') +
+                '>' +
+                '<div class="fc-content">' +
+                (timeText ?
+                    '<div class="fc-time"' +
+                        ' data-start="' + core.htmlEscape(startTimeText) + '"' +
+                        ' data-full="' + core.htmlEscape(fullTimeText) + '"' +
+                        '>' +
+                        '<span>' + core.htmlEscape(timeText) + '</span>' +
+                        '</div>' :
+                    '') +
+                (eventDef.title ?
+                    '<div class="fc-title">' +
+                        core.htmlEscape(eventDef.title) +
+                        '</div>' :
+                    '') +
+                '</div>' +
+                /* TODO: write CSS for this
+                (isResizableFromStart ?
+                  '<div class="fc-resizer fc-start-resizer"></div>' :
+                  ''
+                  ) +
+                */
+                (isResizableFromEnd ?
+                    '<div class="fc-resizer fc-end-resizer"></div>' :
+                    '') +
+                '</a>';
+        };
+        // Given an array of segments that are all in the same column, sets the backwardCoord and forwardCoord on each.
+        // Assumed the segs are already ordered.
+        // NOTE: Also reorders the given array by date!
+        TimeGridEventRenderer.prototype.computeSegHorizontals = function (segs) {
+            var levels;
+            var level0;
+            var i;
+            levels = buildSlotSegLevels(segs);
+            computeForwardSlotSegs(levels);
+            if ((level0 = levels[0])) {
+                for (i = 0; i < level0.length; i++) {
+                    computeSlotSegPressures(level0[i]);
+                }
+                for (i = 0; i < level0.length; i++) {
+                    this.computeSegForwardBack(level0[i], 0, 0);
+                }
+            }
+        };
+        // Calculate seg.forwardCoord and seg.backwardCoord for the segment, where both values range
+        // from 0 to 1. If the calendar is left-to-right, the seg.backwardCoord maps to "left" and
+        // seg.forwardCoord maps to "right" (via percentage). Vice-versa if the calendar is right-to-left.
+        //
+        // The segment might be part of a "series", which means consecutive segments with the same pressure
+        // who's width is unknown until an edge has been hit. `seriesBackwardPressure` is the number of
+        // segments behind this one in the current series, and `seriesBackwardCoord` is the starting
+        // coordinate of the first segment in the series.
+        TimeGridEventRenderer.prototype.computeSegForwardBack = function (seg, seriesBackwardPressure, seriesBackwardCoord) {
+            var forwardSegs = seg.forwardSegs;
+            var i;
+            if (seg.forwardCoord === undefined) { // not already computed
+                if (!forwardSegs.length) {
+                    // if there are no forward segments, this segment should butt up against the edge
+                    seg.forwardCoord = 1;
+                }
+                else {
+                    // sort highest pressure first
+                    this.sortForwardSegs(forwardSegs);
+                    // this segment's forwardCoord will be calculated from the backwardCoord of the
+                    // highest-pressure forward segment.
+                    this.computeSegForwardBack(forwardSegs[0], seriesBackwardPressure + 1, seriesBackwardCoord);
+                    seg.forwardCoord = forwardSegs[0].backwardCoord;
+                }
+                // calculate the backwardCoord from the forwardCoord. consider the series
+                seg.backwardCoord = seg.forwardCoord -
+                    (seg.forwardCoord - seriesBackwardCoord) / // available width for series
+                        (seriesBackwardPressure + 1); // # of segments in the series
+                // use this segment's coordinates to computed the coordinates of the less-pressurized
+                // forward segments
+                for (i = 0; i < forwardSegs.length; i++) {
+                    this.computeSegForwardBack(forwardSegs[i], 0, seg.forwardCoord);
+                }
+            }
+        };
+        TimeGridEventRenderer.prototype.sortForwardSegs = function (forwardSegs) {
+            var objs = forwardSegs.map(buildTimeGridSegCompareObj);
+            var specs = [
+                // put higher-pressure first
+                { field: 'forwardPressure', order: -1 },
+                // put segments that are closer to initial edge first (and favor ones with no coords yet)
+                { field: 'backwardCoord', order: 1 }
+            ].concat(this.context.view.eventOrderSpecs);
+            objs.sort(function (obj0, obj1) {
+                return core.compareByFieldSpecs(obj0, obj1, specs);
+            });
+            return objs.map(function (c) {
+                return c._seg;
+            });
+        };
+        // Given foreground event segments that have already had their position coordinates computed,
+        // assigns position-related CSS values to their elements.
+        TimeGridEventRenderer.prototype.assignSegCss = function (segs) {
+            for (var _i = 0, segs_1 = segs; _i < segs_1.length; _i++) {
+                var seg = segs_1[_i];
+                core.applyStyle(seg.el, this.generateSegCss(seg));
+                if (seg.level > 0) {
+                    seg.el.classList.add('fc-time-grid-event-inset');
+                }
+                // if the event is short that the title will be cut off,
+                // attach a className that condenses the title into the time area.
+                if (seg.eventRange.def.title && seg.bottom - seg.top < 30) {
+                    seg.el.classList.add('fc-short'); // TODO: "condensed" is a better name
+                }
+            }
+        };
+        // Generates an object with CSS properties/values that should be applied to an event segment element.
+        // Contains important positioning-related properties that should be applied to any event element, customized or not.
+        TimeGridEventRenderer.prototype.generateSegCss = function (seg) {
+            var shouldOverlap = this.context.options.slotEventOverlap;
+            var backwardCoord = seg.backwardCoord; // the left side if LTR. the right side if RTL. floating-point
+            var forwardCoord = seg.forwardCoord; // the right side if LTR. the left side if RTL. floating-point
+            var props = this.timeGrid.generateSegVerticalCss(seg); // get top/bottom first
+            var isRtl = this.timeGrid.isRtl;
+            var left; // amount of space from left edge, a fraction of the total width
+            var right; // amount of space from right edge, a fraction of the total width
+            if (shouldOverlap) {
+                // double the width, but don't go beyond the maximum forward coordinate (1.0)
+                forwardCoord = Math.min(1, backwardCoord + (forwardCoord - backwardCoord) * 2);
+            }
+            if (isRtl) {
+                left = 1 - forwardCoord;
+                right = backwardCoord;
+            }
+            else {
+                left = backwardCoord;
+                right = 1 - forwardCoord;
+            }
+            props.zIndex = seg.level + 1; // convert from 0-base to 1-based
+            props.left = left * 100 + '%';
+            props.right = right * 100 + '%';
+            if (shouldOverlap && seg.forwardPressure) {
+                // add padding to the edge so that forward stacked events don't cover the resizer's icon
+                props[isRtl ? 'marginLeft' : 'marginRight'] = 10 * 2; // 10 is a guesstimate of the icon's width
+            }
+            return props;
+        };
+        return TimeGridEventRenderer;
+    }(core.FgEventRenderer));
+    // Builds an array of segments "levels". The first level will be the leftmost tier of segments if the calendar is
+    // left-to-right, or the rightmost if the calendar is right-to-left. Assumes the segments are already ordered by date.
+    function buildSlotSegLevels(segs) {
+        var levels = [];
+        var i;
+        var seg;
+        var j;
+        for (i = 0; i < segs.length; i++) {
+            seg = segs[i];
+            // go through all the levels and stop on the first level where there are no collisions
+            for (j = 0; j < levels.length; j++) {
+                if (!computeSlotSegCollisions(seg, levels[j]).length) {
+                    break;
+                }
+            }
+            seg.level = j;
+            (levels[j] || (levels[j] = [])).push(seg);
+        }
+        return levels;
+    }
+    // For every segment, figure out the other segments that are in subsequent
+    // levels that also occupy the same vertical space. Accumulate in seg.forwardSegs
+    function computeForwardSlotSegs(levels) {
+        var i;
+        var level;
+        var j;
+        var seg;
+        var k;
+        for (i = 0; i < levels.length; i++) {
+            level = levels[i];
+            for (j = 0; j < level.length; j++) {
+                seg = level[j];
+                seg.forwardSegs = [];
+                for (k = i + 1; k < levels.length; k++) {
+                    computeSlotSegCollisions(seg, levels[k], seg.forwardSegs);
+                }
+            }
+        }
+    }
+    // Figure out which path forward (via seg.forwardSegs) results in the longest path until
+    // the furthest edge is reached. The number of segments in this path will be seg.forwardPressure
+    function computeSlotSegPressures(seg) {
+        var forwardSegs = seg.forwardSegs;
+        var forwardPressure = 0;
+        var i;
+        var forwardSeg;
+        if (seg.forwardPressure === undefined) { // not already computed
+            for (i = 0; i < forwardSegs.length; i++) {
+                forwardSeg = forwardSegs[i];
+                // figure out the child's maximum forward path
+                computeSlotSegPressures(forwardSeg);
+                // either use the existing maximum, or use the child's forward pressure
+                // plus one (for the forwardSeg itself)
+                forwardPressure = Math.max(forwardPressure, 1 + forwardSeg.forwardPressure);
+            }
+            seg.forwardPressure = forwardPressure;
+        }
+    }
+    // Find all the segments in `otherSegs` that vertically collide with `seg`.
+    // Append into an optionally-supplied `results` array and return.
+    function computeSlotSegCollisions(seg, otherSegs, results) {
+        if (results === void 0) { results = []; }
+        for (var i = 0; i < otherSegs.length; i++) {
+            if (isSlotSegCollision(seg, otherSegs[i])) {
+                results.push(otherSegs[i]);
+            }
+        }
+        return results;
+    }
+    // Do these segments occupy the same vertical space?
+    function isSlotSegCollision(seg1, seg2) {
+        return seg1.bottom > seg2.top && seg1.top < seg2.bottom;
+    }
+    function buildTimeGridSegCompareObj(seg) {
+        var obj = core.buildSegCompareObj(seg);
+        obj.forwardPressure = seg.forwardPressure;
+        obj.backwardCoord = seg.backwardCoord;
+        return obj;
+    }
+
+    var TimeGridMirrorRenderer = /** @class */ (function (_super) {
+        __extends(TimeGridMirrorRenderer, _super);
+        function TimeGridMirrorRenderer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TimeGridMirrorRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
+            this.segsByCol = this.timeGrid.groupSegsByCol(segs);
+            this.timeGrid.attachSegsByCol(this.segsByCol, this.timeGrid.mirrorContainerEls);
+            this.sourceSeg = mirrorInfo.sourceSeg;
+        };
+        TimeGridMirrorRenderer.prototype.generateSegCss = function (seg) {
+            var props = _super.prototype.generateSegCss.call(this, seg);
+            var sourceSeg = this.sourceSeg;
+            if (sourceSeg && sourceSeg.col === seg.col) {
+                var sourceSegProps = _super.prototype.generateSegCss.call(this, sourceSeg);
+                props.left = sourceSegProps.left;
+                props.right = sourceSegProps.right;
+                props.marginLeft = sourceSegProps.marginLeft;
+                props.marginRight = sourceSegProps.marginRight;
+            }
+            return props;
+        };
+        return TimeGridMirrorRenderer;
+    }(TimeGridEventRenderer));
+
+    var TimeGridFillRenderer = /** @class */ (function (_super) {
+        __extends(TimeGridFillRenderer, _super);
+        function TimeGridFillRenderer(timeGrid) {
+            var _this = _super.call(this, timeGrid.context) || this;
+            _this.timeGrid = timeGrid;
+            return _this;
+        }
+        TimeGridFillRenderer.prototype.attachSegs = function (type, segs) {
+            var timeGrid = this.timeGrid;
+            var containerEls;
+            // TODO: more efficient lookup
+            if (type === 'bgEvent') {
+                containerEls = timeGrid.bgContainerEls;
+            }
+            else if (type === 'businessHours') {
+                containerEls = timeGrid.businessContainerEls;
+            }
+            else if (type === 'highlight') {
+                containerEls = timeGrid.highlightContainerEls;
+            }
+            timeGrid.attachSegsByCol(timeGrid.groupSegsByCol(segs), containerEls);
+            return segs.map(function (seg) {
+                return seg.el;
+            });
+        };
+        TimeGridFillRenderer.prototype.computeSegSizes = function (segs) {
+            this.timeGrid.computeSegVerticals(segs);
+        };
+        TimeGridFillRenderer.prototype.assignSegSizes = function (segs) {
+            this.timeGrid.assignSegVerticals(segs);
+        };
+        return TimeGridFillRenderer;
+    }(core.FillRenderer));
+
+    /* A component that renders one or more columns of vertical time slots
+    ----------------------------------------------------------------------------------------------------------------------*/
+    // potential nice values for the slot-duration and interval-duration
+    // from largest to smallest
+    var AGENDA_STOCK_SUB_DURATIONS = [
+        { hours: 1 },
+        { minutes: 30 },
+        { minutes: 15 },
+        { seconds: 30 },
+        { seconds: 15 }
+    ];
+    var TimeGrid = /** @class */ (function (_super) {
+        __extends(TimeGrid, _super);
+        function TimeGrid(context, el, renderProps) {
+            var _this = _super.call(this, context, el) || this;
+            _this.isSlatSizesDirty = false;
+            _this.isColSizesDirty = false;
+            _this.renderSlats = core.memoizeRendering(_this._renderSlats);
+            var eventRenderer = _this.eventRenderer = new TimeGridEventRenderer(_this);
+            var fillRenderer = _this.fillRenderer = new TimeGridFillRenderer(_this);
+            _this.mirrorRenderer = new TimeGridMirrorRenderer(_this);
+            var renderColumns = _this.renderColumns = core.memoizeRendering(_this._renderColumns, _this._unrenderColumns);
+            _this.renderBusinessHours = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'businessHours'), fillRenderer.unrender.bind(fillRenderer, 'businessHours'), [renderColumns]);
+            _this.renderDateSelection = core.memoizeRendering(_this._renderDateSelection, _this._unrenderDateSelection, [renderColumns]);
+            _this.renderFgEvents = core.memoizeRendering(eventRenderer.renderSegs.bind(eventRenderer), eventRenderer.unrender.bind(eventRenderer), [renderColumns]);
+            _this.renderBgEvents = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'bgEvent'), fillRenderer.unrender.bind(fillRenderer, 'bgEvent'), [renderColumns]);
+            _this.renderEventSelection = core.memoizeRendering(eventRenderer.selectByInstanceId.bind(eventRenderer), eventRenderer.unselectByInstanceId.bind(eventRenderer), [_this.renderFgEvents]);
+            _this.renderEventDrag = core.memoizeRendering(_this._renderEventDrag, _this._unrenderEventDrag, [renderColumns]);
+            _this.renderEventResize = core.memoizeRendering(_this._renderEventResize, _this._unrenderEventResize, [renderColumns]);
+            _this.processOptions();
+            el.innerHTML =
+                '<div class="fc-bg"></div>' +
+                    '<div class="fc-slats"></div>' +
+                    '<hr class="fc-divider ' + _this.theme.getClass('widgetHeader') + '" style="display:none" />';
+            _this.rootBgContainerEl = el.querySelector('.fc-bg');
+            _this.slatContainerEl = el.querySelector('.fc-slats');
+            _this.bottomRuleEl = el.querySelector('.fc-divider');
+            _this.renderProps = renderProps;
+            return _this;
+        }
+        /* Options
+        ------------------------------------------------------------------------------------------------------------------*/
+        // Parses various options into properties of this object
+        TimeGrid.prototype.processOptions = function () {
+            var slotDuration = this.opt('slotDuration');
+            var snapDuration = this.opt('snapDuration');
+            var snapsPerSlot;
+            var input;
+            slotDuration = core.createDuration(slotDuration);
+            snapDuration = snapDuration ? core.createDuration(snapDuration) : slotDuration;
+            snapsPerSlot = core.wholeDivideDurations(slotDuration, snapDuration);
+            if (snapsPerSlot === null) {
+                snapDuration = slotDuration;
+                snapsPerSlot = 1;
+                // TODO: say warning?
+            }
+            this.slotDuration = slotDuration;
+            this.snapDuration = snapDuration;
+            this.snapsPerSlot = snapsPerSlot;
+            // might be an array value (for TimelineView).
+            // if so, getting the most granular entry (the last one probably).
+            input = this.opt('slotLabelFormat');
+            if (Array.isArray(input)) {
+                input = input[input.length - 1];
+            }
+            this.labelFormat = core.createFormatter(input || {
+                hour: 'numeric',
+                minute: '2-digit',
+                omitZeroMinute: true,
+                meridiem: 'short'
+            });
+            input = this.opt('slotLabelInterval');
+            this.labelInterval = input ?
+                core.createDuration(input) :
+                this.computeLabelInterval(slotDuration);
+        };
+        // Computes an automatic value for slotLabelInterval
+        TimeGrid.prototype.computeLabelInterval = function (slotDuration) {
+            var i;
+            var labelInterval;
+            var slotsPerLabel;
+            // find the smallest stock label interval that results in more than one slots-per-label
+            for (i = AGENDA_STOCK_SUB_DURATIONS.length - 1; i >= 0; i--) {
+                labelInterval = core.createDuration(AGENDA_STOCK_SUB_DURATIONS[i]);
+                slotsPerLabel = core.wholeDivideDurations(labelInterval, slotDuration);
+                if (slotsPerLabel !== null && slotsPerLabel > 1) {
+                    return labelInterval;
+                }
+            }
+            return slotDuration; // fall back
+        };
+        /* Rendering
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype.render = function (props) {
+            var cells = props.cells;
+            this.colCnt = cells.length;
+            this.renderSlats(props.dateProfile);
+            this.renderColumns(props.cells, props.dateProfile);
+            this.renderBusinessHours(props.businessHourSegs);
+            this.renderDateSelection(props.dateSelectionSegs);
+            this.renderFgEvents(props.fgEventSegs);
+            this.renderBgEvents(props.bgEventSegs);
+            this.renderEventSelection(props.eventSelection);
+            this.renderEventDrag(props.eventDrag);
+            this.renderEventResize(props.eventResize);
+        };
+        TimeGrid.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            // should unrender everything else too
+            this.renderSlats.unrender();
+            this.renderColumns.unrender();
+        };
+        TimeGrid.prototype.updateSize = function (isResize) {
+            var _a = this, fillRenderer = _a.fillRenderer, eventRenderer = _a.eventRenderer, mirrorRenderer = _a.mirrorRenderer;
+            if (isResize || this.isSlatSizesDirty) {
+                this.buildSlatPositions();
+                this.isSlatSizesDirty = false;
+            }
+            if (isResize || this.isColSizesDirty) {
+                this.buildColPositions();
+                this.isColSizesDirty = false;
+            }
+            fillRenderer.computeSizes(isResize);
+            eventRenderer.computeSizes(isResize);
+            mirrorRenderer.computeSizes(isResize);
+            fillRenderer.assignSizes(isResize);
+            eventRenderer.assignSizes(isResize);
+            mirrorRenderer.assignSizes(isResize);
+        };
+        TimeGrid.prototype._renderSlats = function (dateProfile) {
+            var theme = this.theme;
+            this.slatContainerEl.innerHTML =
+                '<table class="' + theme.getClass('tableGrid') + '">' +
+                    this.renderSlatRowHtml(dateProfile) +
+                    '</table>';
+            this.slatEls = core.findElements(this.slatContainerEl, 'tr');
+            this.slatPositions = new core.PositionCache(this.el, this.slatEls, false, true // vertical
+            );
+            this.isSlatSizesDirty = true;
+        };
+        // Generates the HTML for the horizontal "slats" that run width-wise. Has a time axis on a side. Depends on RTL.
+        TimeGrid.prototype.renderSlatRowHtml = function (dateProfile) {
+            var _a = this, dateEnv = _a.dateEnv, theme = _a.theme, isRtl = _a.isRtl;
+            var html = '';
+            var dayStart = core.startOfDay(dateProfile.renderRange.start);
+            var slotTime = dateProfile.minTime;
+            var slotIterator = core.createDuration(0);
+            var slotDate; // will be on the view's first day, but we only care about its time
+            var isLabeled;
+            var axisHtml;
+            // Calculate the time for each slot
+            while (core.asRoughMs(slotTime) < core.asRoughMs(dateProfile.maxTime)) {
+                slotDate = dateEnv.add(dayStart, slotTime);
+                isLabeled = core.wholeDivideDurations(slotIterator, this.labelInterval) !== null;
+                axisHtml =
+                    '<td class="fc-axis fc-time ' + theme.getClass('widgetContent') + '">' +
+                        (isLabeled ?
+                            '<span>' + // for matchCellWidths
+                                core.htmlEscape(dateEnv.format(slotDate, this.labelFormat)) +
+                                '</span>' :
+                            '') +
+                        '</td>';
+                html +=
+                    '<tr data-time="' + core.formatIsoTimeString(slotDate) + '"' +
+                        (isLabeled ? '' : ' class="fc-minor"') +
+                        '>' +
+                        (!isRtl ? axisHtml : '') +
+                        '<td class="' + theme.getClass('widgetContent') + '"></td>' +
+                        (isRtl ? axisHtml : '') +
+                        '</tr>';
+                slotTime = core.addDurations(slotTime, this.slotDuration);
+                slotIterator = core.addDurations(slotIterator, this.slotDuration);
+            }
+            return html;
+        };
+        TimeGrid.prototype._renderColumns = function (cells, dateProfile) {
+            var _a = this, theme = _a.theme, dateEnv = _a.dateEnv, view = _a.view;
+            var bgRow = new daygrid.DayBgRow(this.context);
+            this.rootBgContainerEl.innerHTML =
+                '<table class="' + theme.getClass('tableGrid') + '">' +
+                    bgRow.renderHtml({
+                        cells: cells,
+                        dateProfile: dateProfile,
+                        renderIntroHtml: this.renderProps.renderBgIntroHtml
+                    }) +
+                    '</table>';
+            this.colEls = core.findElements(this.el, '.fc-day, .fc-disabled-day');
+            for (var col = 0; col < this.colCnt; col++) {
+                this.publiclyTrigger('dayRender', [
+                    {
+                        date: dateEnv.toDate(cells[col].date),
+                        el: this.colEls[col],
+                        view: view
+                    }
+                ]);
+            }
+            if (this.isRtl) {
+                this.colEls.reverse();
+            }
+            this.colPositions = new core.PositionCache(this.el, this.colEls, true, // horizontal
+            false);
+            this.renderContentSkeleton();
+            this.isColSizesDirty = true;
+        };
+        TimeGrid.prototype._unrenderColumns = function () {
+            this.unrenderContentSkeleton();
+        };
+        /* Content Skeleton
+        ------------------------------------------------------------------------------------------------------------------*/
+        // Renders the DOM that the view's content will live in
+        TimeGrid.prototype.renderContentSkeleton = function () {
+            var parts = [];
+            var skeletonEl;
+            parts.push(this.renderProps.renderIntroHtml());
+            for (var i = 0; i < this.colCnt; i++) {
+                parts.push('<td>' +
+                    '<div class="fc-content-col">' +
+                    '<div class="fc-event-container fc-mirror-container"></div>' +
+                    '<div class="fc-event-container"></div>' +
+                    '<div class="fc-highlight-container"></div>' +
+                    '<div class="fc-bgevent-container"></div>' +
+                    '<div class="fc-business-container"></div>' +
+                    '</div>' +
+                    '</td>');
+            }
+            if (this.isRtl) {
+                parts.reverse();
+            }
+            skeletonEl = this.contentSkeletonEl = core.htmlToElement('<div class="fc-content-skeleton">' +
+                '<table>' +
+                '<tr>' + parts.join('') + '</tr>' +
+                '</table>' +
+                '</div>');
+            this.colContainerEls = core.findElements(skeletonEl, '.fc-content-col');
+            this.mirrorContainerEls = core.findElements(skeletonEl, '.fc-mirror-container');
+            this.fgContainerEls = core.findElements(skeletonEl, '.fc-event-container:not(.fc-mirror-container)');
+            this.bgContainerEls = core.findElements(skeletonEl, '.fc-bgevent-container');
+            this.highlightContainerEls = core.findElements(skeletonEl, '.fc-highlight-container');
+            this.businessContainerEls = core.findElements(skeletonEl, '.fc-business-container');
+            if (this.isRtl) {
+                this.colContainerEls.reverse();
+                this.mirrorContainerEls.reverse();
+                this.fgContainerEls.reverse();
+                this.bgContainerEls.reverse();
+                this.highlightContainerEls.reverse();
+                this.businessContainerEls.reverse();
+            }
+            this.el.appendChild(skeletonEl);
+        };
+        TimeGrid.prototype.unrenderContentSkeleton = function () {
+            core.removeElement(this.contentSkeletonEl);
+        };
+        // Given a flat array of segments, return an array of sub-arrays, grouped by each segment's col
+        TimeGrid.prototype.groupSegsByCol = function (segs) {
+            var segsByCol = [];
+            var i;
+            for (i = 0; i < this.colCnt; i++) {
+                segsByCol.push([]);
+            }
+            for (i = 0; i < segs.length; i++) {
+                segsByCol[segs[i].col].push(segs[i]);
+            }
+            return segsByCol;
+        };
+        // Given segments grouped by column, insert the segments' elements into a parallel array of container
+        // elements, each living within a column.
+        TimeGrid.prototype.attachSegsByCol = function (segsByCol, containerEls) {
+            var col;
+            var segs;
+            var i;
+            for (col = 0; col < this.colCnt; col++) { // iterate each column grouping
+                segs = segsByCol[col];
+                for (i = 0; i < segs.length; i++) {
+                    containerEls[col].appendChild(segs[i].el);
+                }
+            }
+        };
+        /* Now Indicator
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype.getNowIndicatorUnit = function () {
+            return 'minute'; // will refresh on the minute
+        };
+        TimeGrid.prototype.renderNowIndicator = function (segs, date) {
+            // HACK: if date columns not ready for some reason (scheduler)
+            if (!this.colContainerEls) {
+                return;
+            }
+            var top = this.computeDateTop(date);
+            var nodes = [];
+            var i;
+            // render lines within the columns
+            for (i = 0; i < segs.length; i++) {
+                var lineEl = core.createElement('div', { className: 'fc-now-indicator fc-now-indicator-line' });
+                lineEl.style.top = top + 'px';
+                this.colContainerEls[segs[i].col].appendChild(lineEl);
+                nodes.push(lineEl);
+            }
+            // render an arrow over the axis
+            if (segs.length > 0) { // is the current time in view?
+                var arrowEl = core.createElement('div', { className: 'fc-now-indicator fc-now-indicator-arrow' });
+                arrowEl.style.top = top + 'px';
+                this.contentSkeletonEl.appendChild(arrowEl);
+                nodes.push(arrowEl);
+            }
+            this.nowIndicatorEls = nodes;
+        };
+        TimeGrid.prototype.unrenderNowIndicator = function () {
+            if (this.nowIndicatorEls) {
+                this.nowIndicatorEls.forEach(core.removeElement);
+                this.nowIndicatorEls = null;
+            }
+        };
+        /* Coordinates
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype.getTotalSlatHeight = function () {
+            return this.slatContainerEl.offsetHeight;
+        };
+        // Computes the top coordinate, relative to the bounds of the grid, of the given date.
+        // A `startOfDayDate` must be given for avoiding ambiguity over how to treat midnight.
+        TimeGrid.prototype.computeDateTop = function (when, startOfDayDate) {
+            if (!startOfDayDate) {
+                startOfDayDate = core.startOfDay(when);
+            }
+            return this.computeTimeTop(when.valueOf() - startOfDayDate.valueOf());
+        };
+        // Computes the top coordinate, relative to the bounds of the grid, of the given time (a Duration).
+        TimeGrid.prototype.computeTimeTop = function (timeMs) {
+            var len = this.slatEls.length;
+            var dateProfile = this.props.dateProfile;
+            var slatCoverage = (timeMs - core.asRoughMs(dateProfile.minTime)) / core.asRoughMs(this.slotDuration); // floating-point value of # of slots covered
+            var slatIndex;
+            var slatRemainder;
+            // compute a floating-point number for how many slats should be progressed through.
+            // from 0 to number of slats (inclusive)
+            // constrained because minTime/maxTime might be customized.
+            slatCoverage = Math.max(0, slatCoverage);
+            slatCoverage = Math.min(len, slatCoverage);
+            // an integer index of the furthest whole slat
+            // from 0 to number slats (*exclusive*, so len-1)
+            slatIndex = Math.floor(slatCoverage);
+            slatIndex = Math.min(slatIndex, len - 1);
+            // how much further through the slatIndex slat (from 0.0-1.0) must be covered in addition.
+            // could be 1.0 if slatCoverage is covering *all* the slots
+            slatRemainder = slatCoverage - slatIndex;
+            return this.slatPositions.tops[slatIndex] +
+                this.slatPositions.getHeight(slatIndex) * slatRemainder;
+        };
+        // For each segment in an array, computes and assigns its top and bottom properties
+        TimeGrid.prototype.computeSegVerticals = function (segs) {
+            var eventMinHeight = this.opt('timeGridEventMinHeight');
+            var i;
+            var seg;
+            var dayDate;
+            for (i = 0; i < segs.length; i++) {
+                seg = segs[i];
+                dayDate = this.props.cells[seg.col].date;
+                seg.top = this.computeDateTop(seg.start, dayDate);
+                seg.bottom = Math.max(seg.top + eventMinHeight, this.computeDateTop(seg.end, dayDate));
+            }
+        };
+        // Given segments that already have their top/bottom properties computed, applies those values to
+        // the segments' elements.
+        TimeGrid.prototype.assignSegVerticals = function (segs) {
+            var i;
+            var seg;
+            for (i = 0; i < segs.length; i++) {
+                seg = segs[i];
+                core.applyStyle(seg.el, this.generateSegVerticalCss(seg));
+            }
+        };
+        // Generates an object with CSS properties for the top/bottom coordinates of a segment element
+        TimeGrid.prototype.generateSegVerticalCss = function (seg) {
+            return {
+                top: seg.top,
+                bottom: -seg.bottom // flipped because needs to be space beyond bottom edge of event container
+            };
+        };
+        /* Sizing
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype.buildPositionCaches = function () {
+            this.buildColPositions();
+            this.buildSlatPositions();
+        };
+        TimeGrid.prototype.buildColPositions = function () {
+            this.colPositions.build();
+        };
+        TimeGrid.prototype.buildSlatPositions = function () {
+            this.slatPositions.build();
+        };
+        /* Hit System
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype.positionToHit = function (positionLeft, positionTop) {
+            var _a = this, dateEnv = _a.dateEnv, snapsPerSlot = _a.snapsPerSlot, slatPositions = _a.slatPositions, colPositions = _a.colPositions;
+            var colIndex = colPositions.leftToIndex(positionLeft);
+            var slatIndex = slatPositions.topToIndex(positionTop);
+            if (colIndex != null && slatIndex != null) {
+                var slatTop = slatPositions.tops[slatIndex];
+                var slatHeight = slatPositions.getHeight(slatIndex);
+                var partial = (positionTop - slatTop) / slatHeight; // floating point number between 0 and 1
+                var localSnapIndex = Math.floor(partial * snapsPerSlot); // the snap # relative to start of slat
+                var snapIndex = slatIndex * snapsPerSlot + localSnapIndex;
+                var dayDate = this.props.cells[colIndex].date;
+                var time = core.addDurations(this.props.dateProfile.minTime, core.multiplyDuration(this.snapDuration, snapIndex));
+                var start = dateEnv.add(dayDate, time);
+                var end = dateEnv.add(start, this.snapDuration);
+                return {
+                    col: colIndex,
+                    dateSpan: {
+                        range: { start: start, end: end },
+                        allDay: false
+                    },
+                    dayEl: this.colEls[colIndex],
+                    relativeRect: {
+                        left: colPositions.lefts[colIndex],
+                        right: colPositions.rights[colIndex],
+                        top: slatTop,
+                        bottom: slatTop + slatHeight
+                    }
+                };
+            }
+        };
+        /* Event Drag Visualization
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype._renderEventDrag = function (state) {
+            if (state) {
+                this.eventRenderer.hideByHash(state.affectedInstances);
+                if (state.isEvent) {
+                    this.mirrorRenderer.renderSegs(state.segs, { isDragging: true, sourceSeg: state.sourceSeg });
+                }
+                else {
+                    this.fillRenderer.renderSegs('highlight', state.segs);
+                }
+            }
+        };
+        TimeGrid.prototype._unrenderEventDrag = function (state) {
+            if (state) {
+                this.eventRenderer.showByHash(state.affectedInstances);
+                this.mirrorRenderer.unrender(state.segs, { isDragging: true, sourceSeg: state.sourceSeg });
+                this.fillRenderer.unrender('highlight');
+            }
+        };
+        /* Event Resize Visualization
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGrid.prototype._renderEventResize = function (state) {
+            if (state) {
+                this.eventRenderer.hideByHash(state.affectedInstances);
+                this.mirrorRenderer.renderSegs(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
+            }
+        };
+        TimeGrid.prototype._unrenderEventResize = function (state) {
+            if (state) {
+                this.eventRenderer.showByHash(state.affectedInstances);
+                this.mirrorRenderer.unrender(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
+            }
+        };
+        /* Selection
+        ------------------------------------------------------------------------------------------------------------------*/
+        // Renders a visual indication of a selection. Overrides the default, which was to simply render a highlight.
+        TimeGrid.prototype._renderDateSelection = function (segs) {
+            if (segs) {
+                if (this.opt('selectMirror')) {
+                    this.mirrorRenderer.renderSegs(segs, { isSelecting: true });
+                }
+                else {
+                    this.fillRenderer.renderSegs('highlight', segs);
+                }
+            }
+        };
+        TimeGrid.prototype._unrenderDateSelection = function (segs) {
+            this.mirrorRenderer.unrender(segs, { isSelecting: true });
+            this.fillRenderer.unrender('highlight');
+        };
+        return TimeGrid;
+    }(core.DateComponent));
+
+    var AllDaySplitter = /** @class */ (function (_super) {
+        __extends(AllDaySplitter, _super);
+        function AllDaySplitter() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AllDaySplitter.prototype.getKeyInfo = function () {
+            return {
+                allDay: {},
+                timed: {}
+            };
+        };
+        AllDaySplitter.prototype.getKeysForDateSpan = function (dateSpan) {
+            if (dateSpan.allDay) {
+                return ['allDay'];
+            }
+            else {
+                return ['timed'];
+            }
+        };
+        AllDaySplitter.prototype.getKeysForEventDef = function (eventDef) {
+            if (!eventDef.allDay) {
+                return ['timed'];
+            }
+            else if (core.hasBgRendering(eventDef)) {
+                return ['timed', 'allDay'];
+            }
+            else {
+                return ['allDay'];
+            }
+        };
+        return AllDaySplitter;
+    }(core.Splitter));
+
+    var TIMEGRID_ALL_DAY_EVENT_LIMIT = 5;
+    var WEEK_HEADER_FORMAT = core.createFormatter({ week: 'short' });
+    /* An abstract class for all timegrid-related views. Displays one more columns with time slots running vertically.
+    ----------------------------------------------------------------------------------------------------------------------*/
+    // Is a manager for the TimeGrid subcomponent and possibly the DayGrid subcomponent (if allDaySlot is on).
+    // Responsible for managing width/height.
+    var TimeGridView = /** @class */ (function (_super) {
+        __extends(TimeGridView, _super);
+        function TimeGridView(context, viewSpec, dateProfileGenerator, parentEl) {
+            var _this = _super.call(this, context, viewSpec, dateProfileGenerator, parentEl) || this;
+            _this.splitter = new AllDaySplitter();
+            /* Header Render Methods
+            ------------------------------------------------------------------------------------------------------------------*/
+            // Generates the HTML that will go before the day-of week header cells
+            _this.renderHeadIntroHtml = function () {
+                var _a = _this, theme = _a.theme, dateEnv = _a.dateEnv;
+                var range = _this.props.dateProfile.renderRange;
+                var dayCnt = core.diffDays(range.start, range.end);
+                var weekText;
+                if (_this.opt('weekNumbers')) {
+                    weekText = dateEnv.format(range.start, WEEK_HEADER_FORMAT);
+                    return '' +
+                        '<th class="fc-axis fc-week-number ' + theme.getClass('widgetHeader') + '" ' + _this.axisStyleAttr() + '>' +
+                        core.buildGotoAnchorHtml(// aside from link, important for matchCellWidths
+                        _this, { date: range.start, type: 'week', forceOff: dayCnt > 1 }, core.htmlEscape(weekText) // inner HTML
+                        ) +
+                        '</th>';
+                }
+                else {
+                    return '<th class="fc-axis ' + theme.getClass('widgetHeader') + '" ' + _this.axisStyleAttr() + '></th>';
+                }
+            };
+            /* Time Grid Render Methods
+            ------------------------------------------------------------------------------------------------------------------*/
+            // Generates the HTML that goes before the bg of the TimeGrid slot area. Long vertical column.
+            _this.renderTimeGridBgIntroHtml = function () {
+                var theme = _this.theme;
+                return '<td class="fc-axis ' + theme.getClass('widgetContent') + '" ' + _this.axisStyleAttr() + '></td>';
+            };
+            // Generates the HTML that goes before all other types of cells.
+            // Affects content-skeleton, mirror-skeleton, highlight-skeleton for both the time-grid and day-grid.
+            _this.renderTimeGridIntroHtml = function () {
+                return '<td class="fc-axis" ' + _this.axisStyleAttr() + '></td>';
+            };
+            /* Day Grid Render Methods
+            ------------------------------------------------------------------------------------------------------------------*/
+            // Generates the HTML that goes before the all-day cells
+            _this.renderDayGridBgIntroHtml = function () {
+                var theme = _this.theme;
+                return '' +
+                    '<td class="fc-axis ' + theme.getClass('widgetContent') + '" ' + _this.axisStyleAttr() + '>' +
+                    '<span>' + // needed for matchCellWidths
+                    core.getAllDayHtml(_this) +
+                    '</span>' +
+                    '</td>';
+            };
+            // Generates the HTML that goes before all other types of cells.
+            // Affects content-skeleton, mirror-skeleton, highlight-skeleton for both the time-grid and day-grid.
+            _this.renderDayGridIntroHtml = function () {
+                return '<td class="fc-axis" ' + _this.axisStyleAttr() + '></td>';
+            };
+            _this.el.classList.add('fc-timeGrid-view');
+            _this.el.innerHTML = _this.renderSkeletonHtml();
+            _this.scroller = new core.ScrollComponent('hidden', // overflow x
+            'auto' // overflow y
+            );
+            var timeGridWrapEl = _this.scroller.el;
+            _this.el.querySelector('.fc-body > tr > td').appendChild(timeGridWrapEl);
+            timeGridWrapEl.classList.add('fc-time-grid-container');
+            var timeGridEl = core.createElement('div', { className: 'fc-time-grid' });
+            timeGridWrapEl.appendChild(timeGridEl);
+            _this.timeGrid = new TimeGrid(_this.context, timeGridEl, {
+                renderBgIntroHtml: _this.renderTimeGridBgIntroHtml,
+                renderIntroHtml: _this.renderTimeGridIntroHtml
+            });
+            if (_this.opt('allDaySlot')) { // should we display the "all-day" area?
+                _this.dayGrid = new daygrid.DayGrid(// the all-day subcomponent of this view
+                _this.context, _this.el.querySelector('.fc-day-grid'), {
+                    renderNumberIntroHtml: _this.renderDayGridIntroHtml,
+                    renderBgIntroHtml: _this.renderDayGridBgIntroHtml,
+                    renderIntroHtml: _this.renderDayGridIntroHtml,
+                    colWeekNumbersVisible: false,
+                    cellWeekNumbersVisible: false
+                });
+                // have the day-grid extend it's coordinate area over the <hr> dividing the two grids
+                _this.dayGrid.bottomCoordPadding = _this.el.querySelector('.fc-divider').offsetHeight;
+            }
+            return _this;
+        }
+        TimeGridView.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.timeGrid.destroy();
+            if (this.dayGrid) {
+                this.dayGrid.destroy();
+            }
+            this.scroller.destroy();
+        };
+        /* Rendering
+        ------------------------------------------------------------------------------------------------------------------*/
+        // Builds the HTML skeleton for the view.
+        // The day-grid and time-grid components will render inside containers defined by this HTML.
+        TimeGridView.prototype.renderSkeletonHtml = function () {
+            var theme = this.theme;
+            return '' +
+                '<table class="' + theme.getClass('tableGrid') + '">' +
+                (this.opt('columnHeader') ?
+                    '<thead class="fc-head">' +
+                        '<tr>' +
+                        '<td class="fc-head-container ' + theme.getClass('widgetHeader') + '">&nbsp;</td>' +
+                        '</tr>' +
+                        '</thead>' :
+                    '') +
+                '<tbody class="fc-body">' +
+                '<tr>' +
+                '<td class="' + theme.getClass('widgetContent') + '">' +
+                (this.opt('allDaySlot') ?
+                    '<div class="fc-day-grid"></div>' +
+                        '<hr class="fc-divider ' + theme.getClass('widgetHeader') + '" />' :
+                    '') +
+                '</td>' +
+                '</tr>' +
+                '</tbody>' +
+                '</table>';
+        };
+        /* Now Indicator
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGridView.prototype.getNowIndicatorUnit = function () {
+            return this.timeGrid.getNowIndicatorUnit();
+        };
+        // subclasses should implement
+        // renderNowIndicator(date: DateMarker) {
+        // }
+        TimeGridView.prototype.unrenderNowIndicator = function () {
+            this.timeGrid.unrenderNowIndicator();
+        };
+        /* Dimensions
+        ------------------------------------------------------------------------------------------------------------------*/
+        TimeGridView.prototype.updateSize = function (isResize, viewHeight, isAuto) {
+            _super.prototype.updateSize.call(this, isResize, viewHeight, isAuto); // will call updateBaseSize. important that executes first
+            this.timeGrid.updateSize(isResize);
+            if (this.dayGrid) {
+                this.dayGrid.updateSize(isResize);
+            }
+        };
+        // Adjusts the vertical dimensions of the view to the specified values
+        TimeGridView.prototype.updateBaseSize = function (isResize, viewHeight, isAuto) {
+            var _this = this;
+            var eventLimit;
+            var scrollerHeight;
+            var scrollbarWidths;
+            // make all axis cells line up
+            this.axisWidth = core.matchCellWidths(core.findElements(this.el, '.fc-axis'));
+            // hack to give the view some height prior to timeGrid's columns being rendered
+            // TODO: separate setting height from scroller VS timeGrid.
+            if (!this.timeGrid.colEls) {
+                if (!isAuto) {
+                    scrollerHeight = this.computeScrollerHeight(viewHeight);
+                    this.scroller.setHeight(scrollerHeight);
+                }
+                return;
+            }
+            // set of fake row elements that must compensate when scroller has scrollbars
+            var noScrollRowEls = core.findElements(this.el, '.fc-row').filter(function (node) {
+                return !_this.scroller.el.contains(node);
+            });
+            // reset all dimensions back to the original state
+            this.timeGrid.bottomRuleEl.style.display = 'none'; // will be shown later if this <hr> is necessary
+            this.scroller.clear(); // sets height to 'auto' and clears overflow
+            noScrollRowEls.forEach(core.uncompensateScroll);
+            // limit number of events in the all-day area
+            if (this.dayGrid) {
+                this.dayGrid.removeSegPopover(); // kill the "more" popover if displayed
+                eventLimit = this.opt('eventLimit');
+                if (eventLimit && typeof eventLimit !== 'number') {
+                    eventLimit = TIMEGRID_ALL_DAY_EVENT_LIMIT; // make sure "auto" goes to a real number
+                }
+                if (eventLimit) {
+                    this.dayGrid.limitRows(eventLimit);
+                }
+            }
+            if (!isAuto) { // should we force dimensions of the scroll container?
+                scrollerHeight = this.computeScrollerHeight(viewHeight);
+                this.scroller.setHeight(scrollerHeight);
+                scrollbarWidths = this.scroller.getScrollbarWidths();
+                if (scrollbarWidths.left || scrollbarWidths.right) { // using scrollbars?
+                    // make the all-day and header rows lines up
+                    noScrollRowEls.forEach(function (rowEl) {
+                        core.compensateScroll(rowEl, scrollbarWidths);
+                    });
+                    // the scrollbar compensation might have changed text flow, which might affect height, so recalculate
+                    // and reapply the desired height to the scroller.
+                    scrollerHeight = this.computeScrollerHeight(viewHeight);
+                    this.scroller.setHeight(scrollerHeight);
+                }
+                // guarantees the same scrollbar widths
+                this.scroller.lockOverflow(scrollbarWidths);
+                // if there's any space below the slats, show the horizontal rule.
+                // this won't cause any new overflow, because lockOverflow already called.
+                if (this.timeGrid.getTotalSlatHeight() < scrollerHeight) {
+                    this.timeGrid.bottomRuleEl.style.display = '';
+                }
+            }
+        };
+        // given a desired total height of the view, returns what the height of the scroller should be
+        TimeGridView.prototype.computeScrollerHeight = function (viewHeight) {
+            return viewHeight -
+                core.subtractInnerElHeight(this.el, this.scroller.el); // everything that's NOT the scroller
+        };
+        /* Scroll
+        ------------------------------------------------------------------------------------------------------------------*/
+        // Computes the initial pre-configured scroll state prior to allowing the user to change it
+        TimeGridView.prototype.computeDateScroll = function (timeMs) {
+            var top = this.timeGrid.computeTimeTop(timeMs);
+            // zoom can give weird floating-point values. rather scroll a little bit further
+            top = Math.ceil(top);
+            if (top) {
+                top++; // to overcome top border that slots beyond the first have. looks better
+            }
+            return { top: top };
+        };
+        TimeGridView.prototype.queryDateScroll = function () {
+            return { top: this.scroller.getScrollTop() };
+        };
+        TimeGridView.prototype.applyDateScroll = function (scroll) {
+            if (scroll.top !== undefined) {
+                this.scroller.setScrollTop(scroll.top);
+            }
+        };
+        // Generates an HTML attribute string for setting the width of the axis, if it is known
+        TimeGridView.prototype.axisStyleAttr = function () {
+            if (this.axisWidth != null) {
+                return 'style="width:' + this.axisWidth + 'px"';
+            }
+            return '';
+        };
+        return TimeGridView;
+    }(core.View));
+    TimeGridView.prototype.usesMinMaxTime = true; // indicates that minTime/maxTime affects rendering
+
+    var SimpleTimeGrid = /** @class */ (function (_super) {
+        __extends(SimpleTimeGrid, _super);
+        function SimpleTimeGrid(context, timeGrid) {
+            var _this = _super.call(this, context, timeGrid.el) || this;
+            _this.buildDayRanges = core.memoize(buildDayRanges);
+            _this.slicer = new TimeGridSlicer();
+            _this.timeGrid = timeGrid;
+            context.calendar.registerInteractiveComponent(_this, {
+                el: _this.timeGrid.el
+            });
+            return _this;
+        }
+        SimpleTimeGrid.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.calendar.unregisterInteractiveComponent(this);
+        };
+        SimpleTimeGrid.prototype.render = function (props) {
+            var dateProfile = props.dateProfile, dayTable = props.dayTable;
+            var dayRanges = this.dayRanges = this.buildDayRanges(dayTable, dateProfile, this.dateEnv);
+            this.timeGrid.receiveProps(__assign({}, this.slicer.sliceProps(props, dateProfile, null, this.timeGrid, dayRanges), { dateProfile: dateProfile, cells: dayTable.cells[0] }));
+        };
+        SimpleTimeGrid.prototype.renderNowIndicator = function (date) {
+            this.timeGrid.renderNowIndicator(this.slicer.sliceNowDate(date, this.timeGrid, this.dayRanges), date);
+        };
+        SimpleTimeGrid.prototype.buildPositionCaches = function () {
+            this.timeGrid.buildPositionCaches();
+        };
+        SimpleTimeGrid.prototype.queryHit = function (positionLeft, positionTop) {
+            var rawHit = this.timeGrid.positionToHit(positionLeft, positionTop);
+            if (rawHit) {
+                return {
+                    component: this.timeGrid,
+                    dateSpan: rawHit.dateSpan,
+                    dayEl: rawHit.dayEl,
+                    rect: {
+                        left: rawHit.relativeRect.left,
+                        right: rawHit.relativeRect.right,
+                        top: rawHit.relativeRect.top,
+                        bottom: rawHit.relativeRect.bottom
+                    },
+                    layer: 0
+                };
+            }
+        };
+        return SimpleTimeGrid;
+    }(core.DateComponent));
+    function buildDayRanges(dayTable, dateProfile, dateEnv) {
+        var ranges = [];
+        for (var _i = 0, _a = dayTable.headerDates; _i < _a.length; _i++) {
+            var date = _a[_i];
+            ranges.push({
+                start: dateEnv.add(date, dateProfile.minTime),
+                end: dateEnv.add(date, dateProfile.maxTime)
+            });
+        }
+        return ranges;
+    }
+    var TimeGridSlicer = /** @class */ (function (_super) {
+        __extends(TimeGridSlicer, _super);
+        function TimeGridSlicer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TimeGridSlicer.prototype.sliceRange = function (range, dayRanges) {
+            var segs = [];
+            for (var col = 0; col < dayRanges.length; col++) {
+                var segRange = core.intersectRanges(range, dayRanges[col]);
+                if (segRange) {
+                    segs.push({
+                        start: segRange.start,
+                        end: segRange.end,
+                        isStart: segRange.start.valueOf() === range.start.valueOf(),
+                        isEnd: segRange.end.valueOf() === range.end.valueOf(),
+                        col: col
+                    });
+                }
+            }
+            return segs;
+        };
+        return TimeGridSlicer;
+    }(core.Slicer));
+
+    var TimeGridView$1 = /** @class */ (function (_super) {
+        __extends(TimeGridView, _super);
+        function TimeGridView(_context, viewSpec, dateProfileGenerator, parentEl) {
+            var _this = _super.call(this, _context, viewSpec, dateProfileGenerator, parentEl) || this;
+            _this.buildDayTable = core.memoize(buildDayTable);
+            if (_this.opt('columnHeader')) {
+                _this.header = new core.DayHeader(_this.context, _this.el.querySelector('.fc-head-container'));
+            }
+            _this.simpleTimeGrid = new SimpleTimeGrid(_this.context, _this.timeGrid);
+            if (_this.dayGrid) {
+                _this.simpleDayGrid = new daygrid.SimpleDayGrid(_this.context, _this.dayGrid);
+            }
+            return _this;
+        }
+        TimeGridView.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            if (this.header) {
+                this.header.destroy();
+            }
+            this.simpleTimeGrid.destroy();
+            if (this.simpleDayGrid) {
+                this.simpleDayGrid.destroy();
+            }
+        };
+        TimeGridView.prototype.render = function (props) {
+            _super.prototype.render.call(this, props); // for flags for updateSize
+            var dateProfile = this.props.dateProfile;
+            var dayTable = this.buildDayTable(dateProfile, this.dateProfileGenerator);
+            var splitProps = this.splitter.splitProps(props);
+            if (this.header) {
+                this.header.receiveProps({
+                    dateProfile: dateProfile,
+                    dates: dayTable.headerDates,
+                    datesRepDistinctDays: true,
+                    renderIntroHtml: this.renderHeadIntroHtml
+                });
+            }
+            this.simpleTimeGrid.receiveProps(__assign({}, splitProps['timed'], { dateProfile: dateProfile,
+                dayTable: dayTable }));
+            if (this.simpleDayGrid) {
+                this.simpleDayGrid.receiveProps(__assign({}, splitProps['allDay'], { dateProfile: dateProfile,
+                    dayTable: dayTable, nextDayThreshold: this.nextDayThreshold, isRigid: false }));
+            }
+        };
+        TimeGridView.prototype.renderNowIndicator = function (date) {
+            this.simpleTimeGrid.renderNowIndicator(date);
+        };
+        return TimeGridView;
+    }(TimeGridView));
+    function buildDayTable(dateProfile, dateProfileGenerator) {
+        var daySeries = new core.DaySeries(dateProfile.renderRange, dateProfileGenerator);
+        return new core.DayTable(daySeries, false);
+    }
+
+    var main = core.createPlugin({
+        defaultView: 'timeGridWeek',
+        views: {
+            timeGrid: {
+                class: TimeGridView$1,
+                allDaySlot: true,
+                slotDuration: '00:30:00',
+                slotEventOverlap: true // a bad name. confused with overlap/constraint system
+            },
+            timeGridDay: {
+                type: 'timeGrid',
+                duration: { days: 1 }
+            },
+            timeGridWeek: {
+                type: 'timeGrid',
+                duration: { weeks: 1 }
+            }
+        }
+    });
+
+    exports.AbstractTimeGridView = TimeGridView;
+    exports.TimeGrid = TimeGrid;
+    exports.TimeGridSlicer = TimeGridSlicer;
+    exports.TimeGridView = TimeGridView$1;
+    exports.buildDayRanges = buildDayRanges;
+    exports.buildDayTable = buildDayTable;
+    exports.default = main;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+}));
+
+/*
+interaction
+*/
+
+/*!
+FullCalendar Interaction Plugin v4.1.0
 Docs & License: https://fullcalendar.io/
 (c) 2019 Adam Shaw
 */
@@ -9842,6 +12861,7 @@ Docs & License: https://fullcalendar.io/
         };
         HitDragging.prototype.prepareHits = function () {
             this.offsetTrackers = core.mapHash(this.droppableStore, function (interactionSettings) {
+                interactionSettings.component.buildPositionCaches();
                 return new OffsetTracker(interactionSettings.el);
             });
         };
@@ -10937,3235 +13957,6 @@ Docs & License: https://fullcalendar.io/
     exports.FeaturefulElementDragging = FeaturefulElementDragging;
     exports.PointerDragging = PointerDragging;
     exports.ThirdPartyDraggable = ThirdPartyDraggable;
-    exports.default = main;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-/*!
-FullCalendar Time Grid Plugin v4.0.2
-Docs & License: https://fullcalendar.io/
-(c) 2019 Adam Shaw
-*/
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@fullcalendar/core'), require('@fullcalendar/daygrid')) :
-    typeof define === 'function' && define.amd ? define(['exports', '@fullcalendar/core', '@fullcalendar/daygrid'], factory) :
-    (global = global || self, factory(global.FullCalendarTimeGrid = {}, global.FullCalendar, global.FullCalendarDayGrid));
-}(this, function (exports, core, daygrid) { 'use strict';
-
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-    /* global Reflect, Promise */
-
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-
-    function __extends(d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    }
-
-    var __assign = function() {
-        __assign = Object.assign || function __assign(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-
-    /*
-    Only handles foreground segs.
-    Does not own rendering. Use for low-level util methods by TimeGrid.
-    */
-    var TimeGridEventRenderer = /** @class */ (function (_super) {
-        __extends(TimeGridEventRenderer, _super);
-        function TimeGridEventRenderer(timeGrid) {
-            var _this = _super.call(this, timeGrid.context) || this;
-            _this.timeGrid = timeGrid;
-            _this.fullTimeFormat = core.createFormatter({
-                hour: 'numeric',
-                minute: '2-digit',
-                separator: _this.context.options.defaultRangeSeparator
-            });
-            return _this;
-        }
-        // Given an array of foreground segments, render a DOM element for each, computes position,
-        // and attaches to the column inner-container elements.
-        TimeGridEventRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
-            var segsByCol = this.timeGrid.groupSegsByCol(segs);
-            // order the segs within each column
-            // TODO: have groupSegsByCol do this?
-            for (var col = 0; col < segsByCol.length; col++) {
-                segsByCol[col] = this.sortEventSegs(segsByCol[col]);
-            }
-            this.segsByCol = segsByCol;
-            this.timeGrid.attachSegsByCol(segsByCol, this.timeGrid.fgContainerEls);
-        };
-        TimeGridEventRenderer.prototype.detachSegs = function (segs) {
-            segs.forEach(function (seg) {
-                core.removeElement(seg.el);
-            });
-            this.segsByCol = null;
-        };
-        TimeGridEventRenderer.prototype.computeSegSizes = function (allSegs) {
-            var _a = this, timeGrid = _a.timeGrid, segsByCol = _a.segsByCol;
-            var colCnt = timeGrid.colCnt;
-            timeGrid.computeSegVerticals(allSegs); // horizontals relies on this
-            if (segsByCol) {
-                for (var col = 0; col < colCnt; col++) {
-                    this.computeSegHorizontals(segsByCol[col]); // compute horizontal coordinates, z-index's, and reorder the array
-                }
-            }
-        };
-        TimeGridEventRenderer.prototype.assignSegSizes = function (allSegs) {
-            var _a = this, timeGrid = _a.timeGrid, segsByCol = _a.segsByCol;
-            var colCnt = timeGrid.colCnt;
-            timeGrid.assignSegVerticals(allSegs); // horizontals relies on this
-            if (segsByCol) {
-                for (var col = 0; col < colCnt; col++) {
-                    this.assignSegCss(segsByCol[col]);
-                }
-            }
-        };
-        // Computes a default event time formatting string if `eventTimeFormat` is not explicitly defined
-        TimeGridEventRenderer.prototype.computeEventTimeFormat = function () {
-            return {
-                hour: 'numeric',
-                minute: '2-digit',
-                meridiem: false
-            };
-        };
-        // Computes a default `displayEventEnd` value if one is not expliclty defined
-        TimeGridEventRenderer.prototype.computeDisplayEventEnd = function () {
-            return true;
-        };
-        // Renders the HTML for a single event segment's default rendering
-        TimeGridEventRenderer.prototype.renderSegHtml = function (seg, mirrorInfo) {
-            var eventRange = seg.eventRange;
-            var eventDef = eventRange.def;
-            var eventUi = eventRange.ui;
-            var allDay = eventDef.allDay;
-            var isDraggable = eventUi.startEditable;
-            var isResizableFromStart = seg.isStart && eventUi.durationEditable && this.context.options.eventResizableFromStart;
-            var isResizableFromEnd = seg.isEnd && eventUi.durationEditable;
-            var classes = this.getSegClasses(seg, isDraggable, isResizableFromStart || isResizableFromEnd, mirrorInfo);
-            var skinCss = core.cssToStr(this.getSkinCss(eventUi));
-            var timeText;
-            var fullTimeText; // more verbose time text. for the print stylesheet
-            var startTimeText; // just the start time text
-            classes.unshift('fc-time-grid-event');
-            // if the event appears to span more than one day...
-            if (core.isMultiDayRange(eventRange.range)) {
-                // Don't display time text on segments that run entirely through a day.
-                // That would appear as midnight-midnight and would look dumb.
-                // Otherwise, display the time text for the *segment's* times (like 6pm-midnight or midnight-10am)
-                if (seg.isStart || seg.isEnd) {
-                    var unzonedStart = seg.start;
-                    var unzonedEnd = seg.end;
-                    timeText = this._getTimeText(unzonedStart, unzonedEnd, allDay); // TODO: give the timezones
-                    fullTimeText = this._getTimeText(unzonedStart, unzonedEnd, allDay, this.fullTimeFormat);
-                    startTimeText = this._getTimeText(unzonedStart, unzonedEnd, allDay, null, false); // displayEnd=false
-                }
-            }
-            else {
-                // Display the normal time text for the *event's* times
-                timeText = this.getTimeText(eventRange);
-                fullTimeText = this.getTimeText(eventRange, this.fullTimeFormat);
-                startTimeText = this.getTimeText(eventRange, null, false); // displayEnd=false
-            }
-            return '<a class="' + classes.join(' ') + '"' +
-                (eventDef.url ?
-                    ' href="' + core.htmlEscape(eventDef.url) + '"' :
-                    '') +
-                (skinCss ?
-                    ' style="' + skinCss + '"' :
-                    '') +
-                '>' +
-                '<div class="fc-content">' +
-                (timeText ?
-                    '<div class="fc-time"' +
-                        ' data-start="' + core.htmlEscape(startTimeText) + '"' +
-                        ' data-full="' + core.htmlEscape(fullTimeText) + '"' +
-                        '>' +
-                        '<span>' + core.htmlEscape(timeText) + '</span>' +
-                        '</div>' :
-                    '') +
-                (eventDef.title ?
-                    '<div class="fc-title">' +
-                        core.htmlEscape(eventDef.title) +
-                        '</div>' :
-                    '') +
-                '</div>' +
-                /* TODO: write CSS for this
-                (isResizableFromStart ?
-                  '<div class="fc-resizer fc-start-resizer"></div>' :
-                  ''
-                  ) +
-                */
-                (isResizableFromEnd ?
-                    '<div class="fc-resizer fc-end-resizer"></div>' :
-                    '') +
-                '</a>';
-        };
-        // Given an array of segments that are all in the same column, sets the backwardCoord and forwardCoord on each.
-        // Assumed the segs are already ordered.
-        // NOTE: Also reorders the given array by date!
-        TimeGridEventRenderer.prototype.computeSegHorizontals = function (segs) {
-            var levels;
-            var level0;
-            var i;
-            levels = buildSlotSegLevels(segs);
-            computeForwardSlotSegs(levels);
-            if ((level0 = levels[0])) {
-                for (i = 0; i < level0.length; i++) {
-                    computeSlotSegPressures(level0[i]);
-                }
-                for (i = 0; i < level0.length; i++) {
-                    this.computeSegForwardBack(level0[i], 0, 0);
-                }
-            }
-        };
-        // Calculate seg.forwardCoord and seg.backwardCoord for the segment, where both values range
-        // from 0 to 1. If the calendar is left-to-right, the seg.backwardCoord maps to "left" and
-        // seg.forwardCoord maps to "right" (via percentage). Vice-versa if the calendar is right-to-left.
-        //
-        // The segment might be part of a "series", which means consecutive segments with the same pressure
-        // who's width is unknown until an edge has been hit. `seriesBackwardPressure` is the number of
-        // segments behind this one in the current series, and `seriesBackwardCoord` is the starting
-        // coordinate of the first segment in the series.
-        TimeGridEventRenderer.prototype.computeSegForwardBack = function (seg, seriesBackwardPressure, seriesBackwardCoord) {
-            var forwardSegs = seg.forwardSegs;
-            var i;
-            if (seg.forwardCoord === undefined) { // not already computed
-                if (!forwardSegs.length) {
-                    // if there are no forward segments, this segment should butt up against the edge
-                    seg.forwardCoord = 1;
-                }
-                else {
-                    // sort highest pressure first
-                    this.sortForwardSegs(forwardSegs);
-                    // this segment's forwardCoord will be calculated from the backwardCoord of the
-                    // highest-pressure forward segment.
-                    this.computeSegForwardBack(forwardSegs[0], seriesBackwardPressure + 1, seriesBackwardCoord);
-                    seg.forwardCoord = forwardSegs[0].backwardCoord;
-                }
-                // calculate the backwardCoord from the forwardCoord. consider the series
-                seg.backwardCoord = seg.forwardCoord -
-                    (seg.forwardCoord - seriesBackwardCoord) / // available width for series
-                        (seriesBackwardPressure + 1); // # of segments in the series
-                // use this segment's coordinates to computed the coordinates of the less-pressurized
-                // forward segments
-                for (i = 0; i < forwardSegs.length; i++) {
-                    this.computeSegForwardBack(forwardSegs[i], 0, seg.forwardCoord);
-                }
-            }
-        };
-        TimeGridEventRenderer.prototype.sortForwardSegs = function (forwardSegs) {
-            var objs = forwardSegs.map(buildTimeGridSegCompareObj);
-            var specs = [
-                // put higher-pressure first
-                { field: 'forwardPressure', order: -1 },
-                // put segments that are closer to initial edge first (and favor ones with no coords yet)
-                { field: 'backwardCoord', order: 1 }
-            ].concat(this.context.view.eventOrderSpecs);
-            objs.sort(function (obj0, obj1) {
-                return core.compareByFieldSpecs(obj0, obj1, specs);
-            });
-            return objs.map(function (c) {
-                return c._seg;
-            });
-        };
-        // Given foreground event segments that have already had their position coordinates computed,
-        // assigns position-related CSS values to their elements.
-        TimeGridEventRenderer.prototype.assignSegCss = function (segs) {
-            for (var _i = 0, segs_1 = segs; _i < segs_1.length; _i++) {
-                var seg = segs_1[_i];
-                core.applyStyle(seg.el, this.generateSegCss(seg));
-                if (seg.level > 0) {
-                    seg.el.classList.add('fc-time-grid-event-inset');
-                }
-                // if the event is short that the title will be cut off,
-                // attach a className that condenses the title into the time area.
-                if (seg.eventRange.def.title && seg.bottom - seg.top < 30) {
-                    seg.el.classList.add('fc-short'); // TODO: "condensed" is a better name
-                }
-            }
-        };
-        // Generates an object with CSS properties/values that should be applied to an event segment element.
-        // Contains important positioning-related properties that should be applied to any event element, customized or not.
-        TimeGridEventRenderer.prototype.generateSegCss = function (seg) {
-            var shouldOverlap = this.context.options.slotEventOverlap;
-            var backwardCoord = seg.backwardCoord; // the left side if LTR. the right side if RTL. floating-point
-            var forwardCoord = seg.forwardCoord; // the right side if LTR. the left side if RTL. floating-point
-            var props = this.timeGrid.generateSegVerticalCss(seg); // get top/bottom first
-            var isRtl = this.timeGrid.isRtl;
-            var left; // amount of space from left edge, a fraction of the total width
-            var right; // amount of space from right edge, a fraction of the total width
-            if (shouldOverlap) {
-                // double the width, but don't go beyond the maximum forward coordinate (1.0)
-                forwardCoord = Math.min(1, backwardCoord + (forwardCoord - backwardCoord) * 2);
-            }
-            if (isRtl) {
-                left = 1 - forwardCoord;
-                right = backwardCoord;
-            }
-            else {
-                left = backwardCoord;
-                right = 1 - forwardCoord;
-            }
-            props.zIndex = seg.level + 1; // convert from 0-base to 1-based
-            props.left = left * 100 + '%';
-            props.right = right * 100 + '%';
-            if (shouldOverlap && seg.forwardPressure) {
-                // add padding to the edge so that forward stacked events don't cover the resizer's icon
-                props[isRtl ? 'marginLeft' : 'marginRight'] = 10 * 2; // 10 is a guesstimate of the icon's width
-            }
-            return props;
-        };
-        return TimeGridEventRenderer;
-    }(core.FgEventRenderer));
-    // Builds an array of segments "levels". The first level will be the leftmost tier of segments if the calendar is
-    // left-to-right, or the rightmost if the calendar is right-to-left. Assumes the segments are already ordered by date.
-    function buildSlotSegLevels(segs) {
-        var levels = [];
-        var i;
-        var seg;
-        var j;
-        for (i = 0; i < segs.length; i++) {
-            seg = segs[i];
-            // go through all the levels and stop on the first level where there are no collisions
-            for (j = 0; j < levels.length; j++) {
-                if (!computeSlotSegCollisions(seg, levels[j]).length) {
-                    break;
-                }
-            }
-            seg.level = j;
-            (levels[j] || (levels[j] = [])).push(seg);
-        }
-        return levels;
-    }
-    // For every segment, figure out the other segments that are in subsequent
-    // levels that also occupy the same vertical space. Accumulate in seg.forwardSegs
-    function computeForwardSlotSegs(levels) {
-        var i;
-        var level;
-        var j;
-        var seg;
-        var k;
-        for (i = 0; i < levels.length; i++) {
-            level = levels[i];
-            for (j = 0; j < level.length; j++) {
-                seg = level[j];
-                seg.forwardSegs = [];
-                for (k = i + 1; k < levels.length; k++) {
-                    computeSlotSegCollisions(seg, levels[k], seg.forwardSegs);
-                }
-            }
-        }
-    }
-    // Figure out which path forward (via seg.forwardSegs) results in the longest path until
-    // the furthest edge is reached. The number of segments in this path will be seg.forwardPressure
-    function computeSlotSegPressures(seg) {
-        var forwardSegs = seg.forwardSegs;
-        var forwardPressure = 0;
-        var i;
-        var forwardSeg;
-        if (seg.forwardPressure === undefined) { // not already computed
-            for (i = 0; i < forwardSegs.length; i++) {
-                forwardSeg = forwardSegs[i];
-                // figure out the child's maximum forward path
-                computeSlotSegPressures(forwardSeg);
-                // either use the existing maximum, or use the child's forward pressure
-                // plus one (for the forwardSeg itself)
-                forwardPressure = Math.max(forwardPressure, 1 + forwardSeg.forwardPressure);
-            }
-            seg.forwardPressure = forwardPressure;
-        }
-    }
-    // Find all the segments in `otherSegs` that vertically collide with `seg`.
-    // Append into an optionally-supplied `results` array and return.
-    function computeSlotSegCollisions(seg, otherSegs, results) {
-        if (results === void 0) { results = []; }
-        for (var i = 0; i < otherSegs.length; i++) {
-            if (isSlotSegCollision(seg, otherSegs[i])) {
-                results.push(otherSegs[i]);
-            }
-        }
-        return results;
-    }
-    // Do these segments occupy the same vertical space?
-    function isSlotSegCollision(seg1, seg2) {
-        return seg1.bottom > seg2.top && seg1.top < seg2.bottom;
-    }
-    function buildTimeGridSegCompareObj(seg) {
-        var obj = core.buildSegCompareObj(seg);
-        obj.forwardPressure = seg.forwardPressure;
-        obj.backwardCoord = seg.backwardCoord;
-        return obj;
-    }
-
-    var TimeGridMirrorRenderer = /** @class */ (function (_super) {
-        __extends(TimeGridMirrorRenderer, _super);
-        function TimeGridMirrorRenderer() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        TimeGridMirrorRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
-            this.segsByCol = this.timeGrid.groupSegsByCol(segs);
-            this.timeGrid.attachSegsByCol(this.segsByCol, this.timeGrid.mirrorContainerEls);
-            this.sourceSeg = mirrorInfo.sourceSeg;
-        };
-        TimeGridMirrorRenderer.prototype.generateSegCss = function (seg) {
-            var props = _super.prototype.generateSegCss.call(this, seg);
-            var sourceSeg = this.sourceSeg;
-            if (sourceSeg && sourceSeg.col === seg.col) {
-                var sourceSegProps = _super.prototype.generateSegCss.call(this, sourceSeg);
-                props.left = sourceSegProps.left;
-                props.right = sourceSegProps.right;
-                props.marginLeft = sourceSegProps.marginLeft;
-                props.marginRight = sourceSegProps.marginRight;
-            }
-            return props;
-        };
-        return TimeGridMirrorRenderer;
-    }(TimeGridEventRenderer));
-
-    var TimeGridFillRenderer = /** @class */ (function (_super) {
-        __extends(TimeGridFillRenderer, _super);
-        function TimeGridFillRenderer(timeGrid) {
-            var _this = _super.call(this, timeGrid.context) || this;
-            _this.timeGrid = timeGrid;
-            return _this;
-        }
-        TimeGridFillRenderer.prototype.attachSegs = function (type, segs) {
-            var timeGrid = this.timeGrid;
-            var containerEls;
-            // TODO: more efficient lookup
-            if (type === 'bgEvent') {
-                containerEls = timeGrid.bgContainerEls;
-            }
-            else if (type === 'businessHours') {
-                containerEls = timeGrid.businessContainerEls;
-            }
-            else if (type === 'highlight') {
-                containerEls = timeGrid.highlightContainerEls;
-            }
-            timeGrid.attachSegsByCol(timeGrid.groupSegsByCol(segs), containerEls);
-            return segs.map(function (seg) {
-                return seg.el;
-            });
-        };
-        TimeGridFillRenderer.prototype.computeSegSizes = function (segs) {
-            this.timeGrid.computeSegVerticals(segs);
-        };
-        TimeGridFillRenderer.prototype.assignSegSizes = function (segs) {
-            this.timeGrid.assignSegVerticals(segs);
-        };
-        return TimeGridFillRenderer;
-    }(core.FillRenderer));
-
-    /* A component that renders one or more columns of vertical time slots
-    ----------------------------------------------------------------------------------------------------------------------*/
-    // potential nice values for the slot-duration and interval-duration
-    // from largest to smallest
-    var AGENDA_STOCK_SUB_DURATIONS = [
-        { hours: 1 },
-        { minutes: 30 },
-        { minutes: 15 },
-        { seconds: 30 },
-        { seconds: 15 }
-    ];
-    var TimeGrid = /** @class */ (function (_super) {
-        __extends(TimeGrid, _super);
-        function TimeGrid(context, el, renderProps) {
-            var _this = _super.call(this, context, el) || this;
-            _this.isSlatSizesDirty = false;
-            _this.isColSizesDirty = false;
-            _this.renderSlats = core.memoizeRendering(_this._renderSlats);
-            var eventRenderer = _this.eventRenderer = new TimeGridEventRenderer(_this);
-            var fillRenderer = _this.fillRenderer = new TimeGridFillRenderer(_this);
-            _this.mirrorRenderer = new TimeGridMirrorRenderer(_this);
-            var renderColumns = _this.renderColumns = core.memoizeRendering(_this._renderColumns, _this._unrenderColumns);
-            _this.renderBusinessHours = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'businessHours'), fillRenderer.unrender.bind(fillRenderer, 'businessHours'), [renderColumns]);
-            _this.renderDateSelection = core.memoizeRendering(_this._renderDateSelection, _this._unrenderDateSelection, [renderColumns]);
-            _this.renderFgEvents = core.memoizeRendering(eventRenderer.renderSegs.bind(eventRenderer), eventRenderer.unrender.bind(eventRenderer), [renderColumns]);
-            _this.renderBgEvents = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'bgEvent'), fillRenderer.unrender.bind(fillRenderer, 'bgEvent'), [renderColumns]);
-            _this.renderEventSelection = core.memoizeRendering(eventRenderer.selectByInstanceId.bind(eventRenderer), eventRenderer.unselectByInstanceId.bind(eventRenderer), [_this.renderFgEvents]);
-            _this.renderEventDrag = core.memoizeRendering(_this._renderEventDrag, _this._unrenderEventDrag, [renderColumns]);
-            _this.renderEventResize = core.memoizeRendering(_this._renderEventResize, _this._unrenderEventResize, [renderColumns]);
-            _this.processOptions();
-            el.innerHTML =
-                '<div class="fc-bg"></div>' +
-                    '<div class="fc-slats"></div>' +
-                    '<hr class="fc-divider ' + _this.theme.getClass('widgetHeader') + '" style="display:none" />';
-            _this.rootBgContainerEl = el.querySelector('.fc-bg');
-            _this.slatContainerEl = el.querySelector('.fc-slats');
-            _this.bottomRuleEl = el.querySelector('.fc-divider');
-            _this.renderProps = renderProps;
-            return _this;
-        }
-        /* Options
-        ------------------------------------------------------------------------------------------------------------------*/
-        // Parses various options into properties of this object
-        TimeGrid.prototype.processOptions = function () {
-            var slotDuration = this.opt('slotDuration');
-            var snapDuration = this.opt('snapDuration');
-            var snapsPerSlot;
-            var input;
-            slotDuration = core.createDuration(slotDuration);
-            snapDuration = snapDuration ? core.createDuration(snapDuration) : slotDuration;
-            snapsPerSlot = core.wholeDivideDurations(slotDuration, snapDuration);
-            if (snapsPerSlot === null) {
-                snapDuration = slotDuration;
-                snapsPerSlot = 1;
-                // TODO: say warning?
-            }
-            this.slotDuration = slotDuration;
-            this.snapDuration = snapDuration;
-            this.snapsPerSlot = snapsPerSlot;
-            // might be an array value (for TimelineView).
-            // if so, getting the most granular entry (the last one probably).
-            input = this.opt('slotLabelFormat');
-            if (Array.isArray(input)) {
-                input = input[input.length - 1];
-            }
-            this.labelFormat = core.createFormatter(input || {
-                hour: 'numeric',
-                minute: '2-digit',
-                omitZeroMinute: true,
-                meridiem: 'short'
-            });
-            input = this.opt('slotLabelInterval');
-            this.labelInterval = input ?
-                core.createDuration(input) :
-                this.computeLabelInterval(slotDuration);
-        };
-        // Computes an automatic value for slotLabelInterval
-        TimeGrid.prototype.computeLabelInterval = function (slotDuration) {
-            var i;
-            var labelInterval;
-            var slotsPerLabel;
-            // find the smallest stock label interval that results in more than one slots-per-label
-            for (i = AGENDA_STOCK_SUB_DURATIONS.length - 1; i >= 0; i--) {
-                labelInterval = core.createDuration(AGENDA_STOCK_SUB_DURATIONS[i]);
-                slotsPerLabel = core.wholeDivideDurations(labelInterval, slotDuration);
-                if (slotsPerLabel !== null && slotsPerLabel > 1) {
-                    return labelInterval;
-                }
-            }
-            return slotDuration; // fall back
-        };
-        /* Rendering
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype.render = function (props) {
-            var cells = props.cells;
-            this.colCnt = cells.length;
-            this.renderSlats(props.dateProfile);
-            this.renderColumns(props.cells, props.dateProfile);
-            this.renderBusinessHours(props.businessHourSegs);
-            this.renderDateSelection(props.dateSelectionSegs);
-            this.renderFgEvents(props.fgEventSegs);
-            this.renderBgEvents(props.bgEventSegs);
-            this.renderEventSelection(props.eventSelection);
-            this.renderEventDrag(props.eventDrag);
-            this.renderEventResize(props.eventResize);
-        };
-        TimeGrid.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            // should unrender everything else too
-            this.renderSlats.unrender();
-            this.renderColumns.unrender();
-        };
-        TimeGrid.prototype.updateSize = function (isResize) {
-            var _a = this, fillRenderer = _a.fillRenderer, eventRenderer = _a.eventRenderer, mirrorRenderer = _a.mirrorRenderer;
-            if (isResize || this.isSlatSizesDirty) {
-                this.buildSlatPositions();
-                this.isSlatSizesDirty = false;
-            }
-            if (isResize || this.isColSizesDirty) {
-                this.buildColPositions();
-                this.isColSizesDirty = false;
-            }
-            fillRenderer.computeSizes(isResize);
-            eventRenderer.computeSizes(isResize);
-            mirrorRenderer.computeSizes(isResize);
-            fillRenderer.assignSizes(isResize);
-            eventRenderer.assignSizes(isResize);
-            mirrorRenderer.assignSizes(isResize);
-        };
-        TimeGrid.prototype._renderSlats = function (dateProfile) {
-            var theme = this.theme;
-            this.slatContainerEl.innerHTML =
-                '<table class="' + theme.getClass('tableGrid') + '">' +
-                    this.renderSlatRowHtml(dateProfile) +
-                    '</table>';
-            this.slatEls = core.findElements(this.slatContainerEl, 'tr');
-            this.slatPositions = new core.PositionCache(this.el, this.slatEls, false, true // vertical
-            );
-            this.isSlatSizesDirty = true;
-        };
-        // Generates the HTML for the horizontal "slats" that run width-wise. Has a time axis on a side. Depends on RTL.
-        TimeGrid.prototype.renderSlatRowHtml = function (dateProfile) {
-            var _a = this, dateEnv = _a.dateEnv, theme = _a.theme, isRtl = _a.isRtl;
-            var html = '';
-            var dayStart = core.startOfDay(dateProfile.renderRange.start);
-            var slotTime = dateProfile.minTime;
-            var slotIterator = core.createDuration(0);
-            var slotDate; // will be on the view's first day, but we only care about its time
-            var isLabeled;
-            var axisHtml;
-            // Calculate the time for each slot
-            while (core.asRoughMs(slotTime) < core.asRoughMs(dateProfile.maxTime)) {
-                slotDate = dateEnv.add(dayStart, slotTime);
-                isLabeled = core.wholeDivideDurations(slotIterator, this.labelInterval) !== null;
-                axisHtml =
-                    '<td class="fc-axis fc-time ' + theme.getClass('widgetContent') + '">' +
-                        (isLabeled ?
-                            '<span>' + // for matchCellWidths
-                                core.htmlEscape(dateEnv.format(slotDate, this.labelFormat)) +
-                                '</span>' :
-                            '') +
-                        '</td>';
-                html +=
-                    '<tr data-time="' + core.formatIsoTimeString(slotDate) + '"' +
-                        (isLabeled ? '' : ' class="fc-minor"') +
-                        '>' +
-                        (!isRtl ? axisHtml : '') +
-                        '<td class="' + theme.getClass('widgetContent') + '"></td>' +
-                        (isRtl ? axisHtml : '') +
-                        '</tr>';
-                slotTime = core.addDurations(slotTime, this.slotDuration);
-                slotIterator = core.addDurations(slotIterator, this.slotDuration);
-            }
-            return html;
-        };
-        TimeGrid.prototype._renderColumns = function (cells, dateProfile) {
-            var theme = this.theme;
-            var bgRow = new daygrid.DayBgRow(this.context);
-            this.rootBgContainerEl.innerHTML =
-                '<table class="' + theme.getClass('tableGrid') + '">' +
-                    bgRow.renderHtml({
-                        cells: cells,
-                        dateProfile: dateProfile,
-                        renderIntroHtml: this.renderProps.renderBgIntroHtml
-                    }) +
-                    '</table>';
-            this.colEls = core.findElements(this.el, '.fc-day, .fc-disabled-day');
-            if (this.isRtl) {
-                this.colEls.reverse();
-            }
-            this.colPositions = new core.PositionCache(this.el, this.colEls, true, // horizontal
-            false);
-            this.renderContentSkeleton();
-            this.isColSizesDirty = true;
-        };
-        TimeGrid.prototype._unrenderColumns = function () {
-            this.unrenderContentSkeleton();
-        };
-        /* Content Skeleton
-        ------------------------------------------------------------------------------------------------------------------*/
-        // Renders the DOM that the view's content will live in
-        TimeGrid.prototype.renderContentSkeleton = function () {
-            var parts = [];
-            var skeletonEl;
-            parts.push(this.renderProps.renderIntroHtml());
-            for (var i = 0; i < this.colCnt; i++) {
-                parts.push('<td>' +
-                    '<div class="fc-content-col">' +
-                    '<div class="fc-event-container fc-mirror-container"></div>' +
-                    '<div class="fc-event-container"></div>' +
-                    '<div class="fc-highlight-container"></div>' +
-                    '<div class="fc-bgevent-container"></div>' +
-                    '<div class="fc-business-container"></div>' +
-                    '</div>' +
-                    '</td>');
-            }
-            if (this.isRtl) {
-                parts.reverse();
-            }
-            skeletonEl = this.contentSkeletonEl = core.htmlToElement('<div class="fc-content-skeleton">' +
-                '<table>' +
-                '<tr>' + parts.join('') + '</tr>' +
-                '</table>' +
-                '</div>');
-            this.colContainerEls = core.findElements(skeletonEl, '.fc-content-col');
-            this.mirrorContainerEls = core.findElements(skeletonEl, '.fc-mirror-container');
-            this.fgContainerEls = core.findElements(skeletonEl, '.fc-event-container:not(.fc-mirror-container)');
-            this.bgContainerEls = core.findElements(skeletonEl, '.fc-bgevent-container');
-            this.highlightContainerEls = core.findElements(skeletonEl, '.fc-highlight-container');
-            this.businessContainerEls = core.findElements(skeletonEl, '.fc-business-container');
-            if (this.isRtl) {
-                this.colContainerEls.reverse();
-                this.mirrorContainerEls.reverse();
-                this.fgContainerEls.reverse();
-                this.bgContainerEls.reverse();
-                this.highlightContainerEls.reverse();
-                this.businessContainerEls.reverse();
-            }
-            this.el.appendChild(skeletonEl);
-        };
-        TimeGrid.prototype.unrenderContentSkeleton = function () {
-            core.removeElement(this.contentSkeletonEl);
-        };
-        // Given a flat array of segments, return an array of sub-arrays, grouped by each segment's col
-        TimeGrid.prototype.groupSegsByCol = function (segs) {
-            var segsByCol = [];
-            var i;
-            for (i = 0; i < this.colCnt; i++) {
-                segsByCol.push([]);
-            }
-            for (i = 0; i < segs.length; i++) {
-                segsByCol[segs[i].col].push(segs[i]);
-            }
-            return segsByCol;
-        };
-        // Given segments grouped by column, insert the segments' elements into a parallel array of container
-        // elements, each living within a column.
-        TimeGrid.prototype.attachSegsByCol = function (segsByCol, containerEls) {
-            var col;
-            var segs;
-            var i;
-            for (col = 0; col < this.colCnt; col++) { // iterate each column grouping
-                segs = segsByCol[col];
-                for (i = 0; i < segs.length; i++) {
-                    containerEls[col].appendChild(segs[i].el);
-                }
-            }
-        };
-        /* Now Indicator
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype.getNowIndicatorUnit = function () {
-            return 'minute'; // will refresh on the minute
-        };
-        TimeGrid.prototype.renderNowIndicator = function (segs, date) {
-            // HACK: if date columns not ready for some reason (scheduler)
-            if (!this.colContainerEls) {
-                return;
-            }
-            var top = this.computeDateTop(date);
-            var nodes = [];
-            var i;
-            // render lines within the columns
-            for (i = 0; i < segs.length; i++) {
-                var lineEl = core.createElement('div', { className: 'fc-now-indicator fc-now-indicator-line' });
-                lineEl.style.top = top + 'px';
-                this.colContainerEls[segs[i].col].appendChild(lineEl);
-                nodes.push(lineEl);
-            }
-            // render an arrow over the axis
-            if (segs.length > 0) { // is the current time in view?
-                var arrowEl = core.createElement('div', { className: 'fc-now-indicator fc-now-indicator-arrow' });
-                arrowEl.style.top = top + 'px';
-                this.contentSkeletonEl.appendChild(arrowEl);
-                nodes.push(arrowEl);
-            }
-            this.nowIndicatorEls = nodes;
-        };
-        TimeGrid.prototype.unrenderNowIndicator = function () {
-            if (this.nowIndicatorEls) {
-                this.nowIndicatorEls.forEach(core.removeElement);
-                this.nowIndicatorEls = null;
-            }
-        };
-        /* Coordinates
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype.getTotalSlatHeight = function () {
-            return this.slatContainerEl.offsetHeight;
-        };
-        // Computes the top coordinate, relative to the bounds of the grid, of the given date.
-        // A `startOfDayDate` must be given for avoiding ambiguity over how to treat midnight.
-        TimeGrid.prototype.computeDateTop = function (when, startOfDayDate) {
-            if (!startOfDayDate) {
-                startOfDayDate = core.startOfDay(when);
-            }
-            return this.computeTimeTop(when.valueOf() - startOfDayDate.valueOf());
-        };
-        // Computes the top coordinate, relative to the bounds of the grid, of the given time (a Duration).
-        TimeGrid.prototype.computeTimeTop = function (timeMs) {
-            var len = this.slatEls.length;
-            var dateProfile = this.props.dateProfile;
-            var slatCoverage = (timeMs - core.asRoughMs(dateProfile.minTime)) / core.asRoughMs(this.slotDuration); // floating-point value of # of slots covered
-            var slatIndex;
-            var slatRemainder;
-            // compute a floating-point number for how many slats should be progressed through.
-            // from 0 to number of slats (inclusive)
-            // constrained because minTime/maxTime might be customized.
-            slatCoverage = Math.max(0, slatCoverage);
-            slatCoverage = Math.min(len, slatCoverage);
-            // an integer index of the furthest whole slat
-            // from 0 to number slats (*exclusive*, so len-1)
-            slatIndex = Math.floor(slatCoverage);
-            slatIndex = Math.min(slatIndex, len - 1);
-            // how much further through the slatIndex slat (from 0.0-1.0) must be covered in addition.
-            // could be 1.0 if slatCoverage is covering *all* the slots
-            slatRemainder = slatCoverage - slatIndex;
-            return this.slatPositions.tops[slatIndex] +
-                this.slatPositions.getHeight(slatIndex) * slatRemainder;
-        };
-        // For each segment in an array, computes and assigns its top and bottom properties
-        TimeGrid.prototype.computeSegVerticals = function (segs) {
-            var eventMinHeight = this.opt('timeGridEventMinHeight');
-            var i;
-            var seg;
-            var dayDate;
-            for (i = 0; i < segs.length; i++) {
-                seg = segs[i];
-                dayDate = this.props.cells[seg.col].date;
-                seg.top = this.computeDateTop(seg.start, dayDate);
-                seg.bottom = Math.max(seg.top + eventMinHeight, this.computeDateTop(seg.end, dayDate));
-            }
-        };
-        // Given segments that already have their top/bottom properties computed, applies those values to
-        // the segments' elements.
-        TimeGrid.prototype.assignSegVerticals = function (segs) {
-            var i;
-            var seg;
-            for (i = 0; i < segs.length; i++) {
-                seg = segs[i];
-                core.applyStyle(seg.el, this.generateSegVerticalCss(seg));
-            }
-        };
-        // Generates an object with CSS properties for the top/bottom coordinates of a segment element
-        TimeGrid.prototype.generateSegVerticalCss = function (seg) {
-            return {
-                top: seg.top,
-                bottom: -seg.bottom // flipped because needs to be space beyond bottom edge of event container
-            };
-        };
-        /* Sizing
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype.buildColPositions = function () {
-            this.colPositions.build();
-        };
-        TimeGrid.prototype.buildSlatPositions = function () {
-            this.slatPositions.build();
-        };
-        /* Hit System
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype.positionToHit = function (positionLeft, positionTop) {
-            var _a = this, dateEnv = _a.dateEnv, snapsPerSlot = _a.snapsPerSlot, slatPositions = _a.slatPositions, colPositions = _a.colPositions;
-            var colIndex = colPositions.leftToIndex(positionLeft);
-            var slatIndex = slatPositions.topToIndex(positionTop);
-            if (colIndex != null && slatIndex != null) {
-                var slatTop = slatPositions.tops[slatIndex];
-                var slatHeight = slatPositions.getHeight(slatIndex);
-                var partial = (positionTop - slatTop) / slatHeight; // floating point number between 0 and 1
-                var localSnapIndex = Math.floor(partial * snapsPerSlot); // the snap # relative to start of slat
-                var snapIndex = slatIndex * snapsPerSlot + localSnapIndex;
-                var dayDate = this.props.cells[colIndex].date;
-                var time = core.addDurations(this.props.dateProfile.minTime, core.multiplyDuration(this.snapDuration, snapIndex));
-                var start = dateEnv.add(dayDate, time);
-                var end = dateEnv.add(start, this.snapDuration);
-                return {
-                    col: colIndex,
-                    dateSpan: {
-                        range: { start: start, end: end },
-                        allDay: false
-                    },
-                    dayEl: this.colEls[colIndex],
-                    relativeRect: {
-                        left: colPositions.lefts[colIndex],
-                        right: colPositions.rights[colIndex],
-                        top: slatTop,
-                        bottom: slatTop + slatHeight
-                    }
-                };
-            }
-        };
-        /* Event Drag Visualization
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype._renderEventDrag = function (state) {
-            if (state) {
-                this.eventRenderer.hideByHash(state.affectedInstances);
-                if (state.isEvent) {
-                    this.mirrorRenderer.renderSegs(state.segs, { isDragging: true, sourceSeg: state.sourceSeg });
-                }
-                else {
-                    this.fillRenderer.renderSegs('highlight', state.segs);
-                }
-            }
-        };
-        TimeGrid.prototype._unrenderEventDrag = function (state) {
-            if (state) {
-                this.eventRenderer.showByHash(state.affectedInstances);
-                this.mirrorRenderer.unrender(state.segs, { isDragging: true, sourceSeg: state.sourceSeg });
-                this.fillRenderer.unrender('highlight');
-            }
-        };
-        /* Event Resize Visualization
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGrid.prototype._renderEventResize = function (state) {
-            if (state) {
-                this.eventRenderer.hideByHash(state.affectedInstances);
-                this.mirrorRenderer.renderSegs(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
-            }
-        };
-        TimeGrid.prototype._unrenderEventResize = function (state) {
-            if (state) {
-                this.eventRenderer.showByHash(state.affectedInstances);
-                this.mirrorRenderer.unrender(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
-            }
-        };
-        /* Selection
-        ------------------------------------------------------------------------------------------------------------------*/
-        // Renders a visual indication of a selection. Overrides the default, which was to simply render a highlight.
-        TimeGrid.prototype._renderDateSelection = function (segs) {
-            if (segs) {
-                if (this.opt('selectMirror')) {
-                    this.mirrorRenderer.renderSegs(segs, { isSelecting: true });
-                }
-                else {
-                    this.fillRenderer.renderSegs('highlight', segs);
-                }
-            }
-        };
-        TimeGrid.prototype._unrenderDateSelection = function (segs) {
-            this.mirrorRenderer.unrender(segs, { isSelecting: true });
-            this.fillRenderer.unrender('highlight');
-        };
-        return TimeGrid;
-    }(core.DateComponent));
-
-    var AllDaySplitter = /** @class */ (function (_super) {
-        __extends(AllDaySplitter, _super);
-        function AllDaySplitter() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        AllDaySplitter.prototype.getKeyInfo = function () {
-            return {
-                allDay: {},
-                timed: {}
-            };
-        };
-        AllDaySplitter.prototype.getKeysForDateSpan = function (dateSpan) {
-            if (dateSpan.allDay) {
-                return ['allDay'];
-            }
-            else {
-                return ['timed'];
-            }
-        };
-        AllDaySplitter.prototype.getKeysForEventDef = function (eventDef) {
-            if (!eventDef.allDay) {
-                return ['timed'];
-            }
-            else if (core.hasBgRendering(eventDef)) {
-                return ['timed', 'allDay'];
-            }
-            else {
-                return ['allDay'];
-            }
-        };
-        return AllDaySplitter;
-    }(core.Splitter));
-
-    var TIMEGRID_ALL_DAY_EVENT_LIMIT = 5;
-    var WEEK_HEADER_FORMAT = core.createFormatter({ week: 'short' });
-    /* An abstract class for all timegrid-related views. Displays one more columns with time slots running vertically.
-    ----------------------------------------------------------------------------------------------------------------------*/
-    // Is a manager for the TimeGrid subcomponent and possibly the DayGrid subcomponent (if allDaySlot is on).
-    // Responsible for managing width/height.
-    var TimeGridView = /** @class */ (function (_super) {
-        __extends(TimeGridView, _super);
-        function TimeGridView(context, viewSpec, dateProfileGenerator, parentEl) {
-            var _this = _super.call(this, context, viewSpec, dateProfileGenerator, parentEl) || this;
-            _this.splitter = new AllDaySplitter();
-            /* Header Render Methods
-            ------------------------------------------------------------------------------------------------------------------*/
-            // Generates the HTML that will go before the day-of week header cells
-            _this.renderHeadIntroHtml = function () {
-                var _a = _this, theme = _a.theme, dateEnv = _a.dateEnv;
-                var range = _this.props.dateProfile.renderRange;
-                var dayCnt = core.diffDays(range.start, range.end);
-                var weekText;
-                if (_this.opt('weekNumbers')) {
-                    weekText = dateEnv.format(range.start, WEEK_HEADER_FORMAT);
-                    return '' +
-                        '<th class="fc-axis fc-week-number ' + theme.getClass('widgetHeader') + '" ' + _this.axisStyleAttr() + '>' +
-                        core.buildGotoAnchorHtml(// aside from link, important for matchCellWidths
-                        _this, { date: range.start, type: 'week', forceOff: dayCnt > 1 }, core.htmlEscape(weekText) // inner HTML
-                        ) +
-                        '</th>';
-                }
-                else {
-                    return '<th class="fc-axis ' + theme.getClass('widgetHeader') + '" ' + _this.axisStyleAttr() + '></th>';
-                }
-            };
-            /* Time Grid Render Methods
-            ------------------------------------------------------------------------------------------------------------------*/
-            // Generates the HTML that goes before the bg of the TimeGrid slot area. Long vertical column.
-            _this.renderTimeGridBgIntroHtml = function () {
-                var theme = _this.theme;
-                return '<td class="fc-axis ' + theme.getClass('widgetContent') + '" ' + _this.axisStyleAttr() + '></td>';
-            };
-            // Generates the HTML that goes before all other types of cells.
-            // Affects content-skeleton, mirror-skeleton, highlight-skeleton for both the time-grid and day-grid.
-            _this.renderTimeGridIntroHtml = function () {
-                return '<td class="fc-axis" ' + _this.axisStyleAttr() + '></td>';
-            };
-            /* Day Grid Render Methods
-            ------------------------------------------------------------------------------------------------------------------*/
-            // Generates the HTML that goes before the all-day cells
-            _this.renderDayGridBgIntroHtml = function () {
-                var theme = _this.theme;
-                return '' +
-                    '<td class="fc-axis ' + theme.getClass('widgetContent') + '" ' + _this.axisStyleAttr() + '>' +
-                    '<span>' + // needed for matchCellWidths
-                    core.getAllDayHtml(_this) +
-                    '</span>' +
-                    '</td>';
-            };
-            // Generates the HTML that goes before all other types of cells.
-            // Affects content-skeleton, mirror-skeleton, highlight-skeleton for both the time-grid and day-grid.
-            _this.renderDayGridIntroHtml = function () {
-                return '<td class="fc-axis" ' + _this.axisStyleAttr() + '></td>';
-            };
-            _this.el.classList.add('fc-timeGrid-view');
-            _this.el.innerHTML = _this.renderSkeletonHtml();
-            _this.scroller = new core.ScrollComponent('hidden', // overflow x
-            'auto' // overflow y
-            );
-            var timeGridWrapEl = _this.scroller.el;
-            _this.el.querySelector('.fc-body > tr > td').appendChild(timeGridWrapEl);
-            timeGridWrapEl.classList.add('fc-time-grid-container');
-            var timeGridEl = core.createElement('div', { className: 'fc-time-grid' });
-            timeGridWrapEl.appendChild(timeGridEl);
-            _this.timeGrid = new TimeGrid(_this.context, timeGridEl, {
-                renderBgIntroHtml: _this.renderTimeGridBgIntroHtml,
-                renderIntroHtml: _this.renderTimeGridIntroHtml
-            });
-            if (_this.opt('allDaySlot')) { // should we display the "all-day" area?
-                _this.dayGrid = new daygrid.DayGrid(// the all-day subcomponent of this view
-                _this.context, _this.el.querySelector('.fc-day-grid'), {
-                    renderNumberIntroHtml: _this.renderDayGridIntroHtml,
-                    renderBgIntroHtml: _this.renderDayGridBgIntroHtml,
-                    renderIntroHtml: _this.renderDayGridIntroHtml,
-                    colWeekNumbersVisible: false,
-                    cellWeekNumbersVisible: false
-                });
-                // have the day-grid extend it's coordinate area over the <hr> dividing the two grids
-                _this.dayGrid.bottomCoordPadding = _this.el.querySelector('.fc-divider').offsetHeight;
-            }
-            return _this;
-        }
-        TimeGridView.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            this.timeGrid.destroy();
-            if (this.dayGrid) {
-                this.dayGrid.destroy();
-            }
-            this.scroller.destroy();
-        };
-        /* Rendering
-        ------------------------------------------------------------------------------------------------------------------*/
-        // Builds the HTML skeleton for the view.
-        // The day-grid and time-grid components will render inside containers defined by this HTML.
-        TimeGridView.prototype.renderSkeletonHtml = function () {
-            var theme = this.theme;
-            return '' +
-                '<table class="' + theme.getClass('tableGrid') + '">' +
-                (this.opt('columnHeader') ?
-                    '<thead class="fc-head">' +
-                        '<tr>' +
-                        '<td class="fc-head-container ' + theme.getClass('widgetHeader') + '">&nbsp;</td>' +
-                        '</tr>' +
-                        '</thead>' :
-                    '') +
-                '<tbody class="fc-body">' +
-                '<tr>' +
-                '<td class="' + theme.getClass('widgetContent') + '">' +
-                (this.opt('allDaySlot') ?
-                    '<div class="fc-day-grid"></div>' +
-                        '<hr class="fc-divider ' + theme.getClass('widgetHeader') + '" />' :
-                    '') +
-                '</td>' +
-                '</tr>' +
-                '</tbody>' +
-                '</table>';
-        };
-        /* Now Indicator
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGridView.prototype.getNowIndicatorUnit = function () {
-            return this.timeGrid.getNowIndicatorUnit();
-        };
-        // subclasses should implement
-        // renderNowIndicator(date: DateMarker) {
-        // }
-        TimeGridView.prototype.unrenderNowIndicator = function () {
-            this.timeGrid.unrenderNowIndicator();
-        };
-        /* Dimensions
-        ------------------------------------------------------------------------------------------------------------------*/
-        TimeGridView.prototype.updateSize = function (isResize, viewHeight, isAuto) {
-            _super.prototype.updateSize.call(this, isResize, viewHeight, isAuto); // will call updateBaseSize. important that executes first
-            this.timeGrid.updateSize(isResize);
-            if (this.dayGrid) {
-                this.dayGrid.updateSize(isResize);
-            }
-        };
-        // Adjusts the vertical dimensions of the view to the specified values
-        TimeGridView.prototype.updateBaseSize = function (isResize, viewHeight, isAuto) {
-            var _this = this;
-            var eventLimit;
-            var scrollerHeight;
-            var scrollbarWidths;
-            // make all axis cells line up
-            this.axisWidth = core.matchCellWidths(core.findElements(this.el, '.fc-axis'));
-            // hack to give the view some height prior to timeGrid's columns being rendered
-            // TODO: separate setting height from scroller VS timeGrid.
-            if (!this.timeGrid.colEls) {
-                if (!isAuto) {
-                    scrollerHeight = this.computeScrollerHeight(viewHeight);
-                    this.scroller.setHeight(scrollerHeight);
-                }
-                return;
-            }
-            // set of fake row elements that must compensate when scroller has scrollbars
-            var noScrollRowEls = core.findElements(this.el, '.fc-row').filter(function (node) {
-                return !_this.scroller.el.contains(node);
-            });
-            // reset all dimensions back to the original state
-            this.timeGrid.bottomRuleEl.style.display = 'none'; // will be shown later if this <hr> is necessary
-            this.scroller.clear(); // sets height to 'auto' and clears overflow
-            noScrollRowEls.forEach(core.uncompensateScroll);
-            // limit number of events in the all-day area
-            if (this.dayGrid) {
-                this.dayGrid.removeSegPopover(); // kill the "more" popover if displayed
-                eventLimit = this.opt('eventLimit');
-                if (eventLimit && typeof eventLimit !== 'number') {
-                    eventLimit = TIMEGRID_ALL_DAY_EVENT_LIMIT; // make sure "auto" goes to a real number
-                }
-                if (eventLimit) {
-                    this.dayGrid.limitRows(eventLimit);
-                }
-            }
-            if (!isAuto) { // should we force dimensions of the scroll container?
-                scrollerHeight = this.computeScrollerHeight(viewHeight);
-                this.scroller.setHeight(scrollerHeight);
-                scrollbarWidths = this.scroller.getScrollbarWidths();
-                if (scrollbarWidths.left || scrollbarWidths.right) { // using scrollbars?
-                    // make the all-day and header rows lines up
-                    noScrollRowEls.forEach(function (rowEl) {
-                        core.compensateScroll(rowEl, scrollbarWidths);
-                    });
-                    // the scrollbar compensation might have changed text flow, which might affect height, so recalculate
-                    // and reapply the desired height to the scroller.
-                    scrollerHeight = this.computeScrollerHeight(viewHeight);
-                    this.scroller.setHeight(scrollerHeight);
-                }
-                // guarantees the same scrollbar widths
-                this.scroller.lockOverflow(scrollbarWidths);
-                // if there's any space below the slats, show the horizontal rule.
-                // this won't cause any new overflow, because lockOverflow already called.
-                if (this.timeGrid.getTotalSlatHeight() < scrollerHeight) {
-                    this.timeGrid.bottomRuleEl.style.display = '';
-                }
-            }
-        };
-        // given a desired total height of the view, returns what the height of the scroller should be
-        TimeGridView.prototype.computeScrollerHeight = function (viewHeight) {
-            return viewHeight -
-                core.subtractInnerElHeight(this.el, this.scroller.el); // everything that's NOT the scroller
-        };
-        /* Scroll
-        ------------------------------------------------------------------------------------------------------------------*/
-        // Computes the initial pre-configured scroll state prior to allowing the user to change it
-        TimeGridView.prototype.computeInitialDateScroll = function () {
-            var scrollTime = core.createDuration(this.opt('scrollTime'));
-            var top = this.timeGrid.computeTimeTop(scrollTime.milliseconds);
-            // zoom can give weird floating-point values. rather scroll a little bit further
-            top = Math.ceil(top);
-            if (top) {
-                top++; // to overcome top border that slots beyond the first have. looks better
-            }
-            return { top: top };
-        };
-        TimeGridView.prototype.queryDateScroll = function () {
-            return { top: this.scroller.getScrollTop() };
-        };
-        TimeGridView.prototype.applyDateScroll = function (scroll) {
-            if (scroll.top !== undefined) {
-                this.scroller.setScrollTop(scroll.top);
-            }
-        };
-        // Generates an HTML attribute string for setting the width of the axis, if it is known
-        TimeGridView.prototype.axisStyleAttr = function () {
-            if (this.axisWidth != null) {
-                return 'style="width:' + this.axisWidth + 'px"';
-            }
-            return '';
-        };
-        return TimeGridView;
-    }(core.View));
-    TimeGridView.prototype.usesMinMaxTime = true; // indicates that minTime/maxTime affects rendering
-
-    var SimpleTimeGrid = /** @class */ (function (_super) {
-        __extends(SimpleTimeGrid, _super);
-        function SimpleTimeGrid(context, timeGrid) {
-            var _this = _super.call(this, context, timeGrid.el) || this;
-            _this.buildDayRanges = core.memoize(buildDayRanges);
-            _this.slicer = new TimeGridSlicer();
-            _this.timeGrid = timeGrid;
-            context.calendar.registerInteractiveComponent(_this, {
-                el: _this.timeGrid.el
-            });
-            return _this;
-        }
-        SimpleTimeGrid.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            this.calendar.unregisterInteractiveComponent(this);
-        };
-        SimpleTimeGrid.prototype.render = function (props) {
-            var dateProfile = props.dateProfile, dayTable = props.dayTable;
-            var dayRanges = this.dayRanges = this.buildDayRanges(dayTable, dateProfile, this.dateEnv);
-            this.timeGrid.receiveProps(__assign({}, this.slicer.sliceProps(props, dateProfile, null, this.timeGrid, dayRanges), { dateProfile: dateProfile, cells: dayTable.cells[0] }));
-        };
-        SimpleTimeGrid.prototype.renderNowIndicator = function (date) {
-            this.timeGrid.renderNowIndicator(this.slicer.sliceNowDate(date, this.timeGrid, this.dayRanges), date);
-        };
-        SimpleTimeGrid.prototype.queryHit = function (positionLeft, positionTop) {
-            var rawHit = this.timeGrid.positionToHit(positionLeft, positionTop);
-            if (rawHit) {
-                return {
-                    component: this.timeGrid,
-                    dateSpan: rawHit.dateSpan,
-                    dayEl: rawHit.dayEl,
-                    rect: {
-                        left: rawHit.relativeRect.left,
-                        right: rawHit.relativeRect.right,
-                        top: rawHit.relativeRect.top,
-                        bottom: rawHit.relativeRect.bottom
-                    },
-                    layer: 0
-                };
-            }
-        };
-        return SimpleTimeGrid;
-    }(core.DateComponent));
-    function buildDayRanges(dayTable, dateProfile, dateEnv) {
-        var ranges = [];
-        for (var _i = 0, _a = dayTable.headerDates; _i < _a.length; _i++) {
-            var date = _a[_i];
-            ranges.push({
-                start: dateEnv.add(date, dateProfile.minTime),
-                end: dateEnv.add(date, dateProfile.maxTime)
-            });
-        }
-        return ranges;
-    }
-    var TimeGridSlicer = /** @class */ (function (_super) {
-        __extends(TimeGridSlicer, _super);
-        function TimeGridSlicer() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        TimeGridSlicer.prototype.sliceRange = function (range, dayRanges) {
-            var segs = [];
-            for (var col = 0; col < dayRanges.length; col++) {
-                var segRange = core.intersectRanges(range, dayRanges[col]);
-                if (segRange) {
-                    segs.push({
-                        start: segRange.start,
-                        end: segRange.end,
-                        isStart: segRange.start.valueOf() === range.start.valueOf(),
-                        isEnd: segRange.end.valueOf() === range.end.valueOf(),
-                        col: col
-                    });
-                }
-            }
-            return segs;
-        };
-        return TimeGridSlicer;
-    }(core.Slicer));
-
-    var TimeGridView$1 = /** @class */ (function (_super) {
-        __extends(TimeGridView, _super);
-        function TimeGridView(_context, viewSpec, dateProfileGenerator, parentEl) {
-            var _this = _super.call(this, _context, viewSpec, dateProfileGenerator, parentEl) || this;
-            _this.buildDayTable = core.memoize(buildDayTable);
-            if (_this.opt('columnHeader')) {
-                _this.header = new core.DayHeader(_this.context, _this.el.querySelector('.fc-head-container'));
-            }
-            _this.simpleTimeGrid = new SimpleTimeGrid(_this.context, _this.timeGrid);
-            if (_this.dayGrid) {
-                _this.simpleDayGrid = new daygrid.SimpleDayGrid(_this.context, _this.dayGrid);
-            }
-            return _this;
-        }
-        TimeGridView.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            if (this.header) {
-                this.header.destroy();
-            }
-            this.simpleTimeGrid.destroy();
-            if (this.simpleDayGrid) {
-                this.simpleDayGrid.destroy();
-            }
-        };
-        TimeGridView.prototype.render = function (props) {
-            _super.prototype.render.call(this, props); // for flags for updateSize
-            var dateProfile = this.props.dateProfile;
-            var dayTable = this.buildDayTable(dateProfile, this.dateProfileGenerator);
-            var splitProps = this.splitter.splitProps(props);
-            if (this.header) {
-                this.header.receiveProps({
-                    dateProfile: dateProfile,
-                    dates: dayTable.headerDates,
-                    datesRepDistinctDays: true,
-                    renderIntroHtml: this.renderHeadIntroHtml
-                });
-            }
-            this.simpleTimeGrid.receiveProps(__assign({}, splitProps['timed'], { dateProfile: dateProfile,
-                dayTable: dayTable }));
-            if (this.simpleDayGrid) {
-                this.simpleDayGrid.receiveProps(__assign({}, splitProps['allDay'], { dateProfile: dateProfile,
-                    dayTable: dayTable, nextDayThreshold: this.nextDayThreshold, isRigid: false }));
-            }
-        };
-        TimeGridView.prototype.renderNowIndicator = function (date) {
-            this.simpleTimeGrid.renderNowIndicator(date);
-        };
-        return TimeGridView;
-    }(TimeGridView));
-    function buildDayTable(dateProfile, dateProfileGenerator) {
-        var daySeries = new core.DaySeries(dateProfile.renderRange, dateProfileGenerator);
-        return new core.DayTable(daySeries, false);
-    }
-
-    var main = core.createPlugin({
-        defaultView: 'timeGridWeek',
-        views: {
-            timeGrid: {
-                class: TimeGridView$1,
-                allDaySlot: true,
-                slotDuration: '00:30:00',
-                slotEventOverlap: true // a bad name. confused with overlap/constraint system
-            },
-            timeGridDay: {
-                type: 'timeGrid',
-                duration: { days: 1 }
-            },
-            timeGridWeek: {
-                type: 'timeGrid',
-                duration: { weeks: 1 }
-            }
-        }
-    });
-
-    exports.AbstractTimeGridView = TimeGridView;
-    exports.TimeGrid = TimeGrid;
-    exports.TimeGridSlicer = TimeGridSlicer;
-    exports.TimeGridView = TimeGridView$1;
-    exports.buildDayRanges = buildDayRanges;
-    exports.buildDayTable = buildDayTable;
-    exports.default = main;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-/*!
-FullCalendar Day Grid Plugin v4.0.2
-Docs & License: https://fullcalendar.io/
-(c) 2019 Adam Shaw
-*/
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@fullcalendar/core')) :
-    typeof define === 'function' && define.amd ? define(['exports', '@fullcalendar/core'], factory) :
-    (global = global || self, factory(global.FullCalendarDayGrid = {}, global.FullCalendar));
-}(this, function (exports, core) { 'use strict';
-
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-    /* global Reflect, Promise */
-
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-
-    function __extends(d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    }
-
-    var __assign = function() {
-        __assign = Object.assign || function __assign(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-
-    var DayGridDateProfileGenerator = /** @class */ (function (_super) {
-        __extends(DayGridDateProfileGenerator, _super);
-        function DayGridDateProfileGenerator() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        // Computes the date range that will be rendered.
-        DayGridDateProfileGenerator.prototype.buildRenderRange = function (currentRange, currentRangeUnit, isRangeAllDay) {
-            var dateEnv = this.dateEnv;
-            var renderRange = _super.prototype.buildRenderRange.call(this, currentRange, currentRangeUnit, isRangeAllDay);
-            var start = renderRange.start;
-            var end = renderRange.end;
-            var endOfWeek;
-            // year and month views should be aligned with weeks. this is already done for week
-            if (/^(year|month)$/.test(currentRangeUnit)) {
-                start = dateEnv.startOfWeek(start);
-                // make end-of-week if not already
-                endOfWeek = dateEnv.startOfWeek(end);
-                if (endOfWeek.valueOf() !== end.valueOf()) {
-                    end = core.addWeeks(endOfWeek, 1);
-                }
-            }
-            // ensure 6 weeks
-            if (this.options.monthMode &&
-                this.options.fixedWeekCount) {
-                var rowCnt = Math.ceil(// could be partial weeks due to hiddenDays
-                core.diffWeeks(start, end));
-                end = core.addWeeks(end, 6 - rowCnt);
-            }
-            return { start: start, end: end };
-        };
-        return DayGridDateProfileGenerator;
-    }(core.DateProfileGenerator));
-
-    /* A rectangular panel that is absolutely positioned over other content
-    ------------------------------------------------------------------------------------------------------------------------
-    Options:
-      - className (string)
-      - content (HTML string, element, or element array)
-      - parentEl
-      - top
-      - left
-      - right (the x coord of where the right edge should be. not a "CSS" right)
-      - autoHide (boolean)
-      - show (callback)
-      - hide (callback)
-    */
-    var Popover = /** @class */ (function () {
-        function Popover(options) {
-            var _this = this;
-            this.isHidden = true;
-            this.margin = 10; // the space required between the popover and the edges of the scroll container
-            // Triggered when the user clicks *anywhere* in the document, for the autoHide feature
-            this.documentMousedown = function (ev) {
-                // only hide the popover if the click happened outside the popover
-                if (_this.el && !_this.el.contains(ev.target)) {
-                    _this.hide();
-                }
-            };
-            this.options = options;
-        }
-        // Shows the popover on the specified position. Renders it if not already
-        Popover.prototype.show = function () {
-            if (this.isHidden) {
-                if (!this.el) {
-                    this.render();
-                }
-                this.el.style.display = '';
-                this.position();
-                this.isHidden = false;
-                this.trigger('show');
-            }
-        };
-        // Hides the popover, through CSS, but does not remove it from the DOM
-        Popover.prototype.hide = function () {
-            if (!this.isHidden) {
-                this.el.style.display = 'none';
-                this.isHidden = true;
-                this.trigger('hide');
-            }
-        };
-        // Creates `this.el` and renders content inside of it
-        Popover.prototype.render = function () {
-            var _this = this;
-            var options = this.options;
-            var el = this.el = core.createElement('div', {
-                className: 'fc-popover ' + (options.className || ''),
-                style: {
-                    top: '0',
-                    left: '0'
-                }
-            });
-            if (typeof options.content === 'function') {
-                options.content(el);
-            }
-            options.parentEl.appendChild(el);
-            // when a click happens on anything inside with a 'fc-close' className, hide the popover
-            core.listenBySelector(el, 'click', '.fc-close', function (ev) {
-                _this.hide();
-            });
-            if (options.autoHide) {
-                document.addEventListener('mousedown', this.documentMousedown);
-            }
-        };
-        // Hides and unregisters any handlers
-        Popover.prototype.destroy = function () {
-            this.hide();
-            if (this.el) {
-                core.removeElement(this.el);
-                this.el = null;
-            }
-            document.removeEventListener('mousedown', this.documentMousedown);
-        };
-        // Positions the popover optimally, using the top/left/right options
-        Popover.prototype.position = function () {
-            var options = this.options;
-            var el = this.el;
-            var elDims = el.getBoundingClientRect(); // only used for width,height
-            var origin = core.computeRect(el.offsetParent);
-            var clippingRect = core.computeClippingRect(options.parentEl);
-            var top; // the "position" (not "offset") values for the popover
-            var left; //
-            // compute top and left
-            top = options.top || 0;
-            if (options.left !== undefined) {
-                left = options.left;
-            }
-            else if (options.right !== undefined) {
-                left = options.right - elDims.width; // derive the left value from the right value
-            }
-            else {
-                left = 0;
-            }
-            // constrain to the view port. if constrained by two edges, give precedence to top/left
-            top = Math.min(top, clippingRect.bottom - elDims.height - this.margin);
-            top = Math.max(top, clippingRect.top + this.margin);
-            left = Math.min(left, clippingRect.right - elDims.width - this.margin);
-            left = Math.max(left, clippingRect.left + this.margin);
-            core.applyStyle(el, {
-                top: top - origin.top,
-                left: left - origin.left
-            });
-        };
-        // Triggers a callback. Calls a function in the option hash of the same name.
-        // Arguments beyond the first `name` are forwarded on.
-        // TODO: better code reuse for this. Repeat code
-        // can kill this???
-        Popover.prototype.trigger = function (name) {
-            if (this.options[name]) {
-                this.options[name].apply(this, Array.prototype.slice.call(arguments, 1));
-            }
-        };
-        return Popover;
-    }());
-
-    /* Event-rendering methods for the DayGrid class
-    ----------------------------------------------------------------------------------------------------------------------*/
-    // "Simple" is bad a name. has nothing to do with SimpleDayGrid
-    var SimpleDayGridEventRenderer = /** @class */ (function (_super) {
-        __extends(SimpleDayGridEventRenderer, _super);
-        function SimpleDayGridEventRenderer() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        // Builds the HTML to be used for the default element for an individual segment
-        SimpleDayGridEventRenderer.prototype.renderSegHtml = function (seg, mirrorInfo) {
-            var options = this.context.options;
-            var eventRange = seg.eventRange;
-            var eventDef = eventRange.def;
-            var eventUi = eventRange.ui;
-            var allDay = eventDef.allDay;
-            var isDraggable = eventUi.startEditable;
-            var isResizableFromStart = allDay && seg.isStart && eventUi.durationEditable && options.eventResizableFromStart;
-            var isResizableFromEnd = allDay && seg.isEnd && eventUi.durationEditable;
-            var classes = this.getSegClasses(seg, isDraggable, isResizableFromStart || isResizableFromEnd, mirrorInfo);
-            var skinCss = core.cssToStr(this.getSkinCss(eventUi));
-            var timeHtml = '';
-            var timeText;
-            var titleHtml;
-            classes.unshift('fc-day-grid-event', 'fc-h-event');
-            // Only display a timed events time if it is the starting segment
-            if (seg.isStart) {
-                timeText = this.getTimeText(eventRange);
-                if (timeText) {
-                    timeHtml = '<span class="fc-time">' + core.htmlEscape(timeText) + '</span>';
-                }
-            }
-            titleHtml =
-                '<span class="fc-title">' +
-                    (core.htmlEscape(eventDef.title || '') || '&nbsp;') + // we always want one line of height
-                    '</span>';
-            return '<a class="' + classes.join(' ') + '"' +
-                (eventDef.url ?
-                    ' href="' + core.htmlEscape(eventDef.url) + '"' :
-                    '') +
-                (skinCss ?
-                    ' style="' + skinCss + '"' :
-                    '') +
-                '>' +
-                '<div class="fc-content">' +
-                (options.dir === 'rtl' ?
-                    titleHtml + ' ' + timeHtml : // put a natural space in between
-                    timeHtml + ' ' + titleHtml //
-                ) +
-                '</div>' +
-                (isResizableFromStart ?
-                    '<div class="fc-resizer fc-start-resizer"></div>' :
-                    '') +
-                (isResizableFromEnd ?
-                    '<div class="fc-resizer fc-end-resizer"></div>' :
-                    '') +
-                '</a>';
-        };
-        // Computes a default event time formatting string if `eventTimeFormat` is not explicitly defined
-        SimpleDayGridEventRenderer.prototype.computeEventTimeFormat = function () {
-            return {
-                hour: 'numeric',
-                minute: '2-digit',
-                omitZeroMinute: true,
-                meridiem: 'narrow'
-            };
-        };
-        SimpleDayGridEventRenderer.prototype.computeDisplayEventEnd = function () {
-            return false; // TODO: somehow consider the originating DayGrid's column count
-        };
-        return SimpleDayGridEventRenderer;
-    }(core.FgEventRenderer));
-
-    /* Event-rendering methods for the DayGrid class
-    ----------------------------------------------------------------------------------------------------------------------*/
-    var DayGridEventRenderer = /** @class */ (function (_super) {
-        __extends(DayGridEventRenderer, _super);
-        function DayGridEventRenderer(dayGrid) {
-            var _this = _super.call(this, dayGrid.context) || this;
-            _this.dayGrid = dayGrid;
-            return _this;
-        }
-        // Renders the given foreground event segments onto the grid
-        DayGridEventRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
-            var rowStructs = this.rowStructs = this.renderSegRows(segs);
-            // append to each row's content skeleton
-            this.dayGrid.rowEls.forEach(function (rowNode, i) {
-                rowNode.querySelector('.fc-content-skeleton > table').appendChild(rowStructs[i].tbodyEl);
-            });
-            // removes the "more.." events popover
-            if (!mirrorInfo) {
-                this.dayGrid.removeSegPopover();
-            }
-        };
-        // Unrenders all currently rendered foreground event segments
-        DayGridEventRenderer.prototype.detachSegs = function () {
-            var rowStructs = this.rowStructs || [];
-            var rowStruct;
-            while ((rowStruct = rowStructs.pop())) {
-                core.removeElement(rowStruct.tbodyEl);
-            }
-            this.rowStructs = null;
-        };
-        // Uses the given events array to generate <tbody> elements that should be appended to each row's content skeleton.
-        // Returns an array of rowStruct objects (see the bottom of `renderSegRow`).
-        // PRECONDITION: each segment shoud already have a rendered and assigned `.el`
-        DayGridEventRenderer.prototype.renderSegRows = function (segs) {
-            var rowStructs = [];
-            var segRows;
-            var row;
-            segRows = this.groupSegRows(segs); // group into nested arrays
-            // iterate each row of segment groupings
-            for (row = 0; row < segRows.length; row++) {
-                rowStructs.push(this.renderSegRow(row, segRows[row]));
-            }
-            return rowStructs;
-        };
-        // Given a row # and an array of segments all in the same row, render a <tbody> element, a skeleton that contains
-        // the segments. Returns object with a bunch of internal data about how the render was calculated.
-        // NOTE: modifies rowSegs
-        DayGridEventRenderer.prototype.renderSegRow = function (row, rowSegs) {
-            var dayGrid = this.dayGrid;
-            var colCnt = dayGrid.colCnt, isRtl = dayGrid.isRtl;
-            var segLevels = this.buildSegLevels(rowSegs); // group into sub-arrays of levels
-            var levelCnt = Math.max(1, segLevels.length); // ensure at least one level
-            var tbody = document.createElement('tbody');
-            var segMatrix = []; // lookup for which segments are rendered into which level+col cells
-            var cellMatrix = []; // lookup for all <td> elements of the level+col matrix
-            var loneCellMatrix = []; // lookup for <td> elements that only take up a single column
-            var i;
-            var levelSegs;
-            var col;
-            var tr;
-            var j;
-            var seg;
-            var td;
-            // populates empty cells from the current column (`col`) to `endCol`
-            function emptyCellsUntil(endCol) {
-                while (col < endCol) {
-                    // try to grab a cell from the level above and extend its rowspan. otherwise, create a fresh cell
-                    td = (loneCellMatrix[i - 1] || [])[col];
-                    if (td) {
-                        td.rowSpan = (td.rowSpan || 1) + 1;
-                    }
-                    else {
-                        td = document.createElement('td');
-                        tr.appendChild(td);
-                    }
-                    cellMatrix[i][col] = td;
-                    loneCellMatrix[i][col] = td;
-                    col++;
-                }
-            }
-            for (i = 0; i < levelCnt; i++) { // iterate through all levels
-                levelSegs = segLevels[i];
-                col = 0;
-                tr = document.createElement('tr');
-                segMatrix.push([]);
-                cellMatrix.push([]);
-                loneCellMatrix.push([]);
-                // levelCnt might be 1 even though there are no actual levels. protect against this.
-                // this single empty row is useful for styling.
-                if (levelSegs) {
-                    for (j = 0; j < levelSegs.length; j++) { // iterate through segments in level
-                        seg = levelSegs[j];
-                        var leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol;
-                        var rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol;
-                        emptyCellsUntil(leftCol);
-                        // create a container that occupies or more columns. append the event element.
-                        td = core.createElement('td', { className: 'fc-event-container' }, seg.el);
-                        if (leftCol !== rightCol) {
-                            td.colSpan = rightCol - leftCol + 1;
-                        }
-                        else { // a single-column segment
-                            loneCellMatrix[i][col] = td;
-                        }
-                        while (col <= rightCol) {
-                            cellMatrix[i][col] = td;
-                            segMatrix[i][col] = seg;
-                            col++;
-                        }
-                        tr.appendChild(td);
-                    }
-                }
-                emptyCellsUntil(colCnt); // finish off the row
-                var introHtml = dayGrid.renderProps.renderIntroHtml();
-                if (introHtml) {
-                    if (dayGrid.isRtl) {
-                        core.appendToElement(tr, introHtml);
-                    }
-                    else {
-                        core.prependToElement(tr, introHtml);
-                    }
-                }
-                tbody.appendChild(tr);
-            }
-            return {
-                row: row,
-                tbodyEl: tbody,
-                cellMatrix: cellMatrix,
-                segMatrix: segMatrix,
-                segLevels: segLevels,
-                segs: rowSegs
-            };
-        };
-        // Stacks a flat array of segments, which are all assumed to be in the same row, into subarrays of vertical levels.
-        // NOTE: modifies segs
-        DayGridEventRenderer.prototype.buildSegLevels = function (segs) {
-            var _a = this.dayGrid, isRtl = _a.isRtl, colCnt = _a.colCnt;
-            var levels = [];
-            var i;
-            var seg;
-            var j;
-            // Give preference to elements with certain criteria, so they have
-            // a chance to be closer to the top.
-            segs = this.sortEventSegs(segs);
-            for (i = 0; i < segs.length; i++) {
-                seg = segs[i];
-                // loop through levels, starting with the topmost, until the segment doesn't collide with other segments
-                for (j = 0; j < levels.length; j++) {
-                    if (!isDaySegCollision(seg, levels[j])) {
-                        break;
-                    }
-                }
-                // `j` now holds the desired subrow index
-                seg.level = j;
-                seg.leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol; // for sorting only
-                seg.rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol // for sorting only
-                ;
-                (levels[j] || (levels[j] = [])).push(seg);
-            }
-            // order segments left-to-right. very important if calendar is RTL
-            for (j = 0; j < levels.length; j++) {
-                levels[j].sort(compareDaySegCols);
-            }
-            return levels;
-        };
-        // Given a flat array of segments, return an array of sub-arrays, grouped by each segment's row
-        DayGridEventRenderer.prototype.groupSegRows = function (segs) {
-            var segRows = [];
-            var i;
-            for (i = 0; i < this.dayGrid.rowCnt; i++) {
-                segRows.push([]);
-            }
-            for (i = 0; i < segs.length; i++) {
-                segRows[segs[i].row].push(segs[i]);
-            }
-            return segRows;
-        };
-        // Computes a default `displayEventEnd` value if one is not expliclty defined
-        DayGridEventRenderer.prototype.computeDisplayEventEnd = function () {
-            return this.dayGrid.colCnt === 1; // we'll likely have space if there's only one day
-        };
-        return DayGridEventRenderer;
-    }(SimpleDayGridEventRenderer));
-    // Computes whether two segments' columns collide. They are assumed to be in the same row.
-    function isDaySegCollision(seg, otherSegs) {
-        var i;
-        var otherSeg;
-        for (i = 0; i < otherSegs.length; i++) {
-            otherSeg = otherSegs[i];
-            if (otherSeg.firstCol <= seg.lastCol &&
-                otherSeg.lastCol >= seg.firstCol) {
-                return true;
-            }
-        }
-        return false;
-    }
-    // A cmp function for determining the leftmost event
-    function compareDaySegCols(a, b) {
-        return a.leftCol - b.leftCol;
-    }
-
-    var DayGridMirrorRenderer = /** @class */ (function (_super) {
-        __extends(DayGridMirrorRenderer, _super);
-        function DayGridMirrorRenderer() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        DayGridMirrorRenderer.prototype.attachSegs = function (segs, mirrorInfo) {
-            var sourceSeg = mirrorInfo.sourceSeg;
-            var rowStructs = this.rowStructs = this.renderSegRows(segs);
-            // inject each new event skeleton into each associated row
-            this.dayGrid.rowEls.forEach(function (rowNode, row) {
-                var skeletonEl = core.htmlToElement('<div class="fc-mirror-skeleton"><table></table></div>'); // will be absolutely positioned
-                var skeletonTopEl;
-                var skeletonTop;
-                // If there is an original segment, match the top position. Otherwise, put it at the row's top level
-                if (sourceSeg && sourceSeg.row === row) {
-                    skeletonTopEl = sourceSeg.el;
-                }
-                else {
-                    skeletonTopEl = rowNode.querySelector('.fc-content-skeleton tbody');
-                    if (!skeletonTopEl) { // when no events
-                        skeletonTopEl = rowNode.querySelector('.fc-content-skeleton table');
-                    }
-                }
-                skeletonTop = skeletonTopEl.getBoundingClientRect().top -
-                    rowNode.getBoundingClientRect().top; // the offsetParent origin
-                skeletonEl.style.top = skeletonTop + 'px';
-                skeletonEl.querySelector('table').appendChild(rowStructs[row].tbodyEl);
-                rowNode.appendChild(skeletonEl);
-            });
-        };
-        return DayGridMirrorRenderer;
-    }(DayGridEventRenderer));
-
-    var DayGridFillRenderer = /** @class */ (function (_super) {
-        __extends(DayGridFillRenderer, _super);
-        function DayGridFillRenderer(dayGrid) {
-            var _this = _super.call(this, dayGrid.context) || this;
-            _this.fillSegTag = 'td'; // override the default tag name
-            _this.dayGrid = dayGrid;
-            return _this;
-        }
-        DayGridFillRenderer.prototype.renderSegs = function (type, segs) {
-            // don't render timed background events
-            if (type === 'bgEvent') {
-                segs = segs.filter(function (seg) {
-                    return seg.eventRange.def.allDay;
-                });
-            }
-            _super.prototype.renderSegs.call(this, type, segs);
-        };
-        DayGridFillRenderer.prototype.attachSegs = function (type, segs) {
-            var els = [];
-            var i;
-            var seg;
-            var skeletonEl;
-            for (i = 0; i < segs.length; i++) {
-                seg = segs[i];
-                skeletonEl = this.renderFillRow(type, seg);
-                this.dayGrid.rowEls[seg.row].appendChild(skeletonEl);
-                els.push(skeletonEl);
-            }
-            return els;
-        };
-        // Generates the HTML needed for one row of a fill. Requires the seg's el to be rendered.
-        DayGridFillRenderer.prototype.renderFillRow = function (type, seg) {
-            var dayGrid = this.dayGrid;
-            var colCnt = dayGrid.colCnt, isRtl = dayGrid.isRtl;
-            var leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol;
-            var rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol;
-            var startCol = leftCol;
-            var endCol = rightCol + 1;
-            var className;
-            var skeletonEl;
-            var trEl;
-            if (type === 'businessHours') {
-                className = 'bgevent';
-            }
-            else {
-                className = type.toLowerCase();
-            }
-            skeletonEl = core.htmlToElement('<div class="fc-' + className + '-skeleton">' +
-                '<table><tr></tr></table>' +
-                '</div>');
-            trEl = skeletonEl.getElementsByTagName('tr')[0];
-            if (startCol > 0) {
-                core.appendToElement(trEl, 
-                // will create (startCol + 1) td's
-                new Array(startCol + 1).join('<td></td>'));
-            }
-            seg.el.colSpan = endCol - startCol;
-            trEl.appendChild(seg.el);
-            if (endCol < colCnt) {
-                core.appendToElement(trEl, 
-                // will create (colCnt - endCol) td's
-                new Array(colCnt - endCol + 1).join('<td></td>'));
-            }
-            var introHtml = dayGrid.renderProps.renderIntroHtml();
-            if (introHtml) {
-                if (dayGrid.isRtl) {
-                    core.appendToElement(trEl, introHtml);
-                }
-                else {
-                    core.prependToElement(trEl, introHtml);
-                }
-            }
-            return skeletonEl;
-        };
-        return DayGridFillRenderer;
-    }(core.FillRenderer));
-
-    var DayTile = /** @class */ (function (_super) {
-        __extends(DayTile, _super);
-        function DayTile(context, el) {
-            var _this = _super.call(this, context, el) || this;
-            var eventRenderer = _this.eventRenderer = new DayTileEventRenderer(_this);
-            var renderFrame = _this.renderFrame = core.memoizeRendering(_this._renderFrame);
-            _this.renderFgEvents = core.memoizeRendering(eventRenderer.renderSegs.bind(eventRenderer), eventRenderer.unrender.bind(eventRenderer), [renderFrame]);
-            _this.renderEventSelection = core.memoizeRendering(eventRenderer.selectByInstanceId.bind(eventRenderer), eventRenderer.unselectByInstanceId.bind(eventRenderer), [_this.renderFgEvents]);
-            _this.renderEventDrag = core.memoizeRendering(eventRenderer.hideByHash.bind(eventRenderer), eventRenderer.showByHash.bind(eventRenderer), [renderFrame]);
-            _this.renderEventResize = core.memoizeRendering(eventRenderer.hideByHash.bind(eventRenderer), eventRenderer.showByHash.bind(eventRenderer), [renderFrame]);
-            context.calendar.registerInteractiveComponent(_this, {
-                el: _this.el,
-                useEventCenter: false
-            });
-            return _this;
-        }
-        DayTile.prototype.render = function (props) {
-            this.renderFrame(props.date);
-            this.renderFgEvents(props.fgSegs);
-            this.renderEventSelection(props.eventSelection);
-            this.renderEventDrag(props.eventDragInstances);
-            this.renderEventResize(props.eventResizeInstances);
-        };
-        DayTile.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            this.renderFrame.unrender(); // should unrender everything else
-            this.calendar.unregisterInteractiveComponent(this);
-        };
-        DayTile.prototype._renderFrame = function (date) {
-            var _a = this, theme = _a.theme, dateEnv = _a.dateEnv;
-            var title = dateEnv.format(date, core.createFormatter(this.opt('dayPopoverFormat')) // TODO: cache
-            );
-            this.el.innerHTML =
-                '<div class="fc-header ' + theme.getClass('popoverHeader') + '">' +
-                    '<span class="fc-title">' +
-                    core.htmlEscape(title) +
-                    '</span>' +
-                    '<span class="fc-close ' + theme.getIconClass('close') + '"></span>' +
-                    '</div>' +
-                    '<div class="fc-body ' + theme.getClass('popoverContent') + '">' +
-                    '<div class="fc-event-container"></div>' +
-                    '</div>';
-            this.segContainerEl = this.el.querySelector('.fc-event-container');
-        };
-        DayTile.prototype.queryHit = function (positionLeft, positionTop, elWidth, elHeight) {
-            var date = this.props.date; // HACK
-            if (positionLeft < elWidth && positionTop < elHeight) {
-                return {
-                    component: this,
-                    dateSpan: {
-                        allDay: true,
-                        range: { start: date, end: core.addDays(date, 1) }
-                    },
-                    dayEl: this.el,
-                    rect: {
-                        left: 0,
-                        top: 0,
-                        right: elWidth,
-                        bottom: elHeight
-                    },
-                    layer: 1
-                };
-            }
-        };
-        return DayTile;
-    }(core.DateComponent));
-    var DayTileEventRenderer = /** @class */ (function (_super) {
-        __extends(DayTileEventRenderer, _super);
-        function DayTileEventRenderer(dayTile) {
-            var _this = _super.call(this, dayTile.context) || this;
-            _this.dayTile = dayTile;
-            return _this;
-        }
-        DayTileEventRenderer.prototype.attachSegs = function (segs) {
-            for (var _i = 0, segs_1 = segs; _i < segs_1.length; _i++) {
-                var seg = segs_1[_i];
-                this.dayTile.segContainerEl.appendChild(seg.el);
-            }
-        };
-        DayTileEventRenderer.prototype.detachSegs = function (segs) {
-            for (var _i = 0, segs_2 = segs; _i < segs_2.length; _i++) {
-                var seg = segs_2[_i];
-                core.removeElement(seg.el);
-            }
-        };
-        return DayTileEventRenderer;
-    }(SimpleDayGridEventRenderer));
-
-    var DayBgRow = /** @class */ (function () {
-        function DayBgRow(context) {
-            this.context = context;
-        }
-        DayBgRow.prototype.renderHtml = function (props) {
-            var parts = [];
-            if (props.renderIntroHtml) {
-                parts.push(props.renderIntroHtml());
-            }
-            for (var _i = 0, _a = props.cells; _i < _a.length; _i++) {
-                var cell = _a[_i];
-                parts.push(renderCellHtml(cell.date, props.dateProfile, this.context, cell.htmlAttrs));
-            }
-            if (!props.cells.length) {
-                parts.push('<td class="fc-day ' + this.context.theme.getClass('widgetContent') + '"></td>');
-            }
-            if (this.context.options.dir === 'rtl') {
-                parts.reverse();
-            }
-            return '<tr>' + parts.join('') + '</tr>';
-        };
-        return DayBgRow;
-    }());
-    function renderCellHtml(date, dateProfile, context, otherAttrs) {
-        var dateEnv = context.dateEnv, theme = context.theme;
-        var isDateValid = core.rangeContainsMarker(dateProfile.activeRange, date); // TODO: called too frequently. cache somehow.
-        var classes = core.getDayClasses(date, dateProfile, context);
-        classes.unshift('fc-day', theme.getClass('widgetContent'));
-        return '<td class="' + classes.join(' ') + '"' +
-            (isDateValid ?
-                ' data-date="' + dateEnv.formatIso(date, { omitTime: true }) + '"' :
-                '') +
-            (otherAttrs ?
-                ' ' + otherAttrs :
-                '') +
-            '></td>';
-    }
-
-    var DAY_NUM_FORMAT = core.createFormatter({ day: 'numeric' });
-    var WEEK_NUM_FORMAT = core.createFormatter({ week: 'numeric' });
-    var DayGrid = /** @class */ (function (_super) {
-        __extends(DayGrid, _super);
-        function DayGrid(context, el, renderProps) {
-            var _this = _super.call(this, context, el) || this;
-            _this.bottomCoordPadding = 0; // hack for extending the hit area for the last row of the coordinate grid
-            _this.isCellSizesDirty = false;
-            var eventRenderer = _this.eventRenderer = new DayGridEventRenderer(_this);
-            var fillRenderer = _this.fillRenderer = new DayGridFillRenderer(_this);
-            _this.mirrorRenderer = new DayGridMirrorRenderer(_this);
-            var renderCells = _this.renderCells = core.memoizeRendering(_this._renderCells, _this._unrenderCells);
-            _this.renderBusinessHours = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'businessHours'), fillRenderer.unrender.bind(fillRenderer, 'businessHours'), [renderCells]);
-            _this.renderDateSelection = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'highlight'), fillRenderer.unrender.bind(fillRenderer, 'highlight'), [renderCells]);
-            _this.renderBgEvents = core.memoizeRendering(fillRenderer.renderSegs.bind(fillRenderer, 'bgEvent'), fillRenderer.unrender.bind(fillRenderer, 'bgEvent'), [renderCells]);
-            _this.renderFgEvents = core.memoizeRendering(eventRenderer.renderSegs.bind(eventRenderer), eventRenderer.unrender.bind(eventRenderer), [renderCells]);
-            _this.renderEventSelection = core.memoizeRendering(eventRenderer.selectByInstanceId.bind(eventRenderer), eventRenderer.unselectByInstanceId.bind(eventRenderer), [_this.renderFgEvents]);
-            _this.renderEventDrag = core.memoizeRendering(_this._renderEventDrag, _this._unrenderEventDrag, [renderCells]);
-            _this.renderEventResize = core.memoizeRendering(_this._renderEventResize, _this._unrenderEventResize, [renderCells]);
-            _this.renderProps = renderProps;
-            return _this;
-        }
-        DayGrid.prototype.render = function (props) {
-            var cells = props.cells;
-            this.rowCnt = cells.length;
-            this.colCnt = cells[0].length;
-            this.renderCells(cells, props.isRigid);
-            this.renderBusinessHours(props.businessHourSegs);
-            this.renderDateSelection(props.dateSelectionSegs);
-            this.renderBgEvents(props.bgEventSegs);
-            this.renderFgEvents(props.fgEventSegs);
-            this.renderEventSelection(props.eventSelection);
-            this.renderEventDrag(props.eventDrag);
-            this.renderEventResize(props.eventResize);
-            if (this.segPopoverTile) {
-                this.updateSegPopoverTile();
-            }
-        };
-        DayGrid.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            this.renderCells.unrender(); // will unrender everything else
-        };
-        DayGrid.prototype.getCellRange = function (row, col) {
-            var start = this.props.cells[row][col].date;
-            var end = core.addDays(start, 1);
-            return { start: start, end: end };
-        };
-        DayGrid.prototype.updateSegPopoverTile = function (date, segs) {
-            var ownProps = this.props;
-            this.segPopoverTile.receiveProps({
-                date: date || this.segPopoverTile.props.date,
-                fgSegs: segs || this.segPopoverTile.props.fgSegs,
-                eventSelection: ownProps.eventSelection,
-                eventDragInstances: ownProps.eventDrag ? ownProps.eventDrag.affectedInstances : null,
-                eventResizeInstances: ownProps.eventResize ? ownProps.eventResize.affectedInstances : null
-            });
-        };
-        /* Date Rendering
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype._renderCells = function (cells, isRigid) {
-            var _a = this, view = _a.view, dateEnv = _a.dateEnv;
-            var _b = this, rowCnt = _b.rowCnt, colCnt = _b.colCnt;
-            var html = '';
-            var row;
-            var col;
-            for (row = 0; row < rowCnt; row++) {
-                html += this.renderDayRowHtml(row, isRigid);
-            }
-            this.el.innerHTML = html;
-            this.rowEls = core.findElements(this.el, '.fc-row');
-            this.cellEls = core.findElements(this.el, '.fc-day, .fc-disabled-day');
-            if (this.isRtl) {
-                this.cellEls.reverse();
-            }
-            this.rowPositions = new core.PositionCache(this.el, this.rowEls, false, true // vertical
-            );
-            this.colPositions = new core.PositionCache(this.el, this.cellEls.slice(0, colCnt), // only the first row
-            true, false // horizontal
-            );
-            // trigger dayRender with each cell's element
-            for (row = 0; row < rowCnt; row++) {
-                for (col = 0; col < colCnt; col++) {
-                    this.publiclyTrigger('dayRender', [
-                        {
-                            date: dateEnv.toDate(cells[row][col].date),
-                            el: this.getCellEl(row, col),
-                            view: view
-                        }
-                    ]);
-                }
-            }
-            this.isCellSizesDirty = true;
-        };
-        DayGrid.prototype._unrenderCells = function () {
-            this.removeSegPopover();
-        };
-        // Generates the HTML for a single row, which is a div that wraps a table.
-        // `row` is the row number.
-        DayGrid.prototype.renderDayRowHtml = function (row, isRigid) {
-            var theme = this.theme;
-            var classes = ['fc-row', 'fc-week', theme.getClass('dayRow')];
-            if (isRigid) {
-                classes.push('fc-rigid');
-            }
-            var bgRow = new DayBgRow(this.context);
-            return '' +
-                '<div class="' + classes.join(' ') + '">' +
-                '<div class="fc-bg">' +
-                '<table class="' + theme.getClass('tableGrid') + '">' +
-                bgRow.renderHtml({
-                    cells: this.props.cells[row],
-                    dateProfile: this.props.dateProfile,
-                    renderIntroHtml: this.renderProps.renderBgIntroHtml
-                }) +
-                '</table>' +
-                '</div>' +
-                '<div class="fc-content-skeleton">' +
-                '<table>' +
-                (this.getIsNumbersVisible() ?
-                    '<thead>' +
-                        this.renderNumberTrHtml(row) +
-                        '</thead>' :
-                    '') +
-                '</table>' +
-                '</div>' +
-                '</div>';
-        };
-        DayGrid.prototype.getIsNumbersVisible = function () {
-            return this.getIsDayNumbersVisible() ||
-                this.renderProps.cellWeekNumbersVisible ||
-                this.renderProps.colWeekNumbersVisible;
-        };
-        DayGrid.prototype.getIsDayNumbersVisible = function () {
-            return this.rowCnt > 1;
-        };
-        /* Grid Number Rendering
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype.renderNumberTrHtml = function (row) {
-            var intro = this.renderProps.renderNumberIntroHtml(row, this);
-            return '' +
-                '<tr>' +
-                (this.isRtl ? '' : intro) +
-                this.renderNumberCellsHtml(row) +
-                (this.isRtl ? intro : '') +
-                '</tr>';
-        };
-        DayGrid.prototype.renderNumberCellsHtml = function (row) {
-            var htmls = [];
-            var col;
-            var date;
-            for (col = 0; col < this.colCnt; col++) {
-                date = this.props.cells[row][col].date;
-                htmls.push(this.renderNumberCellHtml(date));
-            }
-            if (this.isRtl) {
-                htmls.reverse();
-            }
-            return htmls.join('');
-        };
-        // Generates the HTML for the <td>s of the "number" row in the DayGrid's content skeleton.
-        // The number row will only exist if either day numbers or week numbers are turned on.
-        DayGrid.prototype.renderNumberCellHtml = function (date) {
-            var _a = this, view = _a.view, dateEnv = _a.dateEnv;
-            var html = '';
-            var isDateValid = core.rangeContainsMarker(this.props.dateProfile.activeRange, date); // TODO: called too frequently. cache somehow.
-            var isDayNumberVisible = this.getIsDayNumbersVisible() && isDateValid;
-            var classes;
-            var weekCalcFirstDow;
-            if (!isDayNumberVisible && !this.renderProps.cellWeekNumbersVisible) {
-                // no numbers in day cell (week number must be along the side)
-                return '<td></td>'; //  will create an empty space above events :(
-            }
-            classes = core.getDayClasses(date, this.props.dateProfile, this.context);
-            classes.unshift('fc-day-top');
-            if (this.renderProps.cellWeekNumbersVisible) {
-                weekCalcFirstDow = dateEnv.weekDow;
-            }
-            html += '<td class="' + classes.join(' ') + '"' +
-                (isDateValid ?
-                    ' data-date="' + dateEnv.formatIso(date, { omitTime: true }) + '"' :
-                    '') +
-                '>';
-            if (this.renderProps.cellWeekNumbersVisible && (date.getUTCDay() === weekCalcFirstDow)) {
-                html += core.buildGotoAnchorHtml(view, { date: date, type: 'week' }, { 'class': 'fc-week-number' }, dateEnv.format(date, WEEK_NUM_FORMAT) // inner HTML
-                );
-            }
-            if (isDayNumberVisible) {
-                html += core.buildGotoAnchorHtml(view, date, { 'class': 'fc-day-number' }, dateEnv.format(date, DAY_NUM_FORMAT) // inner HTML
-                );
-            }
-            html += '</td>';
-            return html;
-        };
-        /* Sizing
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype.updateSize = function (isResize) {
-            var _a = this, fillRenderer = _a.fillRenderer, eventRenderer = _a.eventRenderer, mirrorRenderer = _a.mirrorRenderer;
-            if (isResize || this.isCellSizesDirty) {
-                this.buildColPositions();
-                this.buildRowPositions();
-                this.isCellSizesDirty = false;
-            }
-            fillRenderer.computeSizes(isResize);
-            eventRenderer.computeSizes(isResize);
-            mirrorRenderer.computeSizes(isResize);
-            fillRenderer.assignSizes(isResize);
-            eventRenderer.assignSizes(isResize);
-            mirrorRenderer.assignSizes(isResize);
-        };
-        DayGrid.prototype.buildColPositions = function () {
-            this.colPositions.build();
-        };
-        DayGrid.prototype.buildRowPositions = function () {
-            this.rowPositions.build();
-            this.rowPositions.bottoms[this.rowCnt - 1] += this.bottomCoordPadding; // hack
-        };
-        /* Hit System
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype.positionToHit = function (leftPosition, topPosition) {
-            var _a = this, colPositions = _a.colPositions, rowPositions = _a.rowPositions;
-            var col = colPositions.leftToIndex(leftPosition);
-            var row = rowPositions.topToIndex(topPosition);
-            if (row != null && col != null) {
-                return {
-                    row: row,
-                    col: col,
-                    dateSpan: {
-                        range: this.getCellRange(row, col),
-                        allDay: true
-                    },
-                    dayEl: this.getCellEl(row, col),
-                    relativeRect: {
-                        left: colPositions.lefts[col],
-                        right: colPositions.rights[col],
-                        top: rowPositions.tops[row],
-                        bottom: rowPositions.bottoms[row]
-                    }
-                };
-            }
-        };
-        /* Cell System
-        ------------------------------------------------------------------------------------------------------------------*/
-        // FYI: the first column is the leftmost column, regardless of date
-        DayGrid.prototype.getCellEl = function (row, col) {
-            return this.cellEls[row * this.colCnt + col];
-        };
-        /* Event Drag Visualization
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype._renderEventDrag = function (state) {
-            if (state) {
-                this.eventRenderer.hideByHash(state.affectedInstances);
-                this.fillRenderer.renderSegs('highlight', state.segs);
-            }
-        };
-        DayGrid.prototype._unrenderEventDrag = function (state) {
-            if (state) {
-                this.eventRenderer.showByHash(state.affectedInstances);
-                this.fillRenderer.unrender('highlight');
-            }
-        };
-        /* Event Resize Visualization
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype._renderEventResize = function (state) {
-            if (state) {
-                this.eventRenderer.hideByHash(state.affectedInstances);
-                this.fillRenderer.renderSegs('highlight', state.segs);
-                this.mirrorRenderer.renderSegs(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
-            }
-        };
-        DayGrid.prototype._unrenderEventResize = function (state) {
-            if (state) {
-                this.eventRenderer.showByHash(state.affectedInstances);
-                this.fillRenderer.unrender('highlight');
-                this.mirrorRenderer.unrender(state.segs, { isResizing: true, sourceSeg: state.sourceSeg });
-            }
-        };
-        /* More+ Link Popover
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGrid.prototype.removeSegPopover = function () {
-            if (this.segPopover) {
-                this.segPopover.hide(); // in handler, will call segPopover's removeElement
-            }
-        };
-        // Limits the number of "levels" (vertically stacking layers of events) for each row of the grid.
-        // `levelLimit` can be false (don't limit), a number, or true (should be computed).
-        DayGrid.prototype.limitRows = function (levelLimit) {
-            var rowStructs = this.eventRenderer.rowStructs || [];
-            var row; // row #
-            var rowLevelLimit;
-            for (row = 0; row < rowStructs.length; row++) {
-                this.unlimitRow(row);
-                if (!levelLimit) {
-                    rowLevelLimit = false;
-                }
-                else if (typeof levelLimit === 'number') {
-                    rowLevelLimit = levelLimit;
-                }
-                else {
-                    rowLevelLimit = this.computeRowLevelLimit(row);
-                }
-                if (rowLevelLimit !== false) {
-                    this.limitRow(row, rowLevelLimit);
-                }
-            }
-        };
-        // Computes the number of levels a row will accomodate without going outside its bounds.
-        // Assumes the row is "rigid" (maintains a constant height regardless of what is inside).
-        // `row` is the row number.
-        DayGrid.prototype.computeRowLevelLimit = function (row) {
-            var rowEl = this.rowEls[row]; // the containing "fake" row div
-            var rowBottom = rowEl.getBoundingClientRect().bottom; // relative to viewport!
-            var trEls = core.findChildren(this.eventRenderer.rowStructs[row].tbodyEl);
-            var i;
-            var trEl;
-            // Reveal one level <tr> at a time and stop when we find one out of bounds
-            for (i = 0; i < trEls.length; i++) {
-                trEl = trEls[i];
-                trEl.classList.remove('fc-limited'); // reset to original state (reveal)
-                if (trEl.getBoundingClientRect().bottom > rowBottom) {
-                    return i;
-                }
-            }
-            return false; // should not limit at all
-        };
-        // Limits the given grid row to the maximum number of levels and injects "more" links if necessary.
-        // `row` is the row number.
-        // `levelLimit` is a number for the maximum (inclusive) number of levels allowed.
-        DayGrid.prototype.limitRow = function (row, levelLimit) {
-            var _this = this;
-            var _a = this, colCnt = _a.colCnt, isRtl = _a.isRtl;
-            var rowStruct = this.eventRenderer.rowStructs[row];
-            var moreNodes = []; // array of "more" <a> links and <td> DOM nodes
-            var col = 0; // col #, left-to-right (not chronologically)
-            var levelSegs; // array of segment objects in the last allowable level, ordered left-to-right
-            var cellMatrix; // a matrix (by level, then column) of all <td> elements in the row
-            var limitedNodes; // array of temporarily hidden level <tr> and segment <td> DOM nodes
-            var i;
-            var seg;
-            var segsBelow; // array of segment objects below `seg` in the current `col`
-            var totalSegsBelow; // total number of segments below `seg` in any of the columns `seg` occupies
-            var colSegsBelow; // array of segment arrays, below seg, one for each column (offset from segs's first column)
-            var td;
-            var rowSpan;
-            var segMoreNodes; // array of "more" <td> cells that will stand-in for the current seg's cell
-            var j;
-            var moreTd;
-            var moreWrap;
-            var moreLink;
-            // Iterates through empty level cells and places "more" links inside if need be
-            var emptyCellsUntil = function (endCol) {
-                while (col < endCol) {
-                    segsBelow = _this.getCellSegs(row, col, levelLimit);
-                    if (segsBelow.length) {
-                        td = cellMatrix[levelLimit - 1][col];
-                        moreLink = _this.renderMoreLink(row, col, segsBelow);
-                        moreWrap = core.createElement('div', null, moreLink);
-                        td.appendChild(moreWrap);
-                        moreNodes.push(moreWrap[0]);
-                    }
-                    col++;
-                }
-            };
-            if (levelLimit && levelLimit < rowStruct.segLevels.length) { // is it actually over the limit?
-                levelSegs = rowStruct.segLevels[levelLimit - 1];
-                cellMatrix = rowStruct.cellMatrix;
-                limitedNodes = core.findChildren(rowStruct.tbodyEl).slice(levelLimit); // get level <tr> elements past the limit
-                limitedNodes.forEach(function (node) {
-                    node.classList.add('fc-limited'); // hide elements and get a simple DOM-nodes array
-                });
-                // iterate though segments in the last allowable level
-                for (i = 0; i < levelSegs.length; i++) {
-                    seg = levelSegs[i];
-                    var leftCol = isRtl ? (colCnt - 1 - seg.lastCol) : seg.firstCol;
-                    var rightCol = isRtl ? (colCnt - 1 - seg.firstCol) : seg.lastCol;
-                    emptyCellsUntil(leftCol); // process empty cells before the segment
-                    // determine *all* segments below `seg` that occupy the same columns
-                    colSegsBelow = [];
-                    totalSegsBelow = 0;
-                    while (col <= rightCol) {
-                        segsBelow = this.getCellSegs(row, col, levelLimit);
-                        colSegsBelow.push(segsBelow);
-                        totalSegsBelow += segsBelow.length;
-                        col++;
-                    }
-                    if (totalSegsBelow) { // do we need to replace this segment with one or many "more" links?
-                        td = cellMatrix[levelLimit - 1][leftCol]; // the segment's parent cell
-                        rowSpan = td.rowSpan || 1;
-                        segMoreNodes = [];
-                        // make a replacement <td> for each column the segment occupies. will be one for each colspan
-                        for (j = 0; j < colSegsBelow.length; j++) {
-                            moreTd = core.createElement('td', { className: 'fc-more-cell', rowSpan: rowSpan });
-                            segsBelow = colSegsBelow[j];
-                            moreLink = this.renderMoreLink(row, leftCol + j, [seg].concat(segsBelow) // count seg as hidden too
-                            );
-                            moreWrap = core.createElement('div', null, moreLink);
-                            moreTd.appendChild(moreWrap);
-                            segMoreNodes.push(moreTd);
-                            moreNodes.push(moreTd);
-                        }
-                        td.classList.add('fc-limited');
-                        core.insertAfterElement(td, segMoreNodes);
-                        limitedNodes.push(td);
-                    }
-                }
-                emptyCellsUntil(this.colCnt); // finish off the level
-                rowStruct.moreEls = moreNodes; // for easy undoing later
-                rowStruct.limitedEls = limitedNodes; // for easy undoing later
-            }
-        };
-        // Reveals all levels and removes all "more"-related elements for a grid's row.
-        // `row` is a row number.
-        DayGrid.prototype.unlimitRow = function (row) {
-            var rowStruct = this.eventRenderer.rowStructs[row];
-            if (rowStruct.moreEls) {
-                rowStruct.moreEls.forEach(core.removeElement);
-                rowStruct.moreEls = null;
-            }
-            if (rowStruct.limitedEls) {
-                rowStruct.limitedEls.forEach(function (limitedEl) {
-                    limitedEl.classList.remove('fc-limited');
-                });
-                rowStruct.limitedEls = null;
-            }
-        };
-        // Renders an <a> element that represents hidden event element for a cell.
-        // Responsible for attaching click handler as well.
-        DayGrid.prototype.renderMoreLink = function (row, col, hiddenSegs) {
-            var _this = this;
-            var _a = this, view = _a.view, dateEnv = _a.dateEnv;
-            var a = core.createElement('a', { className: 'fc-more' });
-            a.innerText = this.getMoreLinkText(hiddenSegs.length);
-            a.addEventListener('click', function (ev) {
-                var clickOption = _this.opt('eventLimitClick');
-                var _col = _this.isRtl ? _this.colCnt - col - 1 : col; // HACK: props.cells has different dir system?
-                var date = _this.props.cells[row][_col].date;
-                var moreEl = ev.currentTarget;
-                var dayEl = _this.getCellEl(row, col);
-                var allSegs = _this.getCellSegs(row, col);
-                // rescope the segments to be within the cell's date
-                var reslicedAllSegs = _this.resliceDaySegs(allSegs, date);
-                var reslicedHiddenSegs = _this.resliceDaySegs(hiddenSegs, date);
-                if (typeof clickOption === 'function') {
-                    // the returned value can be an atomic option
-                    clickOption = _this.publiclyTrigger('eventLimitClick', [
-                        {
-                            date: dateEnv.toDate(date),
-                            allDay: true,
-                            dayEl: dayEl,
-                            moreEl: moreEl,
-                            segs: reslicedAllSegs,
-                            hiddenSegs: reslicedHiddenSegs,
-                            jsEvent: ev,
-                            view: view
-                        }
-                    ]);
-                }
-                if (clickOption === 'popover') {
-                    _this.showSegPopover(row, col, moreEl, reslicedAllSegs);
-                }
-                else if (typeof clickOption === 'string') { // a view name
-                    view.calendar.zoomTo(date, clickOption);
-                }
-            });
-            return a;
-        };
-        // Reveals the popover that displays all events within a cell
-        DayGrid.prototype.showSegPopover = function (row, col, moreLink, segs) {
-            var _this = this;
-            var _a = this, calendar = _a.calendar, view = _a.view, theme = _a.theme;
-            var _col = this.isRtl ? this.colCnt - col - 1 : col; // HACK: props.cells has different dir system?
-            var moreWrap = moreLink.parentNode; // the <div> wrapper around the <a>
-            var topEl; // the element we want to match the top coordinate of
-            var options;
-            if (this.rowCnt === 1) {
-                topEl = view.el; // will cause the popover to cover any sort of header
-            }
-            else {
-                topEl = this.rowEls[row]; // will align with top of row
-            }
-            options = {
-                className: 'fc-more-popover ' + theme.getClass('popover'),
-                parentEl: view.el,
-                top: core.computeRect(topEl).top,
-                autoHide: true,
-                content: function (el) {
-                    _this.segPopoverTile = new DayTile(_this.context, el);
-                    _this.updateSegPopoverTile(_this.props.cells[row][_col].date, segs);
-                },
-                hide: function () {
-                    _this.segPopoverTile.destroy();
-                    _this.segPopoverTile = null;
-                    _this.segPopover.destroy();
-                    _this.segPopover = null;
-                }
-            };
-            // Determine horizontal coordinate.
-            // We use the moreWrap instead of the <td> to avoid border confusion.
-            if (this.isRtl) {
-                options.right = core.computeRect(moreWrap).right + 1; // +1 to be over cell border
-            }
-            else {
-                options.left = core.computeRect(moreWrap).left - 1; // -1 to be over cell border
-            }
-            this.segPopover = new Popover(options);
-            this.segPopover.show();
-            calendar.releaseAfterSizingTriggers(); // hack for eventPositioned
-        };
-        // Given the events within an array of segment objects, reslice them to be in a single day
-        DayGrid.prototype.resliceDaySegs = function (segs, dayDate) {
-            var dayStart = dayDate;
-            var dayEnd = core.addDays(dayStart, 1);
-            var dayRange = { start: dayStart, end: dayEnd };
-            var newSegs = [];
-            for (var _i = 0, segs_1 = segs; _i < segs_1.length; _i++) {
-                var seg = segs_1[_i];
-                var eventRange = seg.eventRange;
-                var origRange = eventRange.range;
-                var slicedRange = core.intersectRanges(origRange, dayRange);
-                if (slicedRange) {
-                    newSegs.push(__assign({}, seg, { eventRange: {
-                            def: eventRange.def,
-                            ui: __assign({}, eventRange.ui, { durationEditable: false }),
-                            instance: eventRange.instance,
-                            range: slicedRange
-                        }, isStart: seg.isStart && slicedRange.start.valueOf() === origRange.start.valueOf(), isEnd: seg.isEnd && slicedRange.end.valueOf() === origRange.end.valueOf() }));
-                }
-            }
-            return newSegs;
-        };
-        // Generates the text that should be inside a "more" link, given the number of events it represents
-        DayGrid.prototype.getMoreLinkText = function (num) {
-            var opt = this.opt('eventLimitText');
-            if (typeof opt === 'function') {
-                return opt(num);
-            }
-            else {
-                return '+' + num + ' ' + opt;
-            }
-        };
-        // Returns segments within a given cell.
-        // If `startLevel` is specified, returns only events including and below that level. Otherwise returns all segs.
-        DayGrid.prototype.getCellSegs = function (row, col, startLevel) {
-            var segMatrix = this.eventRenderer.rowStructs[row].segMatrix;
-            var level = startLevel || 0;
-            var segs = [];
-            var seg;
-            while (level < segMatrix.length) {
-                seg = segMatrix[level][col];
-                if (seg) {
-                    segs.push(seg);
-                }
-                level++;
-            }
-            return segs;
-        };
-        return DayGrid;
-    }(core.DateComponent));
-
-    var WEEK_NUM_FORMAT$1 = core.createFormatter({ week: 'numeric' });
-    /* An abstract class for the daygrid views, as well as month view. Renders one or more rows of day cells.
-    ----------------------------------------------------------------------------------------------------------------------*/
-    // It is a manager for a DayGrid subcomponent, which does most of the heavy lifting.
-    // It is responsible for managing width/height.
-    var DayGridView = /** @class */ (function (_super) {
-        __extends(DayGridView, _super);
-        function DayGridView(context, viewSpec, dateProfileGenerator, parentEl) {
-            var _this = _super.call(this, context, viewSpec, dateProfileGenerator, parentEl) || this;
-            /* Header Rendering
-            ------------------------------------------------------------------------------------------------------------------*/
-            // Generates the HTML that will go before the day-of week header cells
-            _this.renderHeadIntroHtml = function () {
-                var theme = _this.theme;
-                if (_this.colWeekNumbersVisible) {
-                    return '' +
-                        '<th class="fc-week-number ' + theme.getClass('widgetHeader') + '" ' + _this.weekNumberStyleAttr() + '>' +
-                        '<span>' + // needed for matchCellWidths
-                        core.htmlEscape(_this.opt('weekLabel')) +
-                        '</span>' +
-                        '</th>';
-                }
-                return '';
-            };
-            /* Day Grid Rendering
-            ------------------------------------------------------------------------------------------------------------------*/
-            // Generates the HTML that will go before content-skeleton cells that display the day/week numbers
-            _this.renderDayGridNumberIntroHtml = function (row, dayGrid) {
-                var dateEnv = _this.dateEnv;
-                var weekStart = dayGrid.props.cells[row][0].date;
-                if (_this.colWeekNumbersVisible) {
-                    return '' +
-                        '<td class="fc-week-number" ' + _this.weekNumberStyleAttr() + '>' +
-                        core.buildGotoAnchorHtml(// aside from link, important for matchCellWidths
-                        _this, { date: weekStart, type: 'week', forceOff: dayGrid.colCnt === 1 }, dateEnv.format(weekStart, WEEK_NUM_FORMAT$1) // inner HTML
-                        ) +
-                        '</td>';
-                }
-                return '';
-            };
-            // Generates the HTML that goes before the day bg cells for each day-row
-            _this.renderDayGridBgIntroHtml = function () {
-                var theme = _this.theme;
-                if (_this.colWeekNumbersVisible) {
-                    return '<td class="fc-week-number ' + theme.getClass('widgetContent') + '" ' + _this.weekNumberStyleAttr() + '></td>';
-                }
-                return '';
-            };
-            // Generates the HTML that goes before every other type of row generated by DayGrid.
-            // Affects mirror-skeleton and highlight-skeleton rows.
-            _this.renderDayGridIntroHtml = function () {
-                if (_this.colWeekNumbersVisible) {
-                    return '<td class="fc-week-number" ' + _this.weekNumberStyleAttr() + '></td>';
-                }
-                return '';
-            };
-            _this.el.classList.add('fc-dayGrid-view');
-            _this.el.innerHTML = _this.renderSkeletonHtml();
-            _this.scroller = new core.ScrollComponent('hidden', // overflow x
-            'auto' // overflow y
-            );
-            var dayGridContainerEl = _this.scroller.el;
-            _this.el.querySelector('.fc-body > tr > td').appendChild(dayGridContainerEl);
-            dayGridContainerEl.classList.add('fc-day-grid-container');
-            var dayGridEl = core.createElement('div', { className: 'fc-day-grid' });
-            dayGridContainerEl.appendChild(dayGridEl);
-            var cellWeekNumbersVisible;
-            if (_this.opt('weekNumbers')) {
-                if (_this.opt('weekNumbersWithinDays')) {
-                    cellWeekNumbersVisible = true;
-                    _this.colWeekNumbersVisible = false;
-                }
-                else {
-                    cellWeekNumbersVisible = false;
-                    _this.colWeekNumbersVisible = true;
-                }
-            }
-            else {
-                _this.colWeekNumbersVisible = false;
-                cellWeekNumbersVisible = false;
-            }
-            _this.dayGrid = new DayGrid(_this.context, dayGridEl, {
-                renderNumberIntroHtml: _this.renderDayGridNumberIntroHtml,
-                renderBgIntroHtml: _this.renderDayGridBgIntroHtml,
-                renderIntroHtml: _this.renderDayGridIntroHtml,
-                colWeekNumbersVisible: _this.colWeekNumbersVisible,
-                cellWeekNumbersVisible: cellWeekNumbersVisible
-            });
-            return _this;
-        }
-        DayGridView.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            this.dayGrid.destroy();
-            this.scroller.destroy();
-        };
-        // Builds the HTML skeleton for the view.
-        // The day-grid component will render inside of a container defined by this HTML.
-        DayGridView.prototype.renderSkeletonHtml = function () {
-            var theme = this.theme;
-            return '' +
-                '<table class="' + theme.getClass('tableGrid') + '">' +
-                (this.opt('columnHeader') ?
-                    '<thead class="fc-head">' +
-                        '<tr>' +
-                        '<td class="fc-head-container ' + theme.getClass('widgetHeader') + '">&nbsp;</td>' +
-                        '</tr>' +
-                        '</thead>' :
-                    '') +
-                '<tbody class="fc-body">' +
-                '<tr>' +
-                '<td class="' + theme.getClass('widgetContent') + '"></td>' +
-                '</tr>' +
-                '</tbody>' +
-                '</table>';
-        };
-        // Generates an HTML attribute string for setting the width of the week number column, if it is known
-        DayGridView.prototype.weekNumberStyleAttr = function () {
-            if (this.weekNumberWidth != null) {
-                return 'style="width:' + this.weekNumberWidth + 'px"';
-            }
-            return '';
-        };
-        // Determines whether each row should have a constant height
-        DayGridView.prototype.hasRigidRows = function () {
-            var eventLimit = this.opt('eventLimit');
-            return eventLimit && typeof eventLimit !== 'number';
-        };
-        /* Dimensions
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGridView.prototype.updateSize = function (isResize, viewHeight, isAuto) {
-            _super.prototype.updateSize.call(this, isResize, viewHeight, isAuto); // will call updateBaseSize. important that executes first
-            this.dayGrid.updateSize(isResize);
-        };
-        // Refreshes the horizontal dimensions of the view
-        DayGridView.prototype.updateBaseSize = function (isResize, viewHeight, isAuto) {
-            var dayGrid = this.dayGrid;
-            var eventLimit = this.opt('eventLimit');
-            var headRowEl = this.header ? this.header.el : null; // HACK
-            var scrollerHeight;
-            var scrollbarWidths;
-            // hack to give the view some height prior to dayGrid's columns being rendered
-            // TODO: separate setting height from scroller VS dayGrid.
-            if (!dayGrid.rowEls) {
-                if (!isAuto) {
-                    scrollerHeight = this.computeScrollerHeight(viewHeight);
-                    this.scroller.setHeight(scrollerHeight);
-                }
-                return;
-            }
-            if (this.colWeekNumbersVisible) {
-                // Make sure all week number cells running down the side have the same width.
-                this.weekNumberWidth = core.matchCellWidths(core.findElements(this.el, '.fc-week-number'));
-            }
-            // reset all heights to be natural
-            this.scroller.clear();
-            if (headRowEl) {
-                core.uncompensateScroll(headRowEl);
-            }
-            dayGrid.removeSegPopover(); // kill the "more" popover if displayed
-            // is the event limit a constant level number?
-            if (eventLimit && typeof eventLimit === 'number') {
-                dayGrid.limitRows(eventLimit); // limit the levels first so the height can redistribute after
-            }
-            // distribute the height to the rows
-            // (viewHeight is a "recommended" value if isAuto)
-            scrollerHeight = this.computeScrollerHeight(viewHeight);
-            this.setGridHeight(scrollerHeight, isAuto);
-            // is the event limit dynamically calculated?
-            if (eventLimit && typeof eventLimit !== 'number') {
-                dayGrid.limitRows(eventLimit); // limit the levels after the grid's row heights have been set
-            }
-            if (!isAuto) { // should we force dimensions of the scroll container?
-                this.scroller.setHeight(scrollerHeight);
-                scrollbarWidths = this.scroller.getScrollbarWidths();
-                if (scrollbarWidths.left || scrollbarWidths.right) { // using scrollbars?
-                    if (headRowEl) {
-                        core.compensateScroll(headRowEl, scrollbarWidths);
-                    }
-                    // doing the scrollbar compensation might have created text overflow which created more height. redo
-                    scrollerHeight = this.computeScrollerHeight(viewHeight);
-                    this.scroller.setHeight(scrollerHeight);
-                }
-                // guarantees the same scrollbar widths
-                this.scroller.lockOverflow(scrollbarWidths);
-            }
-        };
-        // given a desired total height of the view, returns what the height of the scroller should be
-        DayGridView.prototype.computeScrollerHeight = function (viewHeight) {
-            return viewHeight -
-                core.subtractInnerElHeight(this.el, this.scroller.el); // everything that's NOT the scroller
-        };
-        // Sets the height of just the DayGrid component in this view
-        DayGridView.prototype.setGridHeight = function (height, isAuto) {
-            if (this.opt('monthMode')) {
-                // if auto, make the height of each row the height that it would be if there were 6 weeks
-                if (isAuto) {
-                    height *= this.dayGrid.rowCnt / 6;
-                }
-                core.distributeHeight(this.dayGrid.rowEls, height, !isAuto); // if auto, don't compensate for height-hogging rows
-            }
-            else {
-                if (isAuto) {
-                    core.undistributeHeight(this.dayGrid.rowEls); // let the rows be their natural height with no expanding
-                }
-                else {
-                    core.distributeHeight(this.dayGrid.rowEls, height, true); // true = compensate for height-hogging rows
-                }
-            }
-        };
-        /* Scroll
-        ------------------------------------------------------------------------------------------------------------------*/
-        DayGridView.prototype.computeInitialDateScroll = function () {
-            return { top: 0 };
-        };
-        DayGridView.prototype.queryDateScroll = function () {
-            return { top: this.scroller.getScrollTop() };
-        };
-        DayGridView.prototype.applyDateScroll = function (scroll) {
-            if (scroll.top !== undefined) {
-                this.scroller.setScrollTop(scroll.top);
-            }
-        };
-        return DayGridView;
-    }(core.View));
-    DayGridView.prototype.dateProfileGeneratorClass = DayGridDateProfileGenerator;
-
-    var SimpleDayGrid = /** @class */ (function (_super) {
-        __extends(SimpleDayGrid, _super);
-        function SimpleDayGrid(context, dayGrid) {
-            var _this = _super.call(this, context, dayGrid.el) || this;
-            _this.slicer = new DayGridSlicer();
-            _this.dayGrid = dayGrid;
-            context.calendar.registerInteractiveComponent(_this, { el: _this.dayGrid.el });
-            return _this;
-        }
-        SimpleDayGrid.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            this.calendar.unregisterInteractiveComponent(this);
-        };
-        SimpleDayGrid.prototype.render = function (props) {
-            var dayGrid = this.dayGrid;
-            var dateProfile = props.dateProfile, dayTable = props.dayTable;
-            dayGrid.receiveProps(__assign({}, this.slicer.sliceProps(props, dateProfile, props.nextDayThreshold, dayGrid, dayTable), { dateProfile: dateProfile, cells: dayTable.cells, isRigid: props.isRigid }));
-        };
-        SimpleDayGrid.prototype.queryHit = function (positionLeft, positionTop) {
-            var rawHit = this.dayGrid.positionToHit(positionLeft, positionTop);
-            if (rawHit) {
-                return {
-                    component: this.dayGrid,
-                    dateSpan: rawHit.dateSpan,
-                    dayEl: rawHit.dayEl,
-                    rect: {
-                        left: rawHit.relativeRect.left,
-                        right: rawHit.relativeRect.right,
-                        top: rawHit.relativeRect.top,
-                        bottom: rawHit.relativeRect.bottom
-                    },
-                    layer: 0
-                };
-            }
-        };
-        return SimpleDayGrid;
-    }(core.DateComponent));
-    var DayGridSlicer = /** @class */ (function (_super) {
-        __extends(DayGridSlicer, _super);
-        function DayGridSlicer() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        DayGridSlicer.prototype.sliceRange = function (dateRange, dayTable) {
-            return dayTable.sliceRange(dateRange);
-        };
-        return DayGridSlicer;
-    }(core.Slicer));
-
-    var DayGridView$1 = /** @class */ (function (_super) {
-        __extends(DayGridView, _super);
-        function DayGridView(_context, viewSpec, dateProfileGenerator, parentEl) {
-            var _this = _super.call(this, _context, viewSpec, dateProfileGenerator, parentEl) || this;
-            _this.buildDayTable = core.memoize(buildDayTable);
-            if (_this.opt('columnHeader')) {
-                _this.header = new core.DayHeader(_this.context, _this.el.querySelector('.fc-head-container'));
-            }
-            _this.simpleDayGrid = new SimpleDayGrid(_this.context, _this.dayGrid);
-            return _this;
-        }
-        DayGridView.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
-            if (this.header) {
-                this.header.destroy();
-            }
-            this.simpleDayGrid.destroy();
-        };
-        DayGridView.prototype.render = function (props) {
-            _super.prototype.render.call(this, props);
-            var dateProfile = this.props.dateProfile;
-            var dayTable = this.dayTable =
-                this.buildDayTable(dateProfile, this.dateProfileGenerator);
-            if (this.header) {
-                this.header.receiveProps({
-                    dateProfile: dateProfile,
-                    dates: dayTable.headerDates,
-                    datesRepDistinctDays: dayTable.rowCnt === 1,
-                    renderIntroHtml: this.renderHeadIntroHtml
-                });
-            }
-            this.simpleDayGrid.receiveProps({
-                dateProfile: dateProfile,
-                dayTable: dayTable,
-                businessHours: props.businessHours,
-                dateSelection: props.dateSelection,
-                eventStore: props.eventStore,
-                eventUiBases: props.eventUiBases,
-                eventSelection: props.eventSelection,
-                eventDrag: props.eventDrag,
-                eventResize: props.eventResize,
-                isRigid: this.hasRigidRows(),
-                nextDayThreshold: this.nextDayThreshold
-            });
-        };
-        return DayGridView;
-    }(DayGridView));
-    function buildDayTable(dateProfile, dateProfileGenerator) {
-        var daySeries = new core.DaySeries(dateProfile.renderRange, dateProfileGenerator);
-        return new core.DayTable(daySeries, /year|month|week/.test(dateProfile.currentRangeUnit));
-    }
-
-    var main = core.createPlugin({
-        defaultView: 'dayGridMonth',
-        views: {
-            dayGrid: DayGridView$1,
-            dayGridDay: {
-                type: 'dayGrid',
-                duration: { days: 1 }
-            },
-            dayGridWeek: {
-                type: 'dayGrid',
-                duration: { weeks: 1 }
-            },
-            dayGridMonth: {
-                type: 'dayGrid',
-                duration: { months: 1 },
-                monthMode: true,
-                fixedWeekCount: true
-            }
-        }
-    });
-
-    exports.AbstractDayGridView = DayGridView;
-    exports.DayBgRow = DayBgRow;
-    exports.DayGrid = DayGrid;
-    exports.DayGridSlicer = DayGridSlicer;
-    exports.DayGridView = DayGridView$1;
-    exports.SimpleDayGrid = SimpleDayGrid;
-    exports.buildBasicDayTable = buildDayTable;
-    exports.default = main;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-//delete event
-
-/*!
-FullCalendar RRule Plugin v4.0.2
-Docs & License: https://fullcalendar.io/
-(c) 2019 Adam Shaw
-*/
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('rrule'), require('@fullcalendar/core')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'rrule', '@fullcalendar/core'], factory) :
-    (global = global || self, factory(global.FullCalendarRrule = {}, global.rrule, global.FullCalendar));
-}(this, function (exports, rrule, core) { 'use strict';
-
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-
-    var __assign = function() {
-        __assign = Object.assign || function __assign(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-
-    var EVENT_DEF_PROPS = {
-        rrule: null,
-        duration: core.createDuration
-    };
-    var recurring = {
-        parse: function (rawEvent, leftoverProps, dateEnv) {
-            if (rawEvent.rrule != null) {
-                var props = core.refineProps(rawEvent, EVENT_DEF_PROPS, {}, leftoverProps);
-                var parsed = parseRRule(props.rrule, dateEnv);
-                if (parsed) {
-                    return {
-                        typeData: parsed.rrule,
-                        allDayGuess: parsed.allDayGuess,
-                        duration: props.duration
-                    };
-                }
-            }
-            return null;
-        },
-        expand: function (rrule, framingRange) {
-            // we WANT an inclusive start and in exclusive end, but the js rrule lib will only do either BOTH
-            // inclusive or BOTH exclusive, which is stupid: https://github.com/jakubroztocil/rrule/issues/84
-            // Workaround: make inclusive, which will generate extra occurences, and then trim.
-            return rrule.between(framingRange.start, framingRange.end, true)
-                .filter(function (date) {
-                return date.valueOf() < framingRange.end.valueOf();
-            });
-        }
-    };
-    var main = core.createPlugin({
-        recurringTypes: [recurring]
-    });
-    function parseRRule(input, dateEnv) {
-        var allDayGuess = null;
-        var rrule$1;
-        if (typeof input === 'string') {
-            rrule$1 = rrule.rrulestr(input);
-        }
-        else if (typeof input === 'object' && input) { // non-null object
-            var refined = __assign({}, input); // copy
-            if (typeof refined.dtstart === 'string') {
-                var dtstartMeta = dateEnv.createMarkerMeta(refined.dtstart);
-                if (dtstartMeta) {
-                    refined.dtstart = dtstartMeta.marker;
-                    allDayGuess = dtstartMeta.isTimeUnspecified;
-                }
-                else {
-                    delete refined.dtstart;
-                }
-            }
-            if (typeof refined.until === 'string') {
-                refined.until = dateEnv.createMarker(refined.until);
-            }
-            if (refined.freq != null) {
-                refined.freq = convertConstant(refined.freq);
-            }
-            if (refined.wkst != null) {
-                refined.wkst = convertConstant(refined.wkst);
-            }
-            else {
-                refined.wkst = (dateEnv.weekDow - 1 + 7) % 7; // convert Sunday-first to Monday-first
-            }
-            if (refined.byweekday != null) {
-                refined.byweekday = convertConstants(refined.byweekday); // the plural version
-            }
-            rrule$1 = new rrule.RRule(refined);
-        }
-        if (rrule$1) {
-            return { rrule: rrule$1, allDayGuess: allDayGuess };
-        }
-        return null;
-    }
-    function convertConstants(input) {
-        if (Array.isArray(input)) {
-            return input.map(convertConstant);
-        }
-        return convertConstant(input);
-    }
-    function convertConstant(input) {
-        if (typeof input === 'string') {
-            return rrule.RRule[input.toUpperCase()];
-        }
-        return input;
-    }
-
-    exports.default = main;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-/*!
-FullCalendar RRule Plugin v4.0.2
-Docs & License: https://fullcalendar.io/
-(c) 2019 Adam Shaw
-*/
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('rrule'), require('@fullcalendar/core')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'rrule', '@fullcalendar/core'], factory) :
-    (global = global || self, factory(global.FullCalendarRrule = {}, global.rrule, global.FullCalendar));
-}(this, function (exports, rrule, core) { 'use strict';
-
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-
-    var __assign = function() {
-        __assign = Object.assign || function __assign(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-
-    var EVENT_DEF_PROPS = {
-        rrule: null,
-        duration: core.createDuration
-    };
-    var recurring = {
-        parse: function (rawEvent, leftoverProps, dateEnv) {
-            if (rawEvent.rrule != null) {
-                var props = core.refineProps(rawEvent, EVENT_DEF_PROPS, {}, leftoverProps);
-                var parsed = parseRRule(props.rrule, dateEnv);
-                if (parsed) {
-                    return {
-                        typeData: parsed.rrule,
-                        allDayGuess: parsed.allDayGuess,
-                        duration: props.duration
-                    };
-                }
-            }
-            return null;
-        },
-        expand: function (rrule, framingRange) {
-            // we WANT an inclusive start and in exclusive end, but the js rrule lib will only do either BOTH
-            // inclusive or BOTH exclusive, which is stupid: https://github.com/jakubroztocil/rrule/issues/84
-            // Workaround: make inclusive, which will generate extra occurences, and then trim.
-            return rrule.between(framingRange.start, framingRange.end, true)
-                .filter(function (date) {
-                return date.valueOf() < framingRange.end.valueOf();
-            });
-        }
-    };
-    var main = core.createPlugin({
-        recurringTypes: [recurring]
-    });
-    function parseRRule(input, dateEnv) {
-        var allDayGuess = null;
-        var rrule$1;
-        if (typeof input === 'string') {
-            rrule$1 = rrule.rrulestr(input);
-        }
-        else if (typeof input === 'object' && input) { // non-null object
-            var refined = __assign({}, input); // copy
-            if (typeof refined.dtstart === 'string') {
-                var dtstartMeta = dateEnv.createMarkerMeta(refined.dtstart);
-                if (dtstartMeta) {
-                    refined.dtstart = dtstartMeta.marker;
-                    allDayGuess = dtstartMeta.isTimeUnspecified;
-                }
-                else {
-                    delete refined.dtstart;
-                }
-            }
-            if (typeof refined.until === 'string') {
-                refined.until = dateEnv.createMarker(refined.until);
-            }
-            if (refined.freq != null) {
-                refined.freq = convertConstant(refined.freq);
-            }
-            if (refined.wkst != null) {
-                refined.wkst = convertConstant(refined.wkst);
-            }
-            else {
-                refined.wkst = (dateEnv.weekDow - 1 + 7) % 7; // convert Sunday-first to Monday-first
-            }
-            if (refined.byweekday != null) {
-                refined.byweekday = convertConstants(refined.byweekday); // the plural version
-            }
-            rrule$1 = new rrule.RRule(refined);
-        }
-        if (rrule$1) {
-            return { rrule: rrule$1, allDayGuess: allDayGuess };
-        }
-        return null;
-    }
-    function convertConstants(input) {
-        if (Array.isArray(input)) {
-            return input.map(convertConstant);
-        }
-        return convertConstant(input);
-    }
-    function convertConstant(input) {
-        if (typeof input === 'string') {
-            return rrule.RRule[input.toUpperCase()];
-        }
-        return input;
-    }
-
     exports.default = main;
 
     Object.defineProperty(exports, '__esModule', { value: true });

@@ -42,10 +42,20 @@ session_start();
   <section id="banner">
     <div>
       <h1 style="margin-top:-10%;">Weather Forecast</h1>
-      <section class="wrapper" style="margin-top:-10%; margin-bottom:-15%">
+      <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
         <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
           <div class="container">
             <canvas id="myChart" style="border-style: hidden;"></canvas>
+          </div>
+          <div class="container">
+            <table style="margin-top:10px">
+              <tr id="dates">
+                <td>Date</td>
+              </tr>
+              <tr id="weather">
+                <td>Weather</td>
+              </tr>
+            </table>
           </div>
         </div>
       </section>
@@ -56,7 +66,7 @@ session_start();
     <nav id="nav-top">
       <ul>
         <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
-        <li><a href="placeresult.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
         <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
       </ul>
@@ -103,7 +113,7 @@ session_start();
                       <div class="line"></div>
                     </div>
                     <div class="content">
-                      <div class="title">Seoul</div>
+                      <div class="title"><?php echo $_SESSION['country_to']?></div>
                       <span class="line-hr"></span>
                       <svg class="edit stay-icon" for="r1" title="Edit destination">
                         <use xlink:href="#icon-edit"></use>
@@ -117,7 +127,7 @@ session_start();
                       <div class="line up"></div>
                     </div>
                     <div class="content">
-                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_to'] ?></div>
+                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_from'] ?></div>
                     </div>
                   </div>
                 </div>
@@ -130,7 +140,13 @@ session_start();
                 <div class="dest-rail active" style="display: block;">
                   <div class="see-also">Trip recommendation:</div>
                   <ul style="list-style: none; padding: 0;">
-                    <li>
+                    <li id="recommend_list">
+                      <script>
+                        var recommend = <?php $_SESSION['result_arr']?>;
+                        for(var i=0; i<recommend.length; i++) {
+                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
+                        }
+                      </script>
                       <span class="tour-title">Get from recomendations.</span>&nbsp;
                     </li>
                   </ul>

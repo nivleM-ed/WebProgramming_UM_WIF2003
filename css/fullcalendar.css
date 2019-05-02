@@ -1,15 +1,11 @@
-body {
-  padding-top: 70px;
-  /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
-}
-#calendar {
-max-width: 800px;
-}
-.col-centered{
-float: none;
-margin: 0 auto;
-}
- .fc {
+/*!
+ * FullCalendar v2.6.1 Stylesheet
+ * Docs & License: http://fullcalendar.io/
+ * (c) 2015 Adam Shaw
+ */
+
+
+.fc {
 	direction: ltr;
 	text-align: left;
 }

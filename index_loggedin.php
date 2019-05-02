@@ -39,7 +39,7 @@ if (isset($_POST["input_country"])) {
     <header id="header">
         <nav class="left">
             <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
-            <a>Plan it with ease!</a>
+            <a>Plan with ease!</a>
         </nav>
         <nav class="right">
             <a href="#">New Plan</a>

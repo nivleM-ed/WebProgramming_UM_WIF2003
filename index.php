@@ -21,7 +21,7 @@
     <header id="header">
         <nav class="left">
             <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt<sup>&copy</sup></a>
-            <a>Plan it with ease!</a>
+            <a>Plan with ease!</a>
         </nav>
         <nav class="right">
             <a href="login.php" class="button alt">Log in</a>
@@ -117,12 +117,6 @@
                 <img src="assets/images/calender.png" alt="" width="50%" height="50%" style="float: right;">
             </div>
         </section>
-		<?php
-include 'db_connection.php';
-$conn = OpenCon();
-echo "Connected Successfully";
-CloseCon($conn);
-?>
     </main>
 
     <!-- Footer -->
