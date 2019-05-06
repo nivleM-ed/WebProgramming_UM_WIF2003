@@ -1,0 +1,84 @@
+<!-- 1st Card -->
+                                    <div class="col-md-4">
+                                        <div class="destination">
+                                        <div class="card" style="width: 18rem;">
+                                            <img id="image1" class="card-img-top" src="images/destination-1.jpg" alt="Card image cap" height="300mm">
+                                            <div class="card-body">
+                                                <h5 id="name1" class="card-title">Card title</h5>
+                                                <p id="description1" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <!-- 2nd Card -->
+                                    <div class="col-md-4">
+                                        <div class="destination">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src="images/destination-2.jpg" alt="Card image cap" height="300mm">
+                                            <div class="card-body">
+                                                <h5 id="name2" class="card-title">Card title</h5>
+                                                <p id="description2" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add2" class="btn btn-primary">Add to Checklist</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <!-- 3rd Card -->
+                                    <div class="col-md-4">
+                                        <div class="destination">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src="images/destination-3.jpg" alt="Card image cap" height="300mm">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Card title</h5>
+                                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <!-- 4th Card -->
+                                    <div class="col-md-4">
+                                        <div class="destination">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src="images/destination-4.jpg" alt="Card image cap" height="300mm">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Card title</h5>
+                                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <!-- 5th Card -->
+                                    <div class="col-md-4">
+                                        <div class="destination">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Card title</h5>
+                                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+ <!-- 6th Card -->
+                                    <div class="col-md-4">
+                                        <div class="destination">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src="images/destination-6.jpg" alt="Card image cap" height="300mm">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Card title</h5>
+                                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>

@@ -2,7 +2,7 @@
 <html>
 <?php
     session_start();
-
+    $_SESSION['result_arr'] = array();
     $mysqli = new mysqli("localhost", "root", "", "recommendation");
 
     /* check connection */
@@ -16,25 +16,47 @@
     
     /* numeric array */
     $row = $result->fetch_all();
-    var_dump($row);
+    var_dump($row[0][0]);
 
-    $conn = mysqli_connect("localhost", "root", "", "recommendation");
-        $set = $_POST['country'];
-        
-        echo $searchq. "<br><br>";
-        if($set){
-            $show = "SELECT * FROM recommend WHERE Country like '$searchq'";
-            // WHERE Country like '$searchq'
-            //$result = mysqli_query($conn,$show);
-            //$row = mysqli_fetch_array($result);
-            //while($row)
-            // echo $searchq;
-            // print_r($row);
-            // echo "<td>".$row['Country']."</td>";
-            // echo "<td>".$row['Place']."</td>";
-            // echo "<td>".$row['Description']."</td>";
+    function add1($row){
+        array_push($_SESSION['result_arr'],$row[0][0]);
+        return 0;
+    }
+    function add2($row){
+        array_push($_SESSION['result_arr'],$row[1][0]);
+        return 0;
 
-        }
+    }
+
+    function add3($row){
+        array_push($_SESSION['result_arr'],$row[2][0]);
+        return 0;
+
+    }
+
+    function add4($row){
+        array_push($_SESSION['result_arr'],$row[3][0]);
+        return 0;
+
+    }
+
+    function add5($row){
+        array_push($_SESSION['result_arr'],$row[4][0]);
+        return 0;
+
+    }
+
+    function add6($row){
+        array_push($_SESSION['result_arr'],$row[5][0]);
+        return 0;
+
+    }
+
+    function add($value){
+        array_push($_SESSION['result_arr'],$value);
+
+    }
+    $aaa = $_SESSION['result_arr'];
 ?>
 
 
@@ -57,6 +79,8 @@
     <!--Boostrap CDN-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <!-- JQuery Library -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 </head>
 
 <body>
@@ -153,7 +177,7 @@
                                             <div class="card-body">
                                                 <h5 id="name1" class="card-title">Card title</h5>
                                                 <p id="description1" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                                <a id="add" class="btn btn-primary" onclick="adds1()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -167,7 +191,7 @@
                                             <div class="card-body">
                                                 <h5 id="name2" class="card-title">Sydney</h5>
                                                 <p id="description2" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add2" class="btn btn-primary">Add to Checklist</a>
+                                                <a id="add2" class="btn btn-primary" onclick="adds2()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -181,7 +205,7 @@
                                             <div class="card-body">
                                                 <h5 id="name3" class="card-title">Card title</h5>
                                                 <p id="description3" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                                <a id="add" class="btn btn-primary" onclick="adds3()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -195,7 +219,7 @@
                                             <div class="card-body">
                                                 <h5 id="name4" class="card-title">Card title</h5>
                                                 <p id="description4" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                                <a id="add" class="btn btn-primary" onclick="adds4()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -209,7 +233,7 @@
                                             <div class="card-body">
                                                 <h5 id="name5" class="card-title">Card title</h5>
                                                 <p id="description5" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                                <a id="add" class="btn btn-primary" onclick="adds5()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -223,7 +247,7 @@
                                             <div class="card-body">
                                                 <h5 id="name5" class="card-title">Card title</h5>
                                                 <p id="description5" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary">Add to Checklist</a>
+                                                <a id="add" class="btn btn-primary" onclick="adds6()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -237,6 +261,7 @@
                     </div>
                 </div>
             </div>
+            <a id="add" class="btn btn-primary" onclick="check()">Add to Checklist</a>
         </main>
         <!-- Footer -->
         <footer id="footer">
@@ -287,6 +312,7 @@
 	
         </script>
         <script>
+            <?php $_SESSION['result_arr'] = array(); ?>
             var value = <?php echo json_encode($row); ?>;
             console.log(value);
             var count = (Object.keys(value).length)/2;
@@ -321,6 +347,60 @@
             document.getElementById("image6").src=image6;
             document.getElementById("description6").innerHTML=value[5][1];
 
+            function check(){
+                
+                var test="test";
+                console.log(test);
+            }
+            
+            function adds1(){   
+                var pass = value[0][0];
+                console.log(pass)
+                /*
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass}
+                });        
+              alert("Added to checklist");
+              */
+              fetch("./add.php", {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                headers: {
+                    "Content-Type": "application/json",
+                    // "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: JSON.stringify({passValue: pass, name: 'amirul'}), // body data type must match "Content-Type" header
+            })
+            .then(response => response.json())
+            .then((data) => console.log(data));
+            }
+
+            function adds2(){
+                alert("Added to checklist");
+
+            }
+
+            function adds3(){
+                alert("Added to checklist");
+
+            }
+
+            function adds4(){
+                alert("Added to checklist");
+
+            }
+
+            function adds5(){
+                alert("Added to checklist");
+
+            }
+
+            function adds6(){
+                alert("Added to checklist");
+
+            }
             
 
         </script>
