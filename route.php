@@ -153,8 +153,9 @@ session_start();
                           $row = $result->fetch_all();
                           $_SESSION["result_arr"] = $row;
                           echo "<br>";
+                          $rownum = count($row);
                           $num = 1;
-                          for($i=0;$i<5;$i++) {
+                          for($i=0;$i<$rownum;$i++) {
                             
                             echo  $num.". ",$row[$i][0]. "<br>";
                             $num++;

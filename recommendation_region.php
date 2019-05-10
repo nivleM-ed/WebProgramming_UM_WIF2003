@@ -2,29 +2,23 @@
 <html>
 <?php
     session_start();
+
     $_SESSION['result_arr'] = array();
     include("includes/dbh.inc.php");
-    $searchq = $_SESSION['country_to'];
 
     /* check connection */
     if ($conn->connect_errno) {
         printf("Connect failed: %s\n", $conn->connect_error);
         exit();
     }
-    if(isset($_POST['country'])){
-        $searchq = $_POST['country'];
-    }
-    
-    $query = "Select DISTINCT recommendation.region, city.image 
-            from recommendation inner join city on recommendation.city_id = city.city_id 
-            WHERE recommendation.country like '$searchq'";
+    $searchq = $_GET['region'];
+    echo ($searchq);
+    $query = "select name_place,description,image from recommendation WHERE region like '$searchq'";
     $result = $conn->query($query);
     
     /* numeric array */
     $row = $result->fetch_all();
     // var_dump($row[0][0]);
-    // echo(json_encode($row));
-    // echo($row[1][0]);
 
 ?>
 
@@ -145,8 +139,8 @@
                                             <img id="image1" class="card-img-top" src="images/destination-1.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name1" class="card-title">Card title</h5>
-                                                <!-- <p id="description1" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                                                <a id="add" href="recommendation_region.php?region=default_value" class="btn btn-primary" onclick="adds1()">Add to Checklist</a>
+                                                <p id="description1" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary" onclick="adds1()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -159,8 +153,8 @@
                                             <img id="image2" class="card-img-top" src="images/destination-2.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name2" class="card-title">Sydney</h5>
-                                                <!-- <p id="description2" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                                                <a id="add2" href="recommendation_region.php?region=default_value" class="btn btn-primary" onclick="adds2()">Add to Checklist</a>
+                                                <p id="description2" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add2" class="btn btn-primary" onclick="adds2()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -173,8 +167,8 @@
                                             <img id="image3" class="card-img-top" src="images/destination-3.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name3" class="card-title">Card title</h5>
-                                                <!-- <p id="description3" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                                                <a id="add3" href="recommendation_region.php?region=default_value" class="btn btn-primary" onclick="adds3()">Add to Checklist</a>
+                                                <p id="description3" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary" onclick="adds3()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -187,8 +181,8 @@
                                         <img id="image4" class="card-img-top" src="images/destination-4.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name4" class="card-title">Card title</h5>
-                                                <!-- <p id="description4" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                                                <a id="add4" href="recommendation_region.php?region=default_value" class="btn btn-primary" onclick="adds4()">Add to Checklist</a>
+                                                <p id="description4" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary" onclick="adds4()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -201,8 +195,8 @@
                                         <img id="image5" class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name5" class="card-title">Card title</h5>
-                                                <!-- <p id="description5" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                                                <a id="add5" href="recommendation_region.php?region=default_value" class="btn btn-primary" onclick="adds5()">Add to Checklist</a>
+                                                <p id="description5" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary" onclick="adds5()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -215,8 +209,8 @@
                                         <img id="image6" class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name6" class="card-title">Card title</h5>
-                                                <!-- <p id="description6" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                                                <a id="add6" href="recommendation_region.php?region=default_value" class="btn btn-primary" onclick="adds6()">Add to Checklist</a>
+                                                <p id="description6" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a id="add" class="btn btn-primary" onclick="adds6()">Add to Checklist</a>
                                             </div>
                                             </div>
                                         </div>
@@ -282,80 +276,59 @@
         <script>
             <?php $_SESSION['result_arr'] = array(); ?>
             var value = <?php echo json_encode($row); ?>;
-            console.log("Values: ");
             console.log(value);
             var count = (Object.keys(value).length)/2;
 
-            // card 1
-            var image1="'"+value[0][1]+"'";
+            var image1=value[0][2];
             document.getElementById("name1").innerHTML=value[0][0];
             document.getElementById("image1").src=image1;
-            // document.getElementById("description1").innerHTML=value[0][1];
-            document.getElementById('add').href = "recommendation_region.php?region="+value[0][0];
-            document.getElementById('add').innerHTML = "Go to "+value[0][0];
+            document.getElementById("description1").innerHTML=value[0][1];
 
-
-            // card 2
-            var image2=value[1][1];
+            var image2=value[1][2];
             document.getElementById("name2").innerHTML=value[1][0];
             document.getElementById("image2").src=image2;
-            // document.getElementById("description2").innerHTML=value[1][1];
-            document.getElementById('add2').href = "recommendation_region.php?region="+value[1][0];
-            document.getElementById('add2').innerHTML = "Go to "+value[1][0];
+            document.getElementById("description2").innerHTML=value[1][1];
 
-
-            // card 3
-            var image3=value[2][1];
+            var image3=value[2][2];
             document.getElementById("name3").innerHTML=value[2][0];
             document.getElementById("image3").src=image3;
-            // document.getElementById("description3").innerHTML=value[2][1];
-            document.getElementById('add3').href = "recommendation_region.php?region="+value[2][0];
-            document.getElementById('add3').innerHTML = "Go to "+value[2][0];
+            document.getElementById("description3").innerHTML=value[2][1];
 
-
-            // card 4
-            var image4=value[3][1];
-            // var imageLink = "https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/n-seoul-tower-1789845929.jpg";
+            var image4=value[3][2];
             document.getElementById("name4").innerHTML=value[3][0];
             document.getElementById("image4").src=image4;
-            // document.getElementById("description4").innerHTML=value[3][1];
-            document.getElementById('add4').href = "recommendation_region.php?region="+value[3][0];
-            document.getElementById('add4').innerHTML = "Go to "+value[3][0];
+            document.getElementById("description4").innerHTML=value[3][1];
 
-
-            // card 5
-            var image5=value[4][1];
+            var image5=value[4][2];
             document.getElementById("name5").innerHTML=value[4][0];
             document.getElementById("image5").src=image5;
-            // document.getElementById("description5").innerHTML=value[4][1];
-            document.getElementById('add5').href = "recommendation_region.php?region="+value[4][0];
-            document.getElementById('add5').innerHTML = "Go to "+value[4][0];
+            document.getElementById("description5").innerHTML=value[4][1];
 
-
-            // card 6
-            var image6=value[5][1];
+            var image6=value[5][2];
             document.getElementById("name6").innerHTML=value[5][0];
             document.getElementById("image6").src=image6;
-            // document.getElementById("description6").innerHTML=value[5][1];
-            document.getElementById('add6').href = "recommendation_region.php?region="+value[5][0];
-            document.getElementById('add6').innerHTML = "Go to "+value[5][0];
+            document.getElementById("description6").innerHTML=value[5][1];
 
-
-            
-            // function adds1(){   
-            //     var pass = value[0][0];
-            //     console.log(pass)
+            function check(){
                 
-            //     $.ajax({
-            //         url:"add.php", //the page containing php script
-            //         type: "post", //request type,
-            //         dataType: 'json',
-            //         data: {passValue: pass},
-            //         success: function(data){
-            //             console.log(data);
-            //             }
-            //     });        
-            //   alert("Added to checklist");
+                var test="test";
+                console.log(test);
+            }
+            
+            function adds1(){   
+                var pass = value[0][0];
+                console.log(pass)
+                
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
               
             //   fetch("./add.php", {
             //     method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -367,12 +340,85 @@
             // })
             // .then(response => response.json())
             // .then((data) => console.log(data));
-            // $url = "http://localhost/main.php?email=$email_address&event_id=$event_id";
-            // var url = "recommendation_region.php?region="+pass;
-            // window.open(url); 
-            // }
+            }
 
+            function adds2(){
+                var pass = value[1][0];
+                console.log(pass)
+                
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
 
+            }
+
+            function adds3(){
+                var pass = value[2][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
+
+            }
+
+            function adds4(){
+                var pass = value[3][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
+            }
+
+            function adds5(){
+                var pass = value[4][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
+            }
+
+            function adds6(){
+                var pass = value[5][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
+            }
             
 
         </script>

@@ -1,42 +1,37 @@
 <?php
 
     session_start();
-    $_SESSION['result_arr'] = array();
-    $json = json_decode(file_get_contents('php://input'), true);
-    array_push($_SESSION['result_arr'],$passValues);
-    array_push($_SESSION['result_arr'],$passValues);
+
+    include("includes/dbh.inc.php");
     $pass = $_POST['passValue'];
-    // $userAnswer = $_POST['name'];
 
-    header('Content-Type: application/json');
-    // echo json_encode($_SESSION['result_arr']);
-    
-    $mysqli = new mysqli("localhost", "root", "", "recommendation");
-
-    $sql = "select * from checklist WHERE user_id like '1'";
-    $result = $mysqli->query($query);
-    $row = mysqli_num_rows($result);
-    $result = json_encode($result);
-    
-    if($row>5){
-        $sql = "delete from checklist WHERE user_id like '1'";
-        $mysqli->query($sql);
-        for($i = $row; $i>=5; $i--){
-            $insert = $i-1;
-            $sql = "INSERT INTO checklist (user_id , place)
-                VALUES ('1', '$result[$insert]');";
-            $mysqli->query($sql);
-        }
+    if ($conn->connect_errno) {
+        printf("Connect failed: %s\n", $conn->connect_error);
+        exit();
     }
+    $user = $_SESSION['userUid'];
+    $sql = "select place_id from recommendation WHERE name_place like $pass";
+    $result = $conn->query($query);
+    $row = $result->fetch_all();
 
-    $sql = "INSERT INTO checklist (user_id , place)
-            VALUES ('1', '$pass');";
+    $placeid = $row[0][0];   //Getting the place id value
+    $sql = "INSERT INTO user_recommendation(user_id,place_id) 
+            VALUES($user,$placeid)";
 
-    if ($mysqli->query($sql) === TRUE) {
-        echo "New records created successfully";
-    } else {
-        echo "Error: " . $sql . "<br>" . $mysqli->error;
-    }
+       $result = $conn->query($sql);
+    $sql = "select place_id from user_recommendation where user_id like $user AND place_id like $placeid";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        echo "Duplicate Place\n";
+        // do something to alert user about non-unique email
+     } else {
+        $sql = "INSERT INTO user_recommendation(user_id,place_id) 
+            VALUES($user,$placeid)";
 
+       $result = $conn->query($sql);
+       if ($result === false) {echo "SQL error:".$conn->error;}
+     }
     $conn->close();
+
+
 ?>
