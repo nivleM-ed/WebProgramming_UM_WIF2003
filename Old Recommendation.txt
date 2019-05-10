@@ -1,0 +1,36 @@
+                  <div class="see-also">Trip recommendation:</div> 
+		 <ul style="list-style: none; padding: 0;">
+                    <li id="recommend_list">
+                      
+                      <span class="tour-title">Get from recomendations.<br></span>&nbsp;
+                      <?php
+                        $_SESSION['result_arr'] = array();
+                        $mysqli = new mysqli("localhost", "root", "", "recommendation");
+                        if ($mysqli->connect_error) {
+                          die("Connection failed: " . $mysqli->connect_error);
+                        }
+                        $sql = "SELECT place FROM `checklist` where user_id like '1' ";
+                        $result = $mysqli->query($sql);
+                        $row = $result->fetch_all();
+                        $_SESSION["result_arr"] = $row;
+                        echo "<br>";
+                        $num = 1;
+                        for($i=0;$i<5;$i++) {
+                          
+                          echo  $num.". ",$row[$i][0]. "<br>";
+                          $num++;
+                        }
+                        $mysqli->close();
+                    ?>
+                      <span class="tour-title"><?php $_SESSION['result_arr']  ?></span>&nbsp;
+                      <script>
+                        var recommend = '<?php $_SESSION['result_arr']?>';
+                        console.log("Recommend: ");
+                        console.log(recommend);
+                        for(var i=0; i<recommend.length; i++) {
+                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
+                        }
+                      </script>
+
+                    </li>
+                  </ul>

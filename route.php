@@ -138,18 +138,33 @@ session_start();
                 <div class="clearfix" style="background-color: #fff;"></div>
 
                 <div class="dest-rail active" style="display: block;">
-                  <div class="see-also">Trip recommendation:</div>
-                  <ul style="list-style: none; padding: 0;">
-                    <li id="recommend_list">
-                      <script>
-                        var recommend = <?php $_SESSION['result_arr']?>;
-                        for(var i=0; i<recommend.length; i++) {
-                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
-                        }
-                      </script>
-                      <span class="tour-title">Get from recomendations.</span>&nbsp;
-                    </li>
-                  </ul>
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">Recommendations</h5>
+                    <p class="card-text">
+                      <?php
+                          $_SESSION['result_arr'] = array();
+                          $mysqli = new mysqli("localhost", "root", "", "recommendation");
+                          if ($mysqli->connect_error) {
+                            die("Connection failed: " . $mysqli->connect_error);
+                          }
+                          $sql = "SELECT place FROM `checklist` where user_id like '1' ";
+                          $result = $mysqli->query($sql);
+                          $row = $result->fetch_all();
+                          $_SESSION["result_arr"] = $row;
+                          echo "<br>";
+                          $num = 1;
+                          for($i=0;$i<5;$i++) {
+                            
+                            echo  $num.". ",$row[$i][0]. "<br>";
+                            $num++;
+                          }
+                          $mysqli->close();
+                      ?>
+                    </p>
+                  </div>
+                </div>
+
                 </div>
               </div>
             </div>
@@ -229,7 +244,7 @@ session_start();
   <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
   <!--Own Scripts-->
 
-  <script src="assets/js/jquery.scrolly.min.js"></script>
+  <!-- <script src="assets/js/jquery.scrolly.min.js"></script> -->
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/checklist.js"></script>

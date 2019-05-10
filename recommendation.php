@@ -22,41 +22,7 @@
         array_push($_SESSION['result_arr'],$row[0][0]);
         return 0;
     }
-    function add2($row){
-        array_push($_SESSION['result_arr'],$row[1][0]);
-        return 0;
 
-    }
-
-    function add3($row){
-        array_push($_SESSION['result_arr'],$row[2][0]);
-        return 0;
-
-    }
-
-    function add4($row){
-        array_push($_SESSION['result_arr'],$row[3][0]);
-        return 0;
-
-    }
-
-    function add5($row){
-        array_push($_SESSION['result_arr'],$row[4][0]);
-        return 0;
-
-    }
-
-    function add6($row){
-        array_push($_SESSION['result_arr'],$row[5][0]);
-        return 0;
-
-    }
-
-    function add($value){
-        array_push($_SESSION['result_arr'],$value);
-
-    }
-    $aaa = $_SESSION['result_arr'];
 ?>
 
 
@@ -243,10 +209,10 @@
                                     <div class="col-md-4">
                                         <div class="destination">
                                         <div class="card" style="width: 18rem;">
-                                        <img id="image5" class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
+                                        <img id="image6" class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
-                                                <h5 id="name5" class="card-title">Card title</h5>
-                                                <p id="description5" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <h5 id="name6" class="card-title">Card title</h5>
+                                                <p id="description6" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                                                 <a id="add" class="btn btn-primary" onclick="adds6()">Add to Checklist</a>
                                             </div>
                                             </div>
@@ -356,50 +322,106 @@
             function adds1(){   
                 var pass = value[0][0];
                 console.log(pass)
-                /*
+                
                 $.ajax({
                     url:"add.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
-                    data: {passValue: pass}
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
                 });        
               alert("Added to checklist");
-              */
-              fetch("./add.php", {
-                method: "POST", // *GET, POST, PUT, DELETE, etc.
-                headers: {
-                    "Content-Type": "application/json",
-                    // "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: JSON.stringify({passValue: pass, name: 'amirul'}), // body data type must match "Content-Type" header
-            })
-            .then(response => response.json())
-            .then((data) => console.log(data));
+              
+            //   fetch("./add.php", {
+            //     method: "POST", // *GET, POST, PUT, DELETE, etc.
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //         // "Content-Type": "application/x-www-form-urlencoded",
+            //     },
+            //     body: JSON.stringify({passValue: pass, name: 'amirul'}), // body data type must match "Content-Type" header
+            // })
+            // .then(response => response.json())
+            // .then((data) => console.log(data));
             }
 
             function adds2(){
-                alert("Added to checklist");
+                var pass = value[1][0];
+                console.log(pass)
+                
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
 
             }
 
             function adds3(){
-                alert("Added to checklist");
+                var pass = value[2][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
 
             }
 
             function adds4(){
-                alert("Added to checklist");
-
+                var pass = value[3][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
             }
 
             function adds5(){
-                alert("Added to checklist");
-
+                var pass = value[4][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
             }
 
             function adds6(){
-                alert("Added to checklist");
-
+                var pass = value[5][0];
+                console.log(pass)
+                $.ajax({
+                    url:"add.php", //the page containing php script
+                    type: "post", //request type,
+                    dataType: 'json',
+                    data: {passValue: pass},
+                    success: function(data){
+                        console.log(data);
+                        }
+                });        
+              alert("Added to checklist");
             }
             
 
