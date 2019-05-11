@@ -4,6 +4,7 @@
     session_start();
     $_SESSION['result_arr'] = array();
     include("includes/dbh.inc.php");
+
     $searchq = $_SESSION['country_to'];
 
     /* check connection */
@@ -287,7 +288,7 @@
             var count = (Object.keys(value).length)/2;
 
             // card 1
-            var image1="'"+value[0][1]+"'";
+            var image1=value[0][1];
             document.getElementById("name1").innerHTML=value[0][0];
             document.getElementById("image1").src=image1;
             // document.getElementById("description1").innerHTML=value[0][1];

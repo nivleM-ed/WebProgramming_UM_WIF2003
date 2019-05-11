@@ -144,12 +144,19 @@ session_start();
                     <p class="card-text">
                       <?php
                           $_SESSION['result_arr'] = array();
-                          $mysqli = new mysqli("localhost", "root", "", "recommendation");
-                          if ($mysqli->connect_error) {
-                            die("Connection failed: " . $mysqli->connect_error);
-                          }
-                          $sql = "SELECT place FROM `checklist` where user_id like '1' ";
-                          $result = $mysqli->query($sql);
+                          include("includes/dbh.inc.php");
+                          $user = $_SESSION['userUid'];
+                          $sql = "select idUsers from users where uidUsers like '$user'";
+                          $result = $conn->query($sql);
+                          $row = $result->fetch_all();
+                          $userid = $row[0][0];
+                          // echo ($userid);
+
+                          $sql = "SELECT recommendation.name_place FROM `recommendation` 
+                                  inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
+                                  where user_recommendation.user_id like '$userid'";
+
+                          $result = $conn->query($sql);
                           $row = $result->fetch_all();
                           $_SESSION["result_arr"] = $row;
                           echo "<br>";
@@ -160,7 +167,7 @@ session_start();
                             echo  $num.". ",$row[$i][0]. "<br>";
                             $num++;
                           }
-                          $mysqli->close();
+                          $conn->close();
                       ?>
                     </p>
                   </div>

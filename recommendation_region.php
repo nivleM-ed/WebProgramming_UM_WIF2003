@@ -13,7 +13,7 @@
     }
     $searchq = $_GET['region'];
     echo ($searchq);
-    $query = "select name_place,description,image from recommendation WHERE region like '$searchq'";
+    $query = "select name_place,description,image,place_id from recommendation WHERE region like '$searchq'";
     $result = $conn->query($query);
     
     /* numeric array */
@@ -316,7 +316,7 @@
             }
             
             function adds1(){   
-                var pass = value[0][0];
+                var pass = value[0][3];
                 console.log(pass)
                 
                 $.ajax({
@@ -327,8 +327,9 @@
                     success: function(data){
                         console.log(data);
                         }
-                });        
-              alert("Added to checklist");
+                });    
+                var userids = "<?php echo $_SESSION['userUid'] ?>";
+                alert("Added to checklist");
               
             //   fetch("./add.php", {
             //     method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -343,7 +344,7 @@
             }
 
             function adds2(){
-                var pass = value[1][0];
+                var pass = value[1][3];
                 console.log(pass)
                 
                 $.ajax({
@@ -355,12 +356,12 @@
                         console.log(data);
                         }
                 });        
-              alert("Added to checklist");
+              alert("Added to checklist: ");
 
             }
 
             function adds3(){
-                var pass = value[2][0];
+                var pass = value[2][3];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -371,12 +372,11 @@
                         console.log(data);
                         }
                 });        
-              alert("Added to checklist");
-
+                alert("Added to checklist: ");
             }
 
             function adds4(){
-                var pass = value[3][0];
+                var pass = value[3][3];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -387,11 +387,11 @@
                         console.log(data);
                         }
                 });        
-              alert("Added to checklist");
-            }
+                alert("Added to checklist: ");            
+                }
 
             function adds5(){
-                var pass = value[4][0];
+                var pass = value[4][3];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -402,11 +402,11 @@
                         console.log(data);
                         }
                 });        
-              alert("Added to checklist");
-            }
+                alert("Added to checklist: ");           
+                 }
 
             function adds6(){
-                var pass = value[5][0];
+                var pass = value[5][3];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -417,8 +417,8 @@
                         console.log(data);
                         }
                 });        
-              alert("Added to checklist");
-            }
+                alert("Added to checklist: ");         
+                }
             
 
         </script>
