@@ -44,9 +44,9 @@ session_start();
       <h1 style="margin-top:-10%;">Weather Forecast</h1>
       <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
         <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
-          <div class="container">
+          <!-- <div class="container">
             <canvas id="myChart" style="border-style: hidden;"></canvas>
-          </div>
+          </div> -->
           <div class="container">
             <table style="margin-top:10px">
               <tr id="dates">
@@ -54,6 +54,9 @@ session_start();
               </tr>
               <tr id="weather">
                 <td>Weather</td>
+              </tr>
+              <tr id="temperature">
+                <td>Temperature</td>
               </tr>
             </table>
           </div>

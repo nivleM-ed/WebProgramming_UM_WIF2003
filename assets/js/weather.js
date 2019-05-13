@@ -26,7 +26,7 @@ function getWeather(URL) {
             console.log(myRes);
             // console.log(document.getElementById("city").value);  
             getDataArr();
-            getChart();
+            // getChart();
             setSky();
         } else {
             // console.log(document.getElementById("c   ity").value);
@@ -37,10 +37,18 @@ function getWeather(URL) {
     xhr.open('GET', URL);
     xhr.send();
 }
+
+function dashToSlash(string){
+    var response = string.replace(/-/g,"/");
+    //The slash-g bit says: do this more than once
+    return response;
+  }
+
 function setSky() {
     for(var i=0; i<weatherArrSky.length; i++) {
         $("#dates").append('<td>'+weatherArr[i]+'</td>');
         $("#weather").append('<td>'+weatherArrSky[i]+'</td>');
+        $("#temperature").append('<td>'+parseInt(weatherArrTemp[i])+'</td>');
     }
     
 }
@@ -60,7 +68,7 @@ function getDataArr() {
     }
 
     for (var i = 0; i < myRes.list.length; i++) {
-        skyArr[i] = myRes.list[i].weather[0].description;
+        skyArr[i] = myRes.list[i].weather[0].main;
     }
 
     for (var i = 0; i < dateArr.length; i++) {
