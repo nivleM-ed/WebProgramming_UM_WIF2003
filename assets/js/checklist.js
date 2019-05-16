@@ -40,7 +40,8 @@ $(document).ready(function () {
 	}
 
 	function clEdit() {
-		$(".edit-btn").click(function () {
+		$(".edit-btn").click(function () 
+		{
 			$(".modi-edit").fadeIn(300);
 			itemId = $(this).attr('for');
 			var value = $("label[for='" + itemId + "']").text();

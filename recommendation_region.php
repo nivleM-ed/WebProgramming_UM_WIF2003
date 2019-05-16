@@ -13,7 +13,7 @@
     }
     $searchq = $_GET['region'];
     echo ($searchq);
-    $query = "select name_place,description,image,place_id from recommendation WHERE region like '$searchq'";
+    $query = "select name_place,description,image,activity from recommendation WHERE region like '$searchq'";
     $result = $conn->query($query);
     
     /* numeric array */
@@ -24,6 +24,71 @@
 
 
 <head>
+    <style>
+        .card {
+        margin: 0 auto; /* Added */
+        float: none; /* Added */
+        margin-bottom: 10px; /* Added */
+        }
+        /* Outer */
+        .popup {
+            width:100%;
+            height:100%;
+            display:none;
+            position:fixed;
+            top:0px;
+            left:0px;
+            background:rgba(0,0,0,0.75);
+        }
+        .popup-inner{ overflow: -moz-scrollbars-none;
+         }
+        /* Inner */
+        .popup-inner {
+            max-width:700px;
+            width:90%;
+            padding:40px;
+            position:absolute;
+            top:50%;
+            left:50%;
+            -webkit-transform:translate(-50%, -50%);
+            transform:translate(-50%, -50%);
+            box-shadow:0px 2px 6px rgba(0,0,0,1);
+            border-radius: 25px;
+            background:#fff;
+            overflow:auto;
+            overflow: -moz-scrollbars-none;
+            /* overflow: hidden; */
+        }
+
+        /* Close Button */
+        .popup-close {
+            width:30px;
+            height:30px;
+            padding-top:4px;
+            display:inline-block;
+            position:absolute;
+            top:0px;
+            right:0px;
+            transition:ease 0.25s all;
+            -webkit-transform:translate(50%, -50%);
+            transform:translate(50%, -50%);
+            border-radius:1000px;
+            background:rgba(0,0,0,0.8);
+            font-family:Arial, Sans-Serif;
+            font-size:20px;
+            text-align:center;
+            line-height:100%;
+            color:#fff;
+        }
+
+        .popup-close:hover {
+            -webkit-transform:translate(50%, -50%) rotate(180deg);
+            transform:translate(50%, -50%) rotate(180deg);
+            background:rgba(0,0,0,1);
+            text-decoration:none;
+        }
+    </style>
+
     <title>Plan It</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,7 +112,7 @@
 </head>
 
 <body>
-
+    
     
 
 
@@ -139,8 +204,7 @@
                                             <img id="image1" class="card-img-top" src="images/destination-1.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name1" class="card-title">Card title</h5>
-                                                <p id="description1" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary" onclick="adds1()">Add to Checklist</a>
+                                                <a id="add" data-popup-open="popup-1" class="btn btn-primary"  ">Details</a>
                                             </div>
                                             </div>
                                         </div>
@@ -153,8 +217,8 @@
                                             <img id="image2" class="card-img-top" src="images/destination-2.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name2" class="card-title">Sydney</h5>
-                                                <p id="description2" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add2" class="btn btn-primary" onclick="adds2()">Add to Checklist</a>
+                                                <a id="add" data-popup-open="popup-2" class="btn btn-primary"  ">Details</a>
+
                                             </div>
                                             </div>
                                         </div>
@@ -167,8 +231,8 @@
                                             <img id="image3" class="card-img-top" src="images/destination-3.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name3" class="card-title">Card title</h5>
-                                                <p id="description3" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary" onclick="adds3()">Add to Checklist</a>
+                                                <a id="add" data-popup-open="popup-3" class="btn btn-primary"  ">Details</a>
+
                                             </div>
                                             </div>
                                         </div>
@@ -181,8 +245,8 @@
                                         <img id="image4" class="card-img-top" src="images/destination-4.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name4" class="card-title">Card title</h5>
-                                                <p id="description4" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary" onclick="adds4()">Add to Checklist</a>
+                                                <a id="add" data-popup-open="popup-4" class="btn btn-primary"  ">Details</a>
+
                                             </div>
                                             </div>
                                         </div>
@@ -195,8 +259,8 @@
                                         <img id="image5" class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name5" class="card-title">Card title</h5>
-                                                <p id="description5" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary" onclick="adds5()">Add to Checklist</a>
+                                                <a id="add" data-popup-open="popup-5" class="btn btn-primary"  ">Details</a>
+
                                             </div>
                                             </div>
                                         </div>
@@ -209,13 +273,123 @@
                                         <img id="image6" class="card-img-top" src="images/destination-5.jpg" alt="Card image cap" height="300mm">
                                             <div class="card-body">
                                                 <h5 id="name6" class="card-title">Card title</h5>
-                                                <p id="description6" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                <a id="add" class="btn btn-primary" onclick="adds6()">Add to Checklist</a>
+                                                <a id="add" data-popup-open="popup-6" class="btn btn-primary"  ">Details</a>
+
                                             </div>
                                             </div>
                                         </div>
                                         <br>
                                     </div>
+                                    
+                                    <!-- Card 1 pop up details -->
+                                    <div class="popup" data-popup="popup-1">
+                                        <div class="popup-inner">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src=<?php echo $row[0][2] ?> alt="Card image cap" >
+                                        </div>
+                                            <h2><?php echo $row[0][0] ?></h2>
+                                            <p><strong>Description:</strong> </p>
+                                            <p id="description6" class="card-text"><?php echo($row[0][1]) ?></p>
+                                            <p><strong>Activity:</strong> </p>
+                                            <p><?php echo($row[0][3]) ?></p>                                            
+                                            <a id="add" class="btn btn-primary"  onclick="adds1()">Add to Checklist</a>
+                                            <p><a class="btn btn-primary" data-popup-close="popup-1" href="#">Close</a></p>
+                                            <a class="popup-close" data-popup-close="popup-1" href="#">x</a>
+                                        </div>
+                                    </div>
+                                    <!--End of Card 1 pop up details -->
+
+                                    <!-- Card 2 pop up details -->
+                                    <div class="popup" data-popup="popup-2">
+                                        <div class="popup-inner">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src=<?php echo $row[1][2] ?> alt="Card image cap" >
+                                        </div>
+                                            <h2><?php echo $row[1][0] ?></h2>
+                                            <p><strong>Description:</strong> </p>
+                                            <p id="description6" class="card-text"><?php echo($row[1][1]) ?></p>
+                                            <p><strong>Activity:</strong> </p>
+                                            <p><?php echo($row[1][3]) ?></p>                                            
+                                            <a id="add" class="btn btn-primary"  onclick="adds2()">Add to Checklist</a>
+                                            <p><a class="btn btn-primary" data-popup-close="popup-2" href="#">Close</a></p>
+                                            <a class="popup-close" data-popup-close="popup-2" href="#">x</a>
+                                        </div>
+                                    </div>
+                                    <!--End of Card 2 pop up details -->
+
+                                    <!-- Card 3 pop up details -->
+                                    <div class="popup" data-popup="popup-3">
+                                        <div class="popup-inner">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src=<?php echo $row[2][2] ?> alt="Card image cap" >
+                                        </div>
+                                            <h2><?php echo $row[2][0] ?></h2>
+                                            <p><strong>Description:</strong> </p>
+                                            <p id="description6" class="card-text"><?php echo($row[2][1]) ?></p>
+                                            <p><strong>Activity:</strong> </p>
+                                            <p><?php echo($row[2][3]) ?></p>                                            
+                                            <a id="add" class="btn btn-primary"  onclick="adds3()">Add to Checklist</a>
+                                            <p><a class="btn btn-primary" data-popup-close="popup-3" href="#">Close</a></p>
+                                            <a class="popup-close" data-popup-close="popup-3" href="#">x</a>
+                                        </div>
+                                    </div>
+                                    <!--End of Card 3 pop up details -->
+
+                                    <!-- Card 4 pop up details -->
+                                    <div class="popup" data-popup="popup-4">
+                                        <div class="popup-inner">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src=<?php echo $row[3][2] ?> alt="Card image cap" >
+                                        </div>
+                                            <h2><?php echo $row[3][0] ?></h2>
+                                            <p><strong>Description:</strong> </p>
+                                            <p id="description6" class="card-text"><?php echo($row[3][1]) ?></p>
+                                            <p><strong>Activity:</strong> </p>
+                                            <p><?php echo($row[3][3]) ?></p>                                            
+                                            <a id="add" class="btn btn-primary"  onclick="adds4()">Add to Checklist</a>
+                                            <p><a class="btn btn-primary" data-popup-close="popup-4" href="#">Close</a></p>
+                                            <a class="popup-close" data-popup-close="popup-4" href="#">x</a>
+                                        </div>
+                                    </div>
+                                    <!--End of Card 4 pop up details -->
+
+                                    <!-- Card 5 pop up details -->
+                                    <div class="popup" data-popup="popup-5">
+                                        <div class="popup-inner">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src=<?php echo $row[4][2] ?> alt="Card image cap" >
+                                        </div>
+                                            <h2><?php echo $row[4][0] ?></h2>
+                                            <p><strong>Description:</strong> </p>
+                                            <p id="description6" class="card-text"><?php echo($row[4][1]) ?></p>
+                                            <p><strong>Activity:</strong> </p>
+                                            <p><?php echo($row[4][3]) ?></p>
+                                            <a id="add" class="btn btn-primary"  onclick="adds5()">Add to Checklist</a>
+                                            <p><a class="btn btn-primary" data-popup-close="popup-5" href="#">Close</a></p>
+                                            <a class="popup-close" data-popup-close="popup-5" href="#">x</a>
+                                        </div>
+                                    </div>
+                                    <!--End of Card 5 pop up details -->
+
+                                    <!-- Card 6 pop up details -->
+                                    <div class="popup" data-popup="popup-6">
+                                        <div class="popup-inner">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card-img-top" src=<?php echo $row[5][2] ?> alt="Card image cap" >
+                                        </div>
+                                            <h2><?php echo $row[5][0] ?></h2>
+                                            
+                                            <p><strong>Description:</strong> </p>
+                                            <p id="description6" class="card-text"><?php echo($row[5][1]) ?></p>
+                                            <p><strong>Activity:</strong> </p>
+                                            <p><?php echo($row[5][3]) ?></p>
+                                            
+                                            <a id="add" class="btn btn-primary"  onclick="adds6()">Add to Checklist<br></a>
+                                            <p><a class="btn btn-primary" data-popup-close="popup-6" href="#">Close</a></p>
+                                            <a class="popup-close" data-popup-close="popup-6" href="#">x</a>
+                                        </div>
+                                    </div>
+                                    <!--End of Card 6 pop up details -->
 
                                 </div>
                                 </div>
@@ -282,32 +456,26 @@
             var image1=value[0][2];
             document.getElementById("name1").innerHTML=value[0][0];
             document.getElementById("image1").src=image1;
-            document.getElementById("description1").innerHTML=value[0][1];
 
             var image2=value[1][2];
             document.getElementById("name2").innerHTML=value[1][0];
             document.getElementById("image2").src=image2;
-            document.getElementById("description2").innerHTML=value[1][1];
 
             var image3=value[2][2];
             document.getElementById("name3").innerHTML=value[2][0];
             document.getElementById("image3").src=image3;
-            document.getElementById("description3").innerHTML=value[2][1];
 
             var image4=value[3][2];
             document.getElementById("name4").innerHTML=value[3][0];
             document.getElementById("image4").src=image4;
-            document.getElementById("description4").innerHTML=value[3][1];
 
             var image5=value[4][2];
             document.getElementById("name5").innerHTML=value[4][0];
             document.getElementById("image5").src=image5;
-            document.getElementById("description5").innerHTML=value[4][1];
 
             var image6=value[5][2];
             document.getElementById("name6").innerHTML=value[5][0];
             document.getElementById("image6").src=image6;
-            document.getElementById("description6").innerHTML=value[5][1];
 
             function check(){
                 
@@ -420,7 +588,23 @@
                 alert("Added to checklist: ");         
                 }
             
+                // $(function() {
+                    //----- OPEN
+                    $('[data-popup-open]').on('click', function(e) {
+                        var targeted_popup_class = jQuery(this).attr('data-popup-open');
+                        $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
 
+                        e.preventDefault();
+                    });
+
+                    //----- CLOSE
+                    $('[data-popup-close]').on('click', function(e) {
+                        var targeted_popup_class = jQuery(this).attr('data-popup-close');
+                        $('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
+
+                        e.preventDefault();
+                    });
+                // });
         </script>
 
 
