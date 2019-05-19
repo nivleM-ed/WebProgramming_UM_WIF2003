@@ -2,6 +2,7 @@
 <html>
 <?php
 session_start();
+include "includes/dbh.inc.php"
 ?>
 
 <head>
@@ -38,33 +39,6 @@ session_start();
     </nav>
   </header>
 
-  <!-- Banner -->
-  <section id="banner">
-    <div>
-      <h1 style="margin-top:-10%;">Weather Forecast</h1>
-      <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
-        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
-          <!-- <div class="container">
-            <canvas id="myChart" style="border-style: hidden;"></canvas>
-          </div> -->
-          <div class="container">
-            <table style="margin-top:10px">
-              <tr id="dates">
-                <td>Date</td>
-              </tr>
-              <tr id="weather">
-                <td>Weather</td>
-              </tr>
-              <tr id="temperature">
-                <td>Temperature</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-  </section>
-
   <main>
     <nav id="nav-top">
       <ul>
@@ -72,6 +46,7 @@ session_start();
         <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
         <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+        <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
       </ul>
     </nav>
   </main>
@@ -136,6 +111,25 @@ session_start();
                 </div>
               </div>
               <!-- Add destination -->
+              <div class="route-right-pane">
+                <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
+                <div class="clearfix" style="background-color: #fff;"></div>
+
+                <div class="dest-rail active" style="display: block;">
+                  <div class="see-also">Trip recommendation:</div>
+                  <ul style="list-style: none; padding: 0;">
+                    <li id="recommend_list">
+                      <script>
+                        var recommend = <?php $_SESSION['result_arr']?>;
+                        for(var i=0; i<recommend.length; i++) {
+                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
+                        }
+                      </script>
+                      <span class="tour-title">Get from recomendations.</span>&nbsp;
+                    </li>
+                  </ul>
+                </div>
+              </div>
               <div class="route-right-pane">
                 <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
                 <div class="clearfix" style="background-color: #fff;"></div>

@@ -26,7 +26,7 @@ function getWeather(URL) {
             console.log(myRes);
             // console.log(document.getElementById("city").value);  
             getDataArr();
-            // getChart();
+            getChart();
             setSky();
         } else {
             // console.log(document.getElementById("c   ity").value);
