@@ -13,7 +13,7 @@
     }
     $searchq = $_GET['region'];
     echo ($searchq);
-    $query = "select name_place,description,image,activity from recommendation WHERE region like '$searchq'";
+    $query = "select name_place,description,image,activity, place_id from recommendation WHERE region like '$searchq'";
     $result = $conn->query($query);
     
     /* numeric array */
@@ -484,7 +484,7 @@
             }
             
             function adds1(){   
-                var pass = value[0][3];
+                var pass = value[0][4];
                 console.log(pass)
                 
                 $.ajax({
@@ -512,7 +512,7 @@
             }
 
             function adds2(){
-                var pass = value[1][3];
+                var pass = value[1][4];
                 console.log(pass)
                 
                 $.ajax({
@@ -529,7 +529,7 @@
             }
 
             function adds3(){
-                var pass = value[2][3];
+                var pass = value[2][4];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -544,7 +544,7 @@
             }
 
             function adds4(){
-                var pass = value[3][3];
+                var pass = value[3][4];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -559,7 +559,7 @@
                 }
 
             function adds5(){
-                var pass = value[4][3];
+                var pass = value[4][4];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script
@@ -574,7 +574,7 @@
                  }
 
             function adds6(){
-                var pass = value[5][3];
+                var pass = value[5][4];
                 console.log(pass)
                 $.ajax({
                     url:"add.php", //the page containing php script

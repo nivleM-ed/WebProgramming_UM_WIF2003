@@ -1,37 +1,37 @@
 place_id,name_place,city_id,country_id,description,image,activity,region,rating,country
-1,Gyeongbokgung Palace,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/f/gyeongbokgung-palace--1123954984.jpg,Indoor,Seoul,4.2,South Korea
-2,N Seoul Tower,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/n-seoul-tower-1789845929.jpg,Outdoor,Seoul,4.2,South Korea
-3,Changdeokgung Palace,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/f/changdeokgung-palace-1190362335.jpg,Indoor,Seoul,4.5,South Korea
-4,Namsan Park,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/namsan-park--1608384188.jpg,Outdoor,Seoul,4.4,South Korea
-5,Bukhansan National Park,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/bukhansan-national-park-909468899.jpg,Outdoor,Seoul,4.8,South Korea
-6,Namsangol Hanok Village,1,1,Nice Place,images/destination-2.jpg,Outdoor,Seoul,4.1,South Korea
-7,Manjanggul Cave,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/manjanggul-cave-1293324892.jpg,Indoor,Jeju,3.9,South Korea
-8,Halla Mountain,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/hallasan-national-park-1943779997.jpg,Outdoor,Jeju,4.5,South Korea
-9,Hyeopjae Beach,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/hyeopjae-beach--1001738079.jpg,Outdoor,Jeju,4.4,South Korea
-10,Eco Land Theme Park,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/eco-land-theme-park--2018604429.jpg,Outdoor,Jeju,4,South Korea
-11,Cheonjiyeon Falls,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/cheonjiyeon-falls--1261867003.jpg,Outdoor,Jeju,3.9,South Korea
-12,"Jeolmul Natural Forest Resort,",2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/jeolmul-natural-forest-resort--1836064270.jpg,Outdoor,Jeju,4.7,South Korea
-13,Haeundae Beach,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/haeundae-beach-299859664.jpg,Outdoor,Busan,4.2,South Korea
-14,Haedong Yonggung Temple,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/haedong-yonggung-temple-1250556021.jpg,Indoor,Busan,4.1,South Korea
-15,Yongdusan Park,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/yongdusan-park-1500049101.jpg,Indoor,Busan,3.8,South Korea
-16,Jagalchi Market,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/jagalchi-market--2070532401.jpg,Indoor,Busan,3.6,South Korea
-17,Seokbulsa Temple,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seokbulsa-temple--1856626665.jpg,Indoor,Busan,4.6,South Korea
-18,Busan Museum of Art,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/busan-museum-of-art-109804049.jpg,Indoor,Busan,3.6,South Korea
-19,Bulguksa Temple,4,1,Nice Place,https://lh3.googleusercontent.com/p/AF1QipOB5naQUGdrKzlMYBMVnA4LBHPIRl9Unb_iNBwG=w216-h144-c,Indoor,Gyeongju,4.4,South Korea
-20,Cheomseongdae Observatory,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/cheomseongdae-observatory--2012951980.jpg,Outdoor,Gyeongju,3.7,South Korea
-21,Seomun Market,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seomun-market-142744896.jpg,Indoor,Gyeongju,4,South Korea
-22,Oksan Seowon,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/f/oksan-seowon--1446366291.jpg,Indoor,Gyeongju,5,South Korea
-23,California Beach,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/california-beach--1876244236.jpg,Outdoor,Gyeongju,4.2,South Korea
-24,Yangdong Folk Village,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/yangdong-folk-village--1504098339.jpg,Indoor,Gyeongju,4.1,South Korea
-25,Seoraksan National Park,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seoraksan-national-park--394537728.jpg,Outdoor,Sokcho,4.8,South Korea
-26,Gyeongpo Beach,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/gyeongpo-beach--888481128.jpg,Outdoor,Sokcho,4.5,South Korea
-27,Dongmyeong Port,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/dongmyeong-port--1820328639.jpg,Outdoor,Sokcho,3.5,South Korea
-28,Seorak Waterpia,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seorak-waterpia-1437165700.jpg,Outdoor,Sokcho,3.8,South Korea
-29,Geumganggul Cave,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/geumganggul-cave--1966138637.jpg,Indoor,Sokcho,4.6,South Korea
-30,Biryong Falls,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/biryong-falls--1950835053.jpg,Outdoor,Sokcho,4.1,South Korea
-31,Muuido Island,6,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/muuido-island--743390844.jpg,Outdoor,Incheon,4.2,South Korea
-32,Changdeokgung Palace,6,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/changdeokgung-palace-1190362335.jpg,Indoor,Incheon,4.5,South Korea
-33,Insadong,6,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/insadong--26112658.jpg,Outdoor,Incheon,4.1,South Korea
-34,Baemikkumi Jogak Park,6,1,Nice Place,https://media-cdn.tripadvisor.com/media/photo-s/0e/1a/fc/76/baemikkumi-jogak-park.jpg,Outdoor,Incheon,5,South Korea
-35,Bupyeong History Museum,6,1,Nice Place,https://media-cdn.tripadvisor.com/media/photo-s/15/8d/20/0e/photo2jpg.jpg,Indoor,Incheon,5,South Korea
-36,Incheon Complex Fish Market,6,1,Nice Place,https://img.trippose.com/thum/1083714/800/533,Indoor,Incheon,4.6,South Korea
+1,Gyeongbokgung Palace,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/f/gyeongbokgung-palace--1123954984.jpg,Indoor,Seoul,4.2,Korea
+2,N Seoul Tower,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/n-seoul-tower-1789845929.jpg,Outdoor,Seoul,4.2,Korea
+3,Changdeokgung Palace,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/f/changdeokgung-palace-1190362335.jpg,Indoor,Seoul,4.5,Korea
+4,Namsan Park,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/namsan-park--1608384188.jpg,Outdoor,Seoul,4.4,Korea
+5,Bukhansan National Park,1,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/bukhansan-national-park-909468899.jpg,Outdoor,Seoul,4.8,Korea
+6,Namsangol Hanok Village,1,1,Nice Place,images/destination-2.jpg,Outdoor,Seoul,4.1,Korea
+7,Manjanggul Cave,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/manjanggul-cave-1293324892.jpg,Indoor,Jeju,3.9,Korea
+8,Halla Mountain,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/hallasan-national-park-1943779997.jpg,Outdoor,Jeju,4.5,Korea
+9,Hyeopjae Beach,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/hyeopjae-beach--1001738079.jpg,Outdoor,Jeju,4.4,Korea
+10,Eco Land Theme Park,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/eco-land-theme-park--2018604429.jpg,Outdoor,Jeju,4,Korea
+11,Cheonjiyeon Falls,2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/cheonjiyeon-falls--1261867003.jpg,Outdoor,Jeju,3.9,Korea
+12,"Jeolmul Natural Forest Resort,",2,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/jeolmul-natural-forest-resort--1836064270.jpg,Outdoor,Jeju,4.7,Korea
+13,Haeundae Beach,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/haeundae-beach-299859664.jpg,Outdoor,Busan,4.2,Korea
+14,Haedong Yonggung Temple,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/haedong-yonggung-temple-1250556021.jpg,Indoor,Busan,4.1,Korea
+15,Yongdusan Park,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/yongdusan-park-1500049101.jpg,Indoor,Busan,3.8,Korea
+16,Jagalchi Market,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/jagalchi-market--2070532401.jpg,Indoor,Busan,3.6,Korea
+17,Seokbulsa Temple,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seokbulsa-temple--1856626665.jpg,Indoor,Busan,4.6,Korea
+18,Busan Museum of Art,3,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/busan-museum-of-art-109804049.jpg,Indoor,Busan,3.6,Korea
+19,Bulguksa Temple,4,1,Nice Place,https://lh3.googleusercontent.com/p/AF1QipOB5naQUGdrKzlMYBMVnA4LBHPIRl9Unb_iNBwG=w216-h144-c,Indoor,Gyeongju,4.4,Korea
+20,Cheomseongdae Observatory,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/cheomseongdae-observatory--2012951980.jpg,Outdoor,Gyeongju,3.7,Korea
+21,Seomun Market,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seomun-market-142744896.jpg,Indoor,Gyeongju,4,Korea
+22,Oksan Seowon,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/f/oksan-seowon--1446366291.jpg,Indoor,Gyeongju,5,Korea
+23,California Beach,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/california-beach--1876244236.jpg,Outdoor,Gyeongju,4.2,Korea
+24,Yangdong Folk Village,4,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/yangdong-folk-village--1504098339.jpg,Indoor,Gyeongju,4.1,Korea
+25,Seoraksan National Park,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seoraksan-national-park--394537728.jpg,Outdoor,Sokcho,4.8,Korea
+26,Gyeongpo Beach,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/gyeongpo-beach--888481128.jpg,Outdoor,Sokcho,4.5,Korea
+27,Dongmyeong Port,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/dongmyeong-port--1820328639.jpg,Outdoor,Sokcho,3.5,Korea
+28,Seorak Waterpia,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/seorak-waterpia-1437165700.jpg,Outdoor,Sokcho,3.8,Korea
+29,Geumganggul Cave,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/geumganggul-cave--1966138637.jpg,Indoor,Sokcho,4.6,Korea
+30,Biryong Falls,5,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/biryong-falls--1950835053.jpg,Outdoor,Sokcho,4.1,Korea
+31,Muuido Island,6,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/muuido-island--743390844.jpg,Outdoor,Incheon,4.2,Korea
+32,Changdeokgung Palace,6,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/changdeokgung-palace-1190362335.jpg,Indoor,Incheon,4.5,Korea
+33,Insadong,6,1,Nice Place,https://s.inspirockcdn.com/ds10/photos/South%20Korea/3/insadong--26112658.jpg,Outdoor,Incheon,4.1,Korea
+34,Baemikkumi Jogak Park,6,1,Nice Place,https://media-cdn.tripadvisor.com/media/photo-s/0e/1a/fc/76/baemikkumi-jogak-park.jpg,Outdoor,Incheon,5,Korea
+35,Bupyeong History Museum,6,1,Nice Place,https://media-cdn.tripadvisor.com/media/photo-s/15/8d/20/0e/photo2jpg.jpg,Indoor,Incheon,5,Korea
+36,Incheon Complex Fish Market,6,1,Nice Place,https://img.trippose.com/thum/1083714/800/533,Indoor,Incheon,4.6,Korea
