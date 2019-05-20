@@ -50,10 +50,10 @@ $date_end = $result['date_end'];
   <!-- Banner -->
   <section id="banner">
     <div>
-      <h1 style="margin-top:-10%;"><?php echo $country_from?></h1>
-      <h1 style="margin-top:-4%; margin-bottom:0%;"><?php echo "TO"?></h1>
-      <h1 style="margin-bottom:3%;"><?php echo $country_to?></h1>
-      <h2 style="margin-bottom:-8%; color: white; text-shadow: 1px 1px 2px black; "><?php echo $date_start . " to " . $date_end?></h1>
+      <h1 style="margin-top:-10%;"><?php echo $country_from ?></h1>
+      <h1 style="margin-top:-4%; margin-bottom:0%;"><?php echo "TO" ?></h1>
+      <h1 style="margin-bottom:3%;"><?php echo $country_to ?></h1>
+      <h2 style="margin-bottom:-8%; color: white; text-shadow: 1px 1px 2px black; "><?php echo $date_start . " to " . $date_end ?></h1>
     </div>
   </section>
 
@@ -61,10 +61,10 @@ $date_end = $result['date_end'];
     <nav id="nav-top">
       <ul>
         <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
         <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-        <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
-        <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
+        <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
       </ul>
     </nav>
   </main>
@@ -97,7 +97,7 @@ $date_end = $result['date_end'];
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
-
+  
 </body>
 
 </html>

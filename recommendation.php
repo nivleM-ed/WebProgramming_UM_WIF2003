@@ -24,12 +24,7 @@
             WHERE recommendation.country LIKE '$country_to'";
     $result = $conn->query($query);
     
-    /* numeric array */
     $row = $result->fetch_all();
-    // var_dump($row[0][0]);
-    // echo(json_encode($row));
-    // echo($row[1][0]);
-
 ?>
 
 
@@ -41,7 +36,6 @@
     <!--CSS-->
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/menu.css">
-    <!-- <link rel="stylesheet" href="assets/css/test-checklist.css"> -->
     <!--Google API Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -58,7 +52,6 @@
 
 <body>
     <!-- Header -->
-   
     <header id="header">
         <nav class="left">
             <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
@@ -71,14 +64,15 @@
     </header>
 
     <main>
-        <nav id="nav-top">
-            <ul>
-                <li><a href="recommendation.php" class="active" style="text-decoration: none">Recommendation</a></li>
-                <li><a href="route.php" style="text-decoration: none">Route</a></li>
-                <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-                <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
-            </ul>
-        </nav>
+    <nav id="nav-top">
+      <ul>
+        <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
+        <li><a href="recommendation.php" class="active" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+        <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
+      </ul>
+    </nav>
 
         <main>
             <div id="one" class="wrapper">

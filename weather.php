@@ -50,12 +50,13 @@ $date_end = $result['date_end'];
   </header>
 
   <main>
-    <nav id="nav-top">
+  <nav id="nav-top">
       <ul>
-        <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
-        <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
+        <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="weather.php" class="active" style="text-decoration: none">Weather</a></li>
+        <li><a href="recommendation.php"  style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-        <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+        <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
       </ul>
     </nav>
 
