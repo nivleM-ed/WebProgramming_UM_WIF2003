@@ -25,7 +25,6 @@ if (isset($_POST["input_country"])) {
         } else {
             echo "Error: " . $query . "" . mysqli_error($conn);
         }
-
         header("Location: ini_logged.php?input=success");
         exit();
     }
@@ -57,8 +56,8 @@ if (isset($_POST["input_country"])) {
         </nav>
         <nav class="right">
             <a href="#">New Plan</a>
-            <a href="route.php">My Plan</a>
-            <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
+            <a href="#" class="#">Welcome, <?php echo $_SESSION['userUid'] ?></a>
+            <a href="includes/logout.inc.php" class="#">Logout</a>
         </nav>
     </header>
     <!-- Banner -->

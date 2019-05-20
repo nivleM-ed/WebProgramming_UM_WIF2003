@@ -2,7 +2,17 @@
 <html>
 <?php
 session_start();
-include "includes/dbh.inc.php"
+include "includes/dbh.inc.php";
+
+$user_id = $_SESSION['userId'];
+$query = "SELECT * FROM journey WHERE user_id = $user_id";
+$stmt = mysqli_query($conn, $query);
+$result = mysqli_fetch_assoc($stmt);
+
+$country_from = $result['place_from'];
+$country_to = $result['place_to'];
+$date_start = $result['date_start'];
+$date_end = $result['date_end'];
 ?>
 
 <head>
@@ -50,20 +60,20 @@ include "includes/dbh.inc.php"
     </nav>
 
     <div class="container">
-            <table style="margin-top:10px">
-              <tr id="dates">
-                <td>Date</td>
-              </tr>
-              <tr id="weather">
-                <td>Weather</td>
-              </tr>
-              <tr id="temperature">
-                <td>Temperature</td>
-              </tr>
-            </table>
-            <div class="container">
-            <canvas id="myChart" style="border-style: hidden;"></canvas>
-          </div>
+      <table style="margin-top:10px">
+        <tr id="dates">
+          <td>Date</td>
+        </tr>
+        <tr id="weather">
+          <td>Weather</td>
+        </tr>
+        <tr id="temperature">
+          <td>Temperature</td>
+        </tr>
+      </table>
+    </div>
+    <div class="container">
+      <canvas id="myChart" style="border-style: hidden;"></canvas>
     </div>
   </main>
 
@@ -92,17 +102,15 @@ include "includes/dbh.inc.php"
   <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
   <!--Own Scripts-->
 
-  <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/checklist.js"></script>
   <script src="assets/js/weather.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
   <script>
-    var CITY = "<?php echo $_SESSION['country_to'] ?>";
+    var CITY = "<?php echo $country_to ?>";
     getWeatherData(CITY);
   </script>
-  <script type="text/javascript" src="assets/js/addroute.js"></script>
 
 </body>
 

@@ -2,7 +2,17 @@
 <html>
 <?php
 session_start();
-include "includes/dbh.inc.php"
+include "includes/dbh.inc.php";
+
+$user_id = $_SESSION['userId'];
+$query = "SELECT * FROM journey WHERE user_id = $user_id";
+$stmt = mysqli_query($conn, $query);
+$result = mysqli_fetch_assoc($stmt);
+
+$country_from = $result['place_from'];
+$country_to = $result['place_to'];
+$date_start = $result['date_start'];
+$date_end = $result['date_end'];
 ?>
 
 <head>
@@ -81,7 +91,7 @@ include "includes/dbh.inc.php"
                     </div>
 
                     <div class="content">
-                      <div class="title">Start: <?php echo $_SESSION['country_from'] ?></div>
+                      <div class="title">Start: <?php echo $country_from ?></div>
                     </div>
                   </div>
 
@@ -91,7 +101,7 @@ include "includes/dbh.inc.php"
                       <div class="line"></div>
                     </div>
                     <div class="content">
-                      <div class="title"><?php echo $_SESSION['country_to']?></div>
+                      <div class="title"><?php echo $country_to ?></div>
                       <span class="line-hr"></span>
                       <svg class="edit stay-icon" for="r1" title="Edit destination">
                         <use xlink:href="#icon-edit"></use>
@@ -105,7 +115,7 @@ include "includes/dbh.inc.php"
                       <div class="line up"></div>
                     </div>
                     <div class="content">
-                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_from'] ?></div>
+                      <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
                     </div>
                   </div>
                 </div>
@@ -116,40 +126,35 @@ include "includes/dbh.inc.php"
                 <div class="clearfix" style="background-color: #fff;"></div>
 
                 <div class="dest-rail active" style="display: block;">
-                  <div class="see-also">Trip recommendation:</div>
-                  <ul style="list-style: none; padding: 0;">
-                    <li id="recommend_list">
-                      <script>
-                        var recommend = <?php $_SESSION['result_arr']?>;
-                        for(var i=0; i<recommend.length; i++) {
-                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
-                        }
-                      </script>
-                      <span class="tour-title">Get from recomendations.</span>&nbsp;
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="route-right-pane">
-                <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
-                <div class="clearfix" style="background-color: #fff;"></div>
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">Recommendations</h5>
+                    <p class="card-text">
+                      <?php
+                          $_SESSION['result_arr'] = array();
 
-                <div class="dest-rail active" style="display: block;">
-                  <div class="see-also">Trip recommendation:</div>
-                  <ul style="list-style: none; padding: 0;">
-                    <li id="recommend_list">
-                      <script>
-                        var recommend = <?php $_SESSION['result_arr']?>;
-                        for(var i=0; i<recommend.length; i++) {
-                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
-                        }
-                      </script>
-                      <span class="tour-title">Get from recomendations.</span>&nbsp;
-                    </li>
-                  </ul>
+                          $sql = "SELECT recommendation.name_place FROM `recommendation` 
+                                  inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
+                                  where user_recommendation.user_id like '$user_id'";
+
+                          $result = $conn->query($sql);
+                          $row = $result->fetch_all();
+                          $_SESSION["result_arr"] = $row;
+                          echo "<br>";
+                          $rownum = count($row);
+                          $num = 1;
+                          for($i=0;$i<$rownum;$i++) {
+                            
+                            echo  $num.". ",$row[$i][0]. "<br>";
+                            $num++;
+                          }
+                          $conn->close();
+                      ?>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                </div>
 
             <div class="layer1 edit-pane" style="z-index: 100;">
               <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">

@@ -2,7 +2,17 @@
 <html>
 <?php
 session_start();
-include "includes/dbh.inc.php"
+include "includes/dbh.inc.php";
+
+$user_id = $_SESSION['userId'];
+$query = "SELECT * FROM journey WHERE user_id = $user_id";
+$stmt = mysqli_query($conn, $query);
+$result = mysqli_fetch_assoc($stmt);
+
+$country_from = $result['place_from'];
+$country_to = $result['place_to'];
+$date_start = $result['date_start'];
+$date_end = $result['date_end'];
 ?>
 
 <head>
@@ -13,8 +23,6 @@ include "includes/dbh.inc.php"
   <!--CSS-->
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/menu.css">
-  <link rel="stylesheet" href="assets/css/route.css">
-  <link rel="stylesheet" href="assets/css/route_full.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -42,10 +50,10 @@ include "includes/dbh.inc.php"
   <!-- Banner -->
   <section id="banner">
     <div>
-      <h1 style="margin-top:-10%;"><?php echo $_SESSION["country_from"]?></h1>
+      <h1 style="margin-top:-10%;"><?php echo $country_from?></h1>
       <h1 style="margin-top:-4%; margin-bottom:0%;"><?php echo "TO"?></h1>
-      <h1 style="margin-bottom:3%;"><?php echo $_SESSION["country_to"]?></h1>
-      <h2 style="margin-bottom:-8%; color: white; text-shadow: 1px 1px 2px black; "><?php echo $_SESSION["date_start"] . " to " . $_SESSION["date_start"]?></h1>
+      <h1 style="margin-bottom:3%;"><?php echo $country_to?></h1>
+      <h2 style="margin-bottom:-8%; color: white; text-shadow: 1px 1px 2px black; "><?php echo $date_start . " to " . $date_end?></h1>
     </div>
   </section>
 
@@ -86,17 +94,9 @@ include "includes/dbh.inc.php"
   <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
   <!--Own Scripts-->
 
-  <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
-  <script src="assets/js/checklist.js"></script>
-  <script src="assets/js/weather.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
-  <script>
-    var CITY = "<?php echo $_SESSION['country_to'] ?>";
-    getWeatherData(CITY);
-  </script>
-  <script type="text/javascript" src="assets/js/addroute.js"></script>
 
 </body>
 

@@ -2,6 +2,17 @@
 <html>
 <?php
 session_start();
+include "includes/dbh.inc.php";
+
+$user_id = $_SESSION['userId'];
+$query = "SELECT * FROM journey WHERE user_id = $user_id";
+$stmt = mysqli_query($conn, $query);
+$result = mysqli_fetch_assoc($stmt);
+
+$country_from = $result['place_from'];
+$country_to = $result['place_to'];
+$date_start = $result['date_start'];
+$date_end = $result['date_end'];
 ?>
 
 <head>
