@@ -2,6 +2,17 @@
 <html>
 <?php
 session_start();
+include "includes/dbh.inc.php";
+
+$user_id = $_SESSION['userId'];
+$query = "SELECT * FROM journey WHERE user_id = $user_id";
+$stmt = mysqli_query($conn, $query);
+$result = mysqli_fetch_assoc($stmt);
+
+$country_from = $result['place_from'];
+$country_to = $result['place_to'];
+$date_start = $result['date_start'];
+$date_end = $result['date_end'];
 ?>
 
 <head>
@@ -38,37 +49,14 @@ session_start();
     </nav>
   </header>
 
-  <!-- Banner -->
-  <section id="banner">
-    <div>
-      <h1 style="margin-top:-10%;">Weather Forecast</h1>
-      <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
-        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
-          <div class="container">
-            <canvas id="myChart" style="border-style: hidden;"></canvas>
-          </div>
-          <div class="container">
-            <table style="margin-top:10px">
-              <tr id="dates">
-                <td>Date</td>
-              </tr>
-              <tr id="weather">
-                <td>Weather</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-  </section>
-
   <main>
-    <nav id="nav-top">
+  <nav id="nav-top">
       <ul>
-        <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
+        <li><a href="route.php"  class="active" style="text-decoration: none">Route</a></li>
+        <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
         <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
-        <li><a href="calender.php" style="text-decoration: none">Calender</a></li>
+        <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
       </ul>
     </nav>
   </main>
@@ -103,7 +91,7 @@ session_start();
                     </div>
 
                     <div class="content">
-                      <div class="title">Start: <?php echo $_SESSION['country_from'] ?></div>
+                      <div class="title">Start: <?php echo $country_from ?></div>
                     </div>
                   </div>
 
@@ -113,7 +101,7 @@ session_start();
                       <div class="line"></div>
                     </div>
                     <div class="content">
-                      <div class="title"><?php echo $_SESSION['country_to']?></div>
+                      <div class="title"><?php echo $country_to ?></div>
                       <span class="line-hr"></span>
                       <svg class="edit stay-icon" for="r1" title="Edit destination">
                         <use xlink:href="#icon-edit"></use>
@@ -127,7 +115,7 @@ session_start();
                       <div class="line up"></div>
                     </div>
                     <div class="content">
-                      <div class="title" id="weather_country_to">End: <?php echo $_SESSION['country_from'] ?></div>
+                      <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
                     </div>
                   </div>
                 </div>
@@ -138,21 +126,35 @@ session_start();
                 <div class="clearfix" style="background-color: #fff;"></div>
 
                 <div class="dest-rail active" style="display: block;">
-                  <div class="see-also">Trip recommendation:</div>
-                  <ul style="list-style: none; padding: 0;">
-                    <li id="recommend_list">
-                      <script>
-                        var recommend = <?php $_SESSION['result_arr']?>;
-                        for(var i=0; i<recommend.length; i++) {
-                          $("#recommend_list").append('<span class="tour-title">'+recommend[i]+'</span>&nbsp');
-                        }
-                      </script>
-                      <span class="tour-title">Get from recomendations.</span>&nbsp;
-                    </li>
-                  </ul>
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">Recommendations</h5>
+                    <p class="card-text">
+                      <?php
+                          $_SESSION['result_arr'] = array();
+
+                          $sql = "SELECT recommendation.name_place FROM `recommendation` 
+                                  inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
+                                  where user_recommendation.user_id like '$user_id'";
+
+                          $result = $conn->query($sql);
+                          $row = $result->fetch_all();
+                          $_SESSION["result_arr"] = $row;
+                          echo "<br>";
+                          $rownum = count($row);
+                          $num = 1;
+                          for($i=0;$i<$rownum;$i++) {
+                            
+                            echo  $num.". ",$row[$i][0]. "<br>";
+                            $num++;
+                          }
+                          $conn->close();
+                      ?>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                </div>
 
             <div class="layer1 edit-pane" style="z-index: 100;">
               <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">

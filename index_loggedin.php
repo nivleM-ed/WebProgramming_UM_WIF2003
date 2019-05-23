@@ -2,17 +2,30 @@
 <html>
 <?php
 session_start();
+include "includes/dbh.inc.php";
 
 if (isset($_POST["input_country"])) {
     $inputFrom = $_POST['inputFrom'];
     $inputTo = $_POST['inputTo'];
+    $date_start = $_POST['date1'];
+    $date_end = $_POST['date2'];
     if (empty($inputFrom) || empty($inputTo)) {
         header("Location: ../index_loggedin.php?error=emptyfields");
         exit();
     } else {
         $_SESSION['country_from'] = $inputFrom;
         $_SESSION['country_to'] = $inputTo;
-        header("Location: route.php?input=success");
+        $_SESSION['date_start'] = $date_start;
+        $_SESSION['date_end'] = $date_end;
+
+        $query = "INSERT INTO journey(user_id, place_from, place_to, date_start, date_end) VALUES ('" . $_SESSION['userId'] . "', '" . $inputFrom . "', '" . $inputTo . "','" . $date_start . "','" . $date_end . "')";
+
+        if ($conn->query($query)) {
+            echo "New record created successfully";
+        } else {
+            echo "Error: " . $query . "" . mysqli_error($conn);
+        }
+        header("Location: ini_logged.php?input=success");
         exit();
     }
 }
@@ -43,8 +56,8 @@ if (isset($_POST["input_country"])) {
         </nav>
         <nav class="right">
             <a href="#">New Plan</a>
-            <a href="route.php">My Plan</a>
-            <a href="#" class="#"><?php echo $_SESSION['userUid'] ?></a>
+            <a href="#" class="#">Welcome, <?php echo $_SESSION['userUid'] ?></a>
+            <a href="includes/logout.inc.php" class="#">Logout</a>
         </nav>
     </header>
     <!-- Banner -->
