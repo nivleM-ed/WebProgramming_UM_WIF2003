@@ -1,9 +1,3 @@
-Ni je yg I sempat buat for now, I faced banyak error thus the delay. Anyway there is some changes in database for user-checklist, I haven't discover the main checklist table yet.
-
-
-
-
-
 updated db
 
 CREATE TABLE `loginsystem`.`user_checklist` ( 
