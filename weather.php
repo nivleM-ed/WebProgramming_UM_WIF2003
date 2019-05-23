@@ -50,11 +50,11 @@ $date_end = $result['date_end'];
   </header>
 
   <main>
-  <nav id="nav-top">
+    <nav id="nav-top">
       <ul>
         <li><a href="route.php" style="text-decoration: none">Route</a></li>
         <li><a href="weather.php" class="active" style="text-decoration: none">Weather</a></li>
-        <li><a href="recommendation.php"  style="text-decoration: none">Recommendation</a></li>
+        <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
         <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
       </ul>
@@ -111,6 +111,11 @@ $date_end = $result['date_end'];
   <script>
     var CITY = "<?php echo $country_to ?>";
     getWeatherData(CITY);
+
+    // var date = getDate();
+    // var temp = getTemp();
+
+    // $.post("weather.php", {date:date, temp:temp});
   </script>
 
 </body>
