@@ -1,6 +1,5 @@
 <?php
 //index.php
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -64,7 +63,6 @@
       }
      })
     },
-
     eventDrop:function(event)
     {
      var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
@@ -82,7 +80,6 @@
       }
      });
     },
-
     eventClick:function(event)
     {
      if(confirm("Are you sure you want to remove it?"))
@@ -100,7 +97,6 @@
       })
      }
     },
-
    });
   });
    

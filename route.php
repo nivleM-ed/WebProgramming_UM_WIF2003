@@ -3,12 +3,10 @@
 <?php
 session_start();
 include "includes/dbh.inc.php";
-
 $user_id = $_SESSION['userId'];
 $query = "SELECT * FROM journey WHERE user_id = $user_id";
 $stmt = mysqli_query($conn, $query);
 $result = mysqli_fetch_assoc($stmt);
-
 $country_from = $result['place_from'];
 $country_to = $result['place_to'];
 $date_start = $result['date_start'];
@@ -95,19 +93,53 @@ $date_end = $result['date_end'];
                     </div>
                   </div>
 
-                  <div id="r1" class="draggable route-row stay-row  first" for="r1">
-                    <div class="left">
-                      <div class="marker notranslate" for="r1">1</div>
-                      <div class="line"></div>
-                    </div>
-                    <div class="content">
-                      <div class="title"><?php echo $country_to ?></div>
-                      <span class="line-hr"></span>
-                      <svg class="edit stay-icon" for="r1" title="Edit destination">
-                        <use xlink:href="#icon-edit"></use>
-                      </svg>
-                    </div>
+
+                 <!--next--> 
+                 <?php  $SESSION['t']= array();  
+                  
+                  if(isset($_POST["title"])){
+                    $title = $_POST["title"];
+                    $start_event = $_POST["start"];
+                    $end_event = $_POST["end"];
+                    $sql = "INSERT INTO 'events' (title, start_event, end_event) VALUES ( '$title','$start_event','$end_event')";   // Use you own column name from login table
+                    $result = mysqli_query($sql,$conn);
+                  }                                
+                    
+                  $sql = "SELECT events.title, events.start_event FROM Events WHERE start_event BETWEEN '$date_start' AND '$date_end' ORDER BY start_event LIKE '$user_id'";  
+                          
+                  $result = $conn->query($sql);
+                  $row = $result->fetch_all();
+                  $_SESSION["t"] = $row;
+                
+                  $rownum = count($row);
+                  $num = 1;
+                  for($i=0;$i<$rownum;$i++) {                                 
+                  ?>
+
+                <div id="r1" class="draggable route-row stay-row  first" for="r1">
+                  <div class="left">
+                    <div class="marker notranslate" for="r1"><?php echo $num?></div>
+                    <div class="line"></div>
                   </div>
+                                                         
+                  <div class="content">
+                    <div class="title">
+                    <?php 
+                    echo $row[$i][0]."<br>"; //title                    
+                    ?>
+                      <?php// echo $_SESSION['country_to']?></div>
+                    <span class="line-hr"></span>
+                    <svg class="edit stay-icon" for="r1" title="Edit destination">
+                      <use xlink:href="#icon-edit"></use>
+                    </svg>
+                  </div>
+                </div>
+                <?php
+               // echo  $num.". ",$row[$i][0]. "<br>";
+                $num++;
+              }
+              $conn->close();
+                ?>
 
                   <div class="route-row boundary-row end">
                     <div class="left">
@@ -131,12 +163,10 @@ $date_end = $result['date_end'];
                     <h5 class="card-title">Recommendations</h5>
                     <p class="card-text">
                       <?php
-                          $_SESSION['result_arr'] = array();
-
+                          //$_SESSION['result_arr'] = array();
                           $sql = "SELECT recommendation.name_place FROM `recommendation` 
                                   inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
                                   where user_recommendation.user_id like '$user_id'";
-
                           $result = $conn->query($sql);
                           $row = $result->fetch_all();
                           $_SESSION["result_arr"] = $row;
@@ -190,12 +220,14 @@ $date_end = $result['date_end'];
                 </div>
 
                 <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
-                  <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
+                  <form method="POST">
+                  <input type="text" class="flat ui-autocomplete-input" name="title" placeholder="Start typing..." autocomplete="off">
                 </div>
 
                 <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
                   <div class="ui-dialog-buttonset">
                     <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -242,7 +274,12 @@ $date_end = $result['date_end'];
     getWeatherData(CITY);
   </script>
   <script type="text/javascript" src="assets/js/addroute.js"></script>
-
+<script>
+function viewevent(){
+var val = "<?php echo json_encode() ?>";
+document.getElementByID("ev").innerHTML += val;
+}
+</script>
 </body>
 
 </html>
