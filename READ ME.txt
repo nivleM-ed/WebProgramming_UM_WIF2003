@@ -1,9 +1,0 @@
-updated db
-
-CREATE TABLE `loginsystem`.`user_checklist` ( 
-	`item_id` AUTO_INCREMENT INT NOT NULL , 
-	`item_name` TEXT NOT NULL , 
-	`item_status` INT NOT NULL , 
-    `checklist_id` INT NOT NULL ,
-	PRIMARY KEY (`item_id`)
-) ENGINE = InnoDB;
