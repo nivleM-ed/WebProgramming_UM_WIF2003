@@ -277,8 +277,8 @@ body {
 
 
 
-
-/* #rec-cl ul{
+/* 
+#rec-cl ul{
   padding:0;
   margin:0;
   list-style: none;
@@ -297,6 +297,18 @@ body {
 }
 
 #rec-cl ul li {
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 13px 0 14px;
+  border-top: 1px solid #dedede;
+}
+
+#rec-cl:first-child{
+  padding-top: 0;
+  border-top: 0;
+}
+
+#rec-cl a{
   font-size: 15px;
   line-height: 1.5;
   padding: 13px 0 14px;
@@ -339,6 +351,7 @@ ul li a.toggle{
   border-radius: 0.15em;
   transition: background .3s ease;
 }
-ul li a:hover {
-  background:rgb(0, 0, 0, 0.4);
+
+a.toggle:hover{
+  background-color: #ddd;
 }
