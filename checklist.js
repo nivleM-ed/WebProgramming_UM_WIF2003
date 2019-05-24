@@ -23,7 +23,7 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,value:value},
 			success:function(response){
-				console.log("success");
+				console.log(type);
 				window.location.reload();
 			}
 		});
@@ -41,10 +41,12 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,id:id},
 			success:function(response){
-				console.log("success");
+				console.log(type);
+				window.location.reload();
 			}
 		});
-    });	
+
+  });	
 
 	
 	$(".edit-btn").click(function () {
@@ -73,15 +75,20 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,id:id,value:value},
 			success:function(response){
-				console.log("success");
+				console.log(type);
 			}
 		});
 	});
 
-	$("#checklist input:checked+label div").click(function(){
-		id=$(this).attr('item-id');	
+	$(".cl-cb").click(function(){
+		id=$(this).attr('item_id');	
 		
-		value=2;
+		var value=0
+		if($(this).is(':checked')){
+			value=1;
+		}
+
+		console.log(value);
 
 		var type="check-checklist";
 		$.ajax({
@@ -89,28 +96,17 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,id:id,value:value},
 			success:function(response){
-				console.log("success");
+				console.log("bawah");
 			}
 		});
 
 	});
 
-	$("#checklist label div").click(function(){
-		id=$(this).attr('item-id');		
-
-		value=1;
-
-		var type="check-checklist";
-		$.ajax({
-			url:'saveData.php',
-			type:'post',
-			data:{type:type,id:id,value:value},
-			success:function(response){
-				console.log("success");
-			}
-		});
-
+	$("#rec-cl ul li ").click(function(){
+		console.log("eh");
 	});
+
+	
 
 	
 	
