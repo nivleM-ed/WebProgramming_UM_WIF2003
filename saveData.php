@@ -1,12 +1,5 @@
 <?php 
-    include 'config.php'; // Database connection
-
-    // //first of all dapatkan dulu berapa banyak item dalam ni
-    // $query = "SELECT MAX(item_id) FROM user_checklist";
-    // $result = $pdo->prepare($query);
-    // $result->execute();
-
-    // $lastId = $result->fetch();
+    include 'config.php';
 
     if($_POST['type']=="add-checklist"){
         try {
@@ -25,10 +18,23 @@
         try {
         $id = $_POST['id'];
 
+        $query = "SELECT * FROM user_checklist WHERE user_checklist.item_id =" . $id;
+        $result = $pdo->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+
         $query = "DELETE FROM `user_checklist` WHERE `user_checklist`.`item_id` = ?";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$id]);
 
+        if($row["checklist_id"]!=0){
+            $query = "UPDATE `checklist` SET `item_hide` = 0 WHERE `checklist`.`item_id` = ?";
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([$row["checklist_id"]]);
+
+            
+        }
+    
         } catch(PDOException $e) {
         echo $sql . "<br>" . $e->getMessage();
         }
@@ -62,19 +68,26 @@
         }
     }
 
-    
-    
-    
-    
+    if($_POST['type']=="addinto-checklist"){
+        try {
+        $id = $_POST['id'];
 
-// $uname = $_POST['username'];
-// $fname = $_POST['fname'];
-// $lname = $_POST['lname'];
-// $email = $_POST['email'];
+        $query = "SELECT * FROM checklist WHERE checklist.item_id =" . $id;
+        $result = $pdo->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
 
-// $insert_query = "INSERT INTO 
-//                  users(username,fname,lname,email) 
-//                  VALUES('".$uname."','".$fname."','".$lname."','".$email."')";
-// mysqli_query($con,$insert_query);
-// echo 1;
+
+        $query = "INSERT INTO user_checklist (item_name,checklist_id) VALUES (?,?)";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$row["item_name"],$id]);
+
+        $query = "UPDATE checklist SET item_hide=1 WHERE item_id=?";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$id]);
+
+        } catch(PDOException $e) {
+        echo $sql . "<br>" . $e->getMessage();
+        }
+    }
 ?>
