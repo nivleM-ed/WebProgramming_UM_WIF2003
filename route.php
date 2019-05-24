@@ -5,6 +5,24 @@ session_start();
 ?>
 
 <head>
+  <style>
+    .card-text {
+            width:600px;
+
+        }
+    .card-body {
+        width:1000px;
+
+    }
+    .left {
+        width:80%;
+
+    }
+    .right {
+        width:20%;
+
+    }
+  </style>
   <title>Plan It</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,14 +154,22 @@ session_start();
               <div class="route-right-pane">
                 <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
                 <div class="clearfix" style="background-color: #fff;"></div>
-
+                <script>
+                  function copyFunction() {
+                    var copyText = document.getElementById("copying");
+                    copyText.select();
+                    document.execCommand("copy");
+                    alert("Copied the text: " + copyText.value);
+                  }
+                </script>
                 <div class="dest-rail active" style="display: block;">
-                <div class="card" style="width: 18rem;">
-                  <div class="card-body">
+                <!-- <div class="card" style="width: 18rem;"> -->
+                <div class="card" style="width: 450px;">
+                <div class="card-body" id="reccard" style="width: 440px;">
                     <h5 class="card-title">Recommendations</h5>
-                    <p class="card-text">
+                    <p class="card-text" style="width: 350px;">
+                      <table style="width:90%">
                       <?php
-                          $_SESSION['result_arr'] = array();
                           include("includes/dbh.inc.php");
                           $user = $_SESSION['userUid'];
                           $sql = "select idUsers from users where uidUsers like '$user'";
@@ -152,7 +178,7 @@ session_start();
                           $userid = $row[0][0];
                           // echo ($userid);
 
-                          $sql = "SELECT recommendation.name_place FROM `recommendation` 
+                          $sql = "SELECT recommendation.name_place, user_recommendation.place_id FROM `recommendation` 
                                   inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
                                   where user_recommendation.user_id like '$userid'";
 
@@ -162,13 +188,26 @@ session_start();
                           echo "<br>";
                           $rownum = count($row);
                           $num = 1;
+                          
                           for($i=0;$i<$rownum;$i++) {
-                            
-                            echo  $num.". ",$row[$i][0]. "<br>";
+                            // echo $row[$i][1]."<br>";
+                            $k = $row[$i][0];
+                            $j = $row[$i][1];
+                            echo "<form>
+                            <input type='hidden' id='copying' name='custId' value=$k>
+                                </form>";
+                            // echo  $num.". ",$row[$i][0]. "<a href='delete.php?id=$j'>Delete</a>" ."<br>";
+                            // echo "<p class="left">$num.'.'$row[$i][0]'.'</p> <p class="left">Delete</p>'";
+                            // echo "<p class = 'left'>$num. $k</p><a href='delete.php?id=$j'>Delete</a>" ."<br>";
+                            // echo "<tr><th>$num. $k</th><th><a href='delete.php?id=$j'>Delete</a></th></tr>";
+                            echo "<tr><th>$num. $k</th><th><a href='delete.php?id=$j'><button onclick()='delete.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
+                            </tr>";
+
                             $num++;
                           }
                           $conn->close();
                       ?>
+                      </table>
                     </p>
                   </div>
                 </div>
@@ -213,6 +252,34 @@ session_start();
                 <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
                   <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
                 </div>
+                <script>
+                  $(document).ready(function () {
+                    var count;
+                    $(".add-pane .addtoplan").click(function () {
+                    var value = $(".add-pane input[type='text']").val();
+
+                    count = arrsize + 1;
+                    $("#r" + arrsize).after(
+                      '<div id="r' + count + '" class="draggable route-row stay-row  first">' +
+                      '<div class="left">' +
+                      '<div class="marker notranslate">' + count + '</div>' +
+                      '<div class="line"></div>' +
+                      '</div>' +
+                      '<div class="content" >' +
+                      '<div class="title">' + value + '</div>' +
+                      '<span class="line-hr"></span>' +
+                      '<svg class="edit stay-icon" for="r' + count + '" title="Edit destination">' +
+                      '<use xlink:href="#icon-edit"></use>' +
+                      '</svg>' +
+                      '</div>' +
+                      '</div>  ');
+                    editRoute();
+                    removeRoute();
+                    $(".add-pane input[type='text']").val(null);
+                    $(".add-pane").fadeOut(300);
+                  });
+                });
+              </script>
 
                 <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
                   <div class="ui-dialog-buttonset">

@@ -44,8 +44,8 @@
          }
         /* Inner */
         .popup-inner {
-            max-width:700px;
-            width:90%;
+            max-width:1000px;
+            width:800px;
             padding:40px;
             position:absolute;
             top:50%;
@@ -56,7 +56,7 @@
             border-radius: 25px;
             background:#fff;
             overflow:auto;
-            overflow: -moz-scrollbars-none;
+            overflow-x: hidden;
             /* overflow: hidden; */
         }
 
@@ -291,10 +291,17 @@
                                             <p><strong>Description:</strong> </p>
                                             <p id="description6" class="card-text"><?php echo($row[0][1]) ?></p>
                                             <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[0][3]) ?></p>                                            
-                                            <a id="add" class="btn btn-primary"  onclick="adds1()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-1" href="#">Close</a></p>
-                                            <a class="popup-close" data-popup-close="popup-1" href="#">x</a>
+                                            <p><?php echo($row[0][3]) ?></p> 
+                                            <center>
+                                            <div style="width:380px; display: block;">
+                                            <div style="float: left;  padding-left: 5%; width: 180px">                                            
+                                                <a id="add" class="btn btn-primary"  onclick="adds1()">Add to Checklist</a>
+                                            </div>
+                                            <div style="float: right; padding-right:- 5%; width: 200px"> 
+                                                <p><a class="btn btn-primary" data-popup-close="popup-1" href="#">Close</a></p>
+                                            </div>
+                                             </center>
+                                            <!-- <a class="popup-close" data-popup-close="popup-1" href="#">x</a> -->
                                         </div>
                                     </div>
                                     <!--End of Card 1 pop up details -->
@@ -310,8 +317,15 @@
                                             <p id="description6" class="card-text"><?php echo($row[1][1]) ?></p>
                                             <p><strong>Activity:</strong> </p>
                                             <p><?php echo($row[1][3]) ?></p>                                            
-                                            <a id="add" class="btn btn-primary"  onclick="adds2()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-2" href="#">Close</a></p>
+                                            <center>
+                                                <div style="width:380px; display: block;">
+                                                <div style="float: left;  padding-left: 5%; width: 180px">                                            
+                                                    <a id="add" class="btn btn-primary"  onclick="adds2()">Add to Checklist</a>
+                                                </div>
+                                                <div style="float: right; padding-right:- 5%; width: 200px"> 
+                                                    <p><a class="btn btn-primary" data-popup-close="popup-2" href="#">Close</a></p>
+                                                </div>
+                                             </center>
                                             <a class="popup-close" data-popup-close="popup-2" href="#">x</a>
                                         </div>
                                     </div>
@@ -328,8 +342,15 @@
                                             <p id="description6" class="card-text"><?php echo($row[2][1]) ?></p>
                                             <p><strong>Activity:</strong> </p>
                                             <p><?php echo($row[2][3]) ?></p>                                            
-                                            <a id="add" class="btn btn-primary"  onclick="adds3()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-3" href="#">Close</a></p>
+                                            <center>
+                                                <div style="width:380px; display: block;">
+                                                <div style="float: left;  padding-left: 5%; width: 180px">                                            
+                                                    <a id="add" class="btn btn-primary"  onclick="adds3()">Add to Checklist</a>
+                                                </div>
+                                                <div style="float: right; padding-right:- 5%; width: 200px"> 
+                                                    <p><a class="btn btn-primary" data-popup-close="popup-3" href="#">Close</a></p>
+                                                </div>
+                                             </center>
                                             <a class="popup-close" data-popup-close="popup-3" href="#">x</a>
                                         </div>
                                     </div>
@@ -346,8 +367,15 @@
                                             <p id="description6" class="card-text"><?php echo($row[3][1]) ?></p>
                                             <p><strong>Activity:</strong> </p>
                                             <p><?php echo($row[3][3]) ?></p>                                            
-                                            <a id="add" class="btn btn-primary"  onclick="adds4()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-4" href="#">Close</a></p>
+                                            <center>
+                                                <div style="width:380px; display: block;">
+                                                <div style="float: left;  padding-left: 5%; width: 180px">                                            
+                                                    <a id="add" class="btn btn-primary"  onclick="adds4()">Add to Checklist</a>
+                                                </div>
+                                                <div style="float: right; padding-right:- 5%; width: 200px"> 
+                                                    <p><a class="btn btn-primary" data-popup-close="popup-4" href="#">Close</a></p>
+                                                </div>
+                                             </center>
                                             <a class="popup-close" data-popup-close="popup-4" href="#">x</a>
                                         </div>
                                     </div>
@@ -364,8 +392,15 @@
                                             <p id="description6" class="card-text"><?php echo($row[4][1]) ?></p>
                                             <p><strong>Activity:</strong> </p>
                                             <p><?php echo($row[4][3]) ?></p>
-                                            <a id="add" class="btn btn-primary"  onclick="adds5()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-5" href="#">Close</a></p>
+                                            <center>
+                                                <div style="width:380px; display: block;">
+                                                <div style="float: left;  padding-left: 5%; width: 180px">                                            
+                                                    <a id="add" class="btn btn-primary"  onclick="adds5()">Add to Checklist</a>
+                                                </div>
+                                                <div style="float: right; padding-right:- 5%; width: 200px"> 
+                                                    <p><a class="btn btn-primary" data-popup-close="popup-5" href="#">Close</a></p>
+                                                </div>
+                                             </center>
                                             <a class="popup-close" data-popup-close="popup-5" href="#">x</a>
                                         </div>
                                     </div>
@@ -384,8 +419,15 @@
                                             <p><strong>Activity:</strong> </p>
                                             <p><?php echo($row[5][3]) ?></p>
                                             
-                                            <a id="add" class="btn btn-primary"  onclick="adds6()">Add to Checklist<br></a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-6" href="#">Close</a></p>
+                                            <center>
+                                                <div style="width:380px; display: block;">
+                                                <div style="float: left;  padding-left: 5%; width: 180px">                                            
+                                                    <a id="add" class="btn btn-primary"  onclick="adds6()">Add to Checklist</a>
+                                                </div>
+                                                <div style="float: right; padding-right:- 5%; width: 200px"> 
+                                                    <p><a class="btn btn-primary" data-popup-close="popup-6" href="#">Close</a></p>
+                                                </div>
+                                             </center>
                                             <a class="popup-close" data-popup-close="popup-6" href="#">x</a>
                                         </div>
                                     </div>
@@ -477,12 +519,6 @@
             document.getElementById("name6").innerHTML=value[5][0];
             document.getElementById("image6").src=image6;
 
-            function check(){
-                
-                var test="test";
-                console.log(test);
-            }
-            
             function adds1(){   
                 var pass = value[0][4];
                 console.log(pass)
@@ -588,22 +624,21 @@
                 alert("Added to checklist: ");         
                 }
             
-                // $(function() {
-                    //----- OPEN
-                    $('[data-popup-open]').on('click', function(e) {
-                        var targeted_popup_class = jQuery(this).attr('data-popup-open');
-                        $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
+                //----- OPEN
+                $('[data-popup-open]').on('click', function(e) {
+                    var targeted_popup_class = jQuery(this).attr('data-popup-open');
+                    $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
 
-                        e.preventDefault();
-                    });
+                    e.preventDefault();
+                });
 
-                    //----- CLOSE
-                    $('[data-popup-close]').on('click', function(e) {
-                        var targeted_popup_class = jQuery(this).attr('data-popup-close');
-                        $('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
+                //----- CLOSE
+                $('[data-popup-close]').on('click', function(e) {
+                    var targeted_popup_class = jQuery(this).attr('data-popup-close');
+                    $('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
 
-                        e.preventDefault();
-                    });
+                    e.preventDefault();
+                });
                 // });
         </script>
 

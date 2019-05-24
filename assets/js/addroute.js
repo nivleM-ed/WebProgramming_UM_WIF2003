@@ -2,7 +2,13 @@ $(document).ready(function () {
   var arrsize;
   var count;
   var itemId;
-
+  
+  function copyFunction() {
+    var copyText = document.getElementById("copying");
+    copyText.select();
+    document.execCommand("copy");
+    alert("Copied the text: " + copyText.value);
+  }
 
   $(".routeaddbtn").click(function () {
     arrsize = $(".route-main-pane .stay-row .marker").length;
