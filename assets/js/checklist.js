@@ -6,7 +6,7 @@ $(document).ready(function(){
 	$(".header-btn").click(function () {
 		count++;
 		$(".modi-add").fadeIn(300);
-		console.log("Header Button");
+		console.log("Add");
 			
 	});
 
@@ -18,18 +18,17 @@ $(document).ready(function(){
 		var type="add-checklist";
 		var value = $(".modi-add .modi-input-field:text").val();
 
-		$(".modi-add .modi-input-field:text").val(null);
-		$(".modi-add").fadeOut(300);
-
 		$.ajax({
 			url:'add_checklist.php',
 			type:'post',
 			data:{type:type,value:value},
 			success:function(response){
-				console.log("Data added");
+				console.log(type);
 				window.location.reload();
 			}
 		});
+		$(".modi-add .modi-input-field:text").val(null);
+		$(".modi-add").fadeOut(300);
 	});
 
 	$(".remv-btn").click(function() {
@@ -42,11 +41,12 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,id:id},
 			success:function(response){
-				console.log("Data removed");
+				console.log(type);
 				window.location.reload();
 			}
 		});
-    });	
+
+  });	
 
 	
 	$(".edit-btn").click(function () {
@@ -75,16 +75,20 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,id:id,value:value},
 			success:function(response){
-				console.log("Edited");
-				window.location.reload();
+				console.log(type);
 			}
 		});
 	});
 
-	$("#checklist input:checked+label div").click(function(){
-		id=$(this).attr('item-id');	
+	$(".cl-cb").click(function(){
+		id=$(this).attr('item_id');	
 		
-		value=2;
+		var value=0
+		if($(this).is(':checked')){
+			value=1;
+		}
+
+		console.log(value);
 
 		var type="check-checklist";
 		$.ajax({
@@ -92,27 +96,14 @@ $(document).ready(function(){
 			type:'post',
 			data:{type:type,id:id,value:value},
 			success:function(response){
-				console.log("success");
+				console.log("Checked/Unchecked");
 			}
 		});
 
 	});
 
-	$("#checklist label div").click(function(){
-		id=$(this).attr('item-id');		
-
-		value=1;
-
-		var type="check-checklist";
-		$.ajax({
-			url:'add_checklist.php',
-			type:'post',
-			data:{type:type,id:id,value:value},
-			success:function(response){
-				console.log("success");
-			}
-		});
-
+	$("#rec-cl ul li ").click(function(){
+		console.log("-");
 	});
 	
 });

@@ -111,11 +111,6 @@ $date_end = $result['date_end'];
   <script>
     var CITY = "<?php echo $country_to ?>";
     getWeatherData(CITY);
-
-    // var date = getDate();
-    // var temp = getTemp();
-
-    // $.post("weather.php", {date:date, temp:temp});
   </script>
 
 </body>
