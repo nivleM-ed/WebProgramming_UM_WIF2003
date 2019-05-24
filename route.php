@@ -158,7 +158,7 @@ $date_end = $result['date_end'];
                             echo "<form>
                             <input type='hidden' id='copying' name='custId' value=$k>
                                 </form>";
-                            echo "<tr><th>$num. $k</th><th><a href='delete.php?id=$j'><button onclick()='delete.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
+                            echo "<tr><th>$num. $k</th><th><a href='delete_recommendations.php?id=$j'><button onclick()='delete_recommendations.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
                             </tr>";
 
                             $num++;
