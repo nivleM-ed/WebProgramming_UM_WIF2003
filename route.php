@@ -50,9 +50,9 @@ $date_end = $result['date_end'];
   </header>
 
   <main>
-  <nav id="nav-top">
+    <nav id="nav-top">
       <ul>
-        <li><a href="route.php"  class="active" style="text-decoration: none">Route</a></li>
+        <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
         <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
         <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
@@ -126,16 +126,23 @@ $date_end = $result['date_end'];
                 <div class="clearfix" style="background-color: #fff;"></div>
 
                 <div class="dest-rail active" style="display: block;">
-                <div class="card" style="width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">Recommendations</h5>
-                    <p class="card-text">
-                      <?php
-                          $_SESSION['result_arr'] = array();
+                  <div class="card" style="width: 450px;">
+                    <div class="card-body" id="reccard" style="width: 440px;">
+                      <h5 class="card-title">Recommendations</h5>
+                      <p class="card-text" style="width: 350px;">
+                        <table style="width:90%">
+                          <?php
+                          include("includes/dbh.inc.php");
+                          $user = $_SESSION['userUid'];
+                          $sql = "select idUsers from users where uidUsers like '$user'";
+                          $result = $conn->query($sql);
+                          $row = $result->fetch_all();
+                          $userid = $row[0][0];
+                          // echo ($userid);
 
-                          $sql = "SELECT recommendation.name_place FROM `recommendation` 
+                          $sql = "SELECT recommendation.name_place, user_recommendation.place_id FROM `recommendation` 
                                   inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
-                                  where user_recommendation.user_id like '$user_id'";
+                                  where user_recommendation.user_id like '$userid'";
 
                           $result = $conn->query($sql);
                           $row = $result->fetch_all();
@@ -143,66 +150,79 @@ $date_end = $result['date_end'];
                           echo "<br>";
                           $rownum = count($row);
                           $num = 1;
-                          for($i=0;$i<$rownum;$i++) {
-                            
-                            echo  $num.". ",$row[$i][0]. "<br>";
+
+                          for ($i = 0; $i < $rownum; $i++) {
+                            // echo $row[$i][1]."<br>";
+                            $k = $row[$i][0];
+                            $j = $row[$i][1];
+                            echo "<form>
+                            <input type='hidden' id='copying' name='custId' value=$k>
+                                </form>";
+                            echo "<tr><th>$num. $k</th><th><a href='delete.php?id=$j'><button onclick()='delete.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
+                            </tr>";
+
                             $num++;
                           }
                           $conn->close();
-                      ?>
-                    </p>
+                          ?>
+                        </table>
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                </div>
-
-            <div class="layer1 edit-pane" style="z-index: 100;">
-              <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
-                <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
-                  <span id="ui-id-16" class="ui-dialog-title">Edit destination</span>
-                  <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Cancel edit">
-                    <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
-                    <span class="ui-button-icon-space"> </span>
-                  </button>
-                </div>
-
-                <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
-                  <input type="text" class="flat ui-autocomplete-input" name="search" id="dest-search" placeholder="Start typing..." autocomplete="off" title="Edit destination">
-                </div>
-
-                <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
-                  <div class="ui-dialog-buttonset">
-                    <button type="button" style="left: 30%;" class="editsavebtn cta-button large" title="Save edit">Save</button>
-                    <button type="button" style="left: 40%; background-color:red;" class="editremobtn cta-button large" title="Remove destination">Remove</button>
-                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="dialog-container add-pane" style="z-index: 1002;">
-              <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
-                <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
-                  <span class="ui-dialog-title">Add destination</span>
-                  <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="">
-                    <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
-                    <span class="ui-button-icon-space"></span>
-                  </button>
-                </div>
+          </div>
 
-                <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
-                  <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
-                </div>
+          <div class="layer1 edit-pane" style="z-index: 100;">
+            <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
+              <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
+                <span id="ui-id-16" class="ui-dialog-title">Edit destination</span>
+                <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Cancel edit">
+                  <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+                  <span class="ui-button-icon-space"> </span>
+                </button>
+              </div>
 
-                <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
-                  <div class="ui-dialog-buttonset">
-                    <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
-                  </div>
+              <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
+                <input type="text" class="flat ui-autocomplete-input" name="search" id="dest-search" placeholder="Start typing..." autocomplete="off" title="Edit destination">
+              </div>
+
+              <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+                <div class="ui-dialog-buttonset">
+                  <button type="button" style="left: 30%;" class="editsavebtn cta-button large" title="Save edit">Save</button>
+                  <button type="button" style="left: 40%; background-color:red;" class="editremobtn cta-button large" title="Remove destination">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dialog-container add-pane" style="z-index: 1002;">
+            <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
+              <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
+                <span class="ui-dialog-title">Add destination</span>
+                <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="">
+                  <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+                  <span class="ui-button-icon-space"></span>
+                </button>
+              </div>
+
+              <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
+                <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
+              </div>
+
+              <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
+                <div class="ui-dialog-buttonset">
+                  <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
 
