@@ -111,11 +111,9 @@ $date_end = $result['date_end'];
                   $result_weather->execute();
                   $test = $result_weather->fetch();
                   $weather = unserialize($test['weather']);
-                  echo "<script>console.log($weather[0])</script>";
+                  
 
-                  // $weather = 'rainy';
-
-                  $query = "SELECT checklist.item_id,checklist.item_name FROM checklist LEFT JOIN user_checklist ON user_checklist.checklist_id = checklist.item_id WHERE (user_checklist.checklist_id IS NULL AND weather='normal') OR (user_checklist.checklist_id IS NULL AND weather ='" . $weather[0] . "')";
+                  $query = "SELECT checklist.item_id,checklist.item_name FROM checklist LEFT JOIN user_checklist ON user_checklist.checklist_id = checklist.item_id WHERE (user_checklist.checklist_id IS NULL AND weather='Normal') OR (user_checklist.checklist_id IS NULL AND weather ='" . $weather[0] . "')";
                   $result = $pdo->prepare($query);
                   $result->execute();
 

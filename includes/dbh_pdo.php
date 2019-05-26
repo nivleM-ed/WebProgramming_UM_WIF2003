@@ -1,7 +1,8 @@
 <?php
 
 $hostname = "localhost";
-$database = "loginsystem";
+// $database = "loginsystem";
+$database = "planit_database";
 $username = "root";
 $password = "";
 $connect = "mysql:host=$hostname;dbname=$database;";

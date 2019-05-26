@@ -1,12 +1,14 @@
 <?php
-
+session_start();
 //load.php
 
-$connect = new PDO('mysql:host=localhost;dbname=loginsystem', 'root', '');
+// $connect = new PDO('mysql:host=localhost;dbname=loginsystem', 'root', '');
+$connect = new PDO('mysql:host=localhost;dbname=planit_database', 'root', '');
 
+$user_id = $_SESSION['userId'];
 $data = array();
 
-$query = "SELECT * FROM events ORDER BY id";
+$query = "SELECT * FROM events WHERE user_id = '$user_id' ORDER BY id";
 
 $statement = $connect->prepare($query);
 
