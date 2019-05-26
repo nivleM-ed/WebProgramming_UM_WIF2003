@@ -39,6 +39,11 @@
                         <form method="POST" action="includes/login.inc.php" class="register-form" id="login-form">
                             <h2 class="form-title">Sign In</h2>
                             <?php
+                            if (isset($_GET["newpwd"])) {
+                                if ($_GET["newpwd"] == "passwordupdated") {
+                                    echo '<p style="color:green">Password updated!</p>';
+                                }
+                            }
                             if (isset($_GET['error'])) {
                                 if ($_GET['error'] == 'emptyfields') {
                                     echo '<p style="color:red">Fill in all fields!</p>';

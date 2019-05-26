@@ -36,19 +36,36 @@ if (isset($_POST['reset-request-submit'])) {
     }
 
     mysqli_stmt_close($stmt);
-    mysqli_close();
+    mysqli_close($conn);
 
-    $to = $userEmail;
-    $subject = 'Reset your password for TripIt';
-    $message = '<p>We received a password request, the link to reset your password is given below, you can ignore this email if you did not make the request.</p>';
-    $message .= '<p>Here is your password reset link: </br>';
-    $message .= '<a href="'.$url.'">'.$url.'</a></p>';
+    require_once('../PHPMailer/PHPMailerAutoload.php');
+    $mail = new PHPMailer();
+    $mail->isSMTP();
+    $mail->SMTPAuth = true;
+    $mail->SMTPSecure = 'ssl';
+    $mail->Host = 'smtp.gmail.com';
+    $mail->Port = '465';
+    $mail->isHTML();
+    $mail->Username = 'iamablues97@gmail.com';
+    $mail->Password = '420187at';
+    $mail->SetFrom('no-reply@tripit.com');
+    $mail->Subject = 'Reset your password for TripIt';
+    $mail->Body = '<p>We received a password request, the link to reset your password is given below, you can ignore this email if you did not make the request.</p>
+                    <p>Here is your password reset link: </br>
+                    <a href="'.$url.'">'.$url.'</a></p>';
+    $mail->AddAddress($userEmail);
+    $mail->Send();
+    // $to = $userEmail;
+    // $subject = 'Reset your password for TripIt';
+    // $message = '<p>We received a password request, the link to reset your password is given below, you can ignore this email if you did not make the request.</p>';
+    // $message .= '<p>Here is your password reset link: </br>';
+    // $message .= '<a href="'.$url.'">'.$url.'</a></p>';
 
-    $headers = "From: TripIt <tripit@gmail.com\r\n";
-    $headers .= "Reply-To: tripit@gmail.com\r\n";
-    $headers .= "Content-type: text/html\r\n";
+    // $headers = "From: TripIt <tripit@gmail.com\r\n";
+    // $headers .= "Reply-To: tripit@gmail.com\r\n";
+    // $headers .= "Content-type: text/html\r\n";
 
-    mail($to, $subject, $message, $headers);
+    // mail($to, $subject, $message, $headers);
 
     header("Location: ../reset-password.php?reset=success");
 
