@@ -30,6 +30,10 @@ CREATE TABLE `loginsystem`.`user_checklist` (
 	PRIMARY KEY (`item_id`)
 ) ENGINE = InnoDB;
 
+ALTER TABLE `user_checklist` CHANGE `status` `item_status` VARCHAR(20) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0';
+ALTER TABLE `user_checklist` ADD `checklist_id` INT NOT NULL DEFAULT '0' AFTER `item_status`;
+
+
 CREATE TABLE `loginsystem`.`checklist` ( 
 	`item_id` INT NOT NULL , 
 	`item_name` TEXT NOT NULL , 
@@ -42,6 +46,17 @@ CREATE TABLE `loginsystem`.`checklist` (
 ALTER TABLE `checklist` 
 ADD FOREIGN KEY (`item_id`) REFERENCES `user_checklist`(`item_id`) ON 
 DELETE RESTRICT ON UPDATE RESTRICT;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+ALTER TABLE `user_checklist` CHANGE `item_id` `item_id` INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `checklist` CHANGE `item_id` `item_id` INT(11) NOT NULL AUTO_INCREMENT;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+ALTER TABLE `checklist`
+  DROP `temp`;
+
 
 CREATE TABLE `loginsystem`.`city` ( 
 	`city_id` INT NOT NULL , 
