@@ -3,7 +3,8 @@
 $servername = "localhost";
 $dbBUsername = "root";
 $dBpass = "";
-$dBName = "loginsystem";
+// $dBName = "loginsystem";
+$dBName = "planit_database";
 
 $conn = mysqli_connect($servername,$dbBUsername,$dBpass,$dBName);
 

@@ -1,8 +1,10 @@
 <?php
-
+session_start();
 //update.php
 
-$connect = new PDO('mysql:host=localhost;dbname=loginsystem', 'root', '');
+// $connect = new PDO('mysql:host=localhost;dbname=loginsystem', 'root', '');
+$connect = new PDO('mysql:host=localhost;dbname=planit_database', 'root', '');
+$user_id = $_SESSION['userId'];
 
 if(isset($_POST["id"]))
 {
