@@ -42,7 +42,7 @@ $date_end = $result['date_end'];
   <!-- Header -->
   <header id="header">
     <nav class="left">
-      <a href="index.html" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
+      <a href="ini_logged.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
       <a href="route.php">My Plan</a> <!-- isi webpage signup-->
@@ -112,8 +112,13 @@ $date_end = $result['date_end'];
                   $test = $result_weather->fetch();
                   $weather = unserialize($test['weather']);
                   
+                  if(in_array('Rain', $weather)){
+                    $weather = 'Rain';
+                  } elseif(in_array('Sunny', $weather)){
+                    $weather = 'Sunny';
+                  }
 
-                  $query = "SELECT checklist.item_id,checklist.item_name FROM checklist LEFT JOIN user_checklist ON user_checklist.checklist_id = checklist.item_id WHERE (user_checklist.checklist_id IS NULL AND weather='Normal') OR (user_checklist.checklist_id IS NULL AND weather ='" . $weather[0] . "')";
+                  $query = "SELECT checklist.item_id,checklist.item_name FROM checklist LEFT JOIN user_checklist ON user_checklist.checklist_id = checklist.item_id WHERE (user_checklist.checklist_id IS NULL AND weather='Normal') OR (user_checklist.checklist_id IS NULL AND weather ='" . $weather . "')";
                   $result = $pdo->prepare($query);
                   $result->execute();
 

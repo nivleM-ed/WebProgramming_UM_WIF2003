@@ -38,7 +38,7 @@ $date_end = $result['date_end'];
   <!-- Header -->
   <header id="header">
     <nav class="left">
-      <a href="index.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
+      <a href="ini_logged.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
     </nav>
     <nav class="right">
       <a href="route.php">My Plan</a>

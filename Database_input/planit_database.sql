@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 26, 2019 at 12:57 PM
+-- Generation Time: May 26, 2019 at 05:35 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.2
 
@@ -19,8 +19,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `loginsystem`
+-- Database: `planit_database`
 --
+CREATE DATABASE IF NOT EXISTS `planit_database` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `planit_database`;
 
 -- --------------------------------------------------------
 
@@ -74,6 +76,20 @@ CREATE TABLE `journey` (
   `place_to` text NOT NULL,
   `date_start` date NOT NULL,
   `date_end` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pwdreset`
+--
+
+CREATE TABLE `pwdreset` (
+  `pwdResetId` int(11) NOT NULL,
+  `pwdResetEmail` text NOT NULL,
+  `pwdResetSelector` text NOT NULL,
+  `pwdResetToken` longtext NOT NULL,
+  `pwdResetExpires` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -175,6 +191,12 @@ ALTER TABLE `journey`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `pwdreset`
+--
+ALTER TABLE `pwdreset`
+  ADD PRIMARY KEY (`pwdResetId`);
+
+--
 -- Indexes for table `recommendation`
 --
 ALTER TABLE `recommendation`
@@ -211,6 +233,12 @@ ALTER TABLE `events`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `pwdreset`
+--
+ALTER TABLE `pwdreset`
+  MODIFY `pwdResetId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -231,13 +259,6 @@ ALTER TABLE `user_checklist`
 --
 ALTER TABLE `journey`
   ADD CONSTRAINT `journey_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`idUsers`);
-
---
--- Constraints for table `recommendation`
---
-ALTER TABLE `recommendation`
-  ADD CONSTRAINT `recommendation_ibfk_1` FOREIGN KEY (`city_id`) REFERENCES `city` (`city_id`),
-  ADD CONSTRAINT `recommendation_ibfk_2` FOREIGN KEY (`country_id`) REFERENCES `country` (`country_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
