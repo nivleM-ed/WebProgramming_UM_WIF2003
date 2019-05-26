@@ -80,6 +80,17 @@ function getDataArr() {
             weatherArrSky.push(skyArr[i]);
         }
     }
+    $.ajax({
+        url: "add_weather.php",
+        type: "post",
+        datatype: "json",
+        data:  {date:dateArr, temp:weatherArrTemp, weather:skyArr},
+        success: function(data) {
+            console.log(data);
+        }
+    });
+    // $.post("weather/add_weather.php", {date:dateArr, temp:weatherArrTemp, weather:skyArr});
+    // console.log(dateArr);
 }
 
 //taken from chart.js
@@ -127,3 +138,11 @@ function getChart() {
         }
     });
 }
+
+function getTemp(){
+    return weatherArrTemp;
+}
+
+function getDate(){
+    return dateArr;
+}    

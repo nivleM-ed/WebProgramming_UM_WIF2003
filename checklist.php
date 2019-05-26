@@ -2,6 +2,18 @@
 <html>
 <?php
 session_start();
+include "includes/dbh_pdo.php";
+include "includes/dbh.inc.php";
+
+$user_id = $_SESSION['userId'];
+$query = "SELECT * FROM journey WHERE user_id = $user_id";
+$stmt = mysqli_query($conn, $query);
+$result = mysqli_fetch_assoc($stmt);
+
+$country_from = $result['place_from'];
+$country_to = $result['place_to'];
+$date_start = $result['date_start'];
+$date_end = $result['date_end'];
 ?>
 
 <head>
@@ -12,7 +24,7 @@ session_start();
   <!--CSS-->
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/menu.css">
-  <link rel="stylesheet" href="assets/css/test-checklist.css">
+  <link rel="stylesheet" href="assets/css/checklist.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -40,73 +52,114 @@ session_start();
   </header>
 
   <main>
-  <nav id="nav-top">
+    <nav id="nav-top">
       <ul>
         <li><a href="route.php" style="text-decoration: none">Route</a></li>
         <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
-        <li><a href="recommendation.php"  style="text-decoration: none">Recommendation</a></li>
+        <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" class="active" style="text-decoration: none">Checklist</a></li>
         <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
       </ul>
     </nav>
     <!-- Two -->
     <main>
-      <!-- One -->
-      <!-- left side search-->
-      <section>
-        <div style="margin-top:40px; margin-bottom:180px;">
-          <div id="checklist" style="margin: 0 15% 0 15% ;">
 
-            <div class="cl-header">
-              <div class="contents clearfix">
-                <span class="header-title">Trip checklist</span>
-                <button class="header-btn add-custom-item large"> + Add item</button>
+      <div class="container-fluid">
+        <div id="checklist" style="margin: 0 20%; min-height: 500px;">
+
+          <div class="cl-header">
+            <div class="contents clearfix">
+              <span class="header-title">Trip checklist</span>
+              <button class="header-btn add-custom-item large"> + Add item</button>
+            </div>
+          </div>
+
+          <div id="item-cl" style="float:right; width:70%;">
+            <div style="background-color:#ff00ff">
+            </div>
+            <?php
+            $query = "SELECT * FROM user_checklist WHERE user_id = ?";
+            $result = $pdo->prepare($query);
+            $result->execute([$user_id]);
+
+            if ($result->rowCount() > 0) {
+              while ($row = $result->fetch()) {
+
+                echo '<div class="item-container">';
+                echo '<div class="item-box">';
+                if ($row['item_status'] == 1) {
+                  echo '<input type="checkbox" class="cl-cb" item_id="' . $row['item_id'] . '" id="check' . $row['item_id'] . '"checked/>';
+                } else {
+                  echo '<input type="checkbox" class="cl-cb" item_id="' . $row['item_id'] . '" id="check' . $row['item_id'] . '"/>';
+                }
+                echo '<label for="check' . $row['item_id'] . '" item_id="' . $row['item_id'] . '"><div><i class="fa fa-check"></i></div>' . $row['item_name'] . '</label>';
+                echo '<span class="edit-btn side-btn" item-id="' . $row['item_id'] . '"/></span> ';
+                echo '<span class="remv-btn side-btn" item-id="' . $row['item_id'] . '"/></span> </div></div>';
+              }
+            }
+            ?>
+          </div>
+
+          <div id="rec-cl" style="background-color:none; width: 25%; display:block;">
+            <ul class="accordion">
+              <li>
+                <a class="toggle" href="javascript:void(0);" title="Click on the item to add it on your checklist!">Item Recommendation</a>
+                <ul class="inner">
+                  <?php
+                  $query = "SELECT weather FROM weather";
+                  $result_weather = $pdo->prepare($query);
+                  $result_weather->execute();
+                  $test = $result_weather->fetch();
+                  $weather = unserialize($test['weather']);
+                  echo "<script>console.log($weather[0])</script>";
+
+                  // $weather = 'rainy';
+
+                  $query = "SELECT checklist.item_id,checklist.item_name FROM checklist LEFT JOIN user_checklist ON user_checklist.checklist_id = checklist.item_id WHERE (user_checklist.checklist_id IS NULL AND weather='normal') OR (user_checklist.checklist_id IS NULL AND weather ='" . $weather[0] . "')";
+                  $result = $pdo->prepare($query);
+                  $result->execute();
+
+                  if ($result->rowCount() > 0) {
+                    while ($row = $result->fetch()) {
+                      echo "<li checklist-id='" . $row['item_id'] . "'><a href='javascript:void(0);' onclick='doSomething(" . $row['item_id'] . ");'>" . $row['item_name'] . "</a></li>";
+                    }
+                  }
+                  ?>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div class="modi-bg modi-edit">
+            <div class="modi-box">
+              <div class="modi-title" title>Edit Item</div>
+              <div class="modi-input">
+                <div class="modi-input-title">Item title</div>
+                <input type="text" name="title" class="modi-input-field" value="">
+              </div>
+              <div class="modi-btn">
+                <button class="btn modi-btn-save">Save</button>
+                <button class="btn modi-btn-cncl">Cancel</button>
               </div>
             </div>
+          </div>
 
-            <div id="item-cl">
-              <div class="item-container">
-                <div class="item-box">
-                  <input type="checkbox" class="cl-cb" id="check1" />
-                  <label for="check1">Buy Ticket</label>
-                  <span class="edit-btn side-btn" for="check1"></span>
-                  <span class="remv-btn side-btn" for="check1"></span>
-                </div>
+
+          <div class="modi-bg modi-add">
+            <div class="modi-box">
+              <div class="modi-title" title>Add Item</div>
+              <div class="modi-input">
+                <div class="modi-input-title">Item title</div>
+                <input type="text" name="title" class="modi-input-field" value="">
               </div>
-            </div>
-
-            <div class="modi-bg modi-edit">
-              <div class="modi-box">
-                <div class="modi-title" title>Edit Item</div>
-                <div class="modi-input">
-                  <div class="modi-input-title">Item title</div>
-                  <input type="text" name="title" class="modi-input-field" value="">
-                </div>
-                <div class="modi-btn">
-                  <button class="btn modi-btn-save">Save</button>
-                  <button class="btn modi-btn-cncl">Cancel</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="modi-bg modi-add">
-              <div class="modi-box">
-                <div class="modi-title" title>Add Item</div>
-                <div class="modi-input">
-                  <div class="modi-input-title">Item title</div>
-                  <input type="text" name="title" class="modi-input-field" value="">
-                </div>
-                <div class="modi-btn">
-                  <button class="btn modi-btn-save">Save</button>
-                  <button class="btn modi-btn-cncl">Cancel</button>
-                </div>
+              <div class="modi-btn">
+                <button class="btn modi-btn-save">Save</button>
+                <button class="btn modi-btn-cncl">Cancel</button>
               </div>
             </div>
           </div>
         </div>
-      </section>
-
-      <!-- right side KOSONG-->
+      </div>
     </main>
 
     <!-- Footer -->
@@ -137,11 +190,25 @@ session_start();
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/checklist.js"></script>
-    <script src="assets/js/weather.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
     <script>
-      var CITY = "<?php echo $_SESSION['country_to'] ?>";
-      getWeatherData(CITY);
+      function doSomething(id) {
+        $("[checklist-id='" + id + "']").css("display", "none");
+
+        var type = "addinto-checklist";
+        $.ajax({
+          url: 'add_checklist.php',
+          type: 'post',
+          data: {
+            type: type,
+            id: id
+          },
+          success: function(response) {
+            console.log(id);
+            window.location.reload();
+          }
+        });
+      }
     </script>
   </main>
 </body>

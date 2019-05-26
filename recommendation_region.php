@@ -455,7 +455,7 @@
                 console.log(pass)
                 
                 $.ajax({
-                    url:"add.php", //the page containing php script
+                    url:"add_recommendations.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
                     data: {passValue: pass},
@@ -483,7 +483,7 @@
                 console.log(pass)
                 
                 $.ajax({
-                    url:"add.php", //the page containing php script
+                    url:"add_recommendations.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
                     data: {passValue: pass},
@@ -499,7 +499,7 @@
                 var pass = value[2][4];
                 console.log(pass)
                 $.ajax({
-                    url:"add.php", //the page containing php script
+                    url:"add_recommendations.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
                     data: {passValue: pass},
@@ -514,7 +514,7 @@
                 var pass = value[3][4];
                 console.log(pass)
                 $.ajax({
-                    url:"add.php", //the page containing php script
+                    url:"add_recommendations.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
                     data: {passValue: pass},
@@ -529,7 +529,7 @@
                 var pass = value[4][4];
                 console.log(pass)
                 $.ajax({
-                    url:"add.php", //the page containing php script
+                    url:"add_recommendations.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
                     data: {passValue: pass},
@@ -544,7 +544,7 @@
                 var pass = value[5][4];
                 console.log(pass)
                 $.ajax({
-                    url:"add.php", //the page containing php script
+                    url:"add_recommendations.php", //the page containing php script
                     type: "post", //request type,
                     dataType: 'json',
                     data: {passValue: pass},
