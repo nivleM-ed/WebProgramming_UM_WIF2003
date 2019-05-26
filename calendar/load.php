@@ -9,11 +9,8 @@ $user_id = $_SESSION['userId'];
 $data = array();
 
 $query = "SELECT * FROM events WHERE user_id = '$user_id' ORDER BY id";
-
 $statement = $connect->prepare($query);
-
 $statement->execute();
-
 $result = $statement->fetchAll();
 
 foreach($result as $row)

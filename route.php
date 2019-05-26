@@ -3,6 +3,7 @@
 <?php
 session_start();
 include "includes/dbh.inc.php";
+include "includes/dbh_pdo.php";
 
 $user_id = $_SESSION['userId'];
 $query = "SELECT * FROM journey WHERE user_id = $user_id";
@@ -81,8 +82,10 @@ $date_end = $result['date_end'];
         <div id="overview" class="tab-content active">
           <div id="overviewRoutePane" class="overview-route-pane">
             <div id="route" style="background-color: #fff;">
-              <div class="route-main-pane" style="background-color: #fff;">
-                <h2 class="edit-route-title">View / Edit route</h2>
+              <h2 class="edit-route-title">View / Edit route</h2>
+              <div class="route-main-pane" style="background-color: #fff; overflow-y: scroll;
+min-width: 200px; height: 500px; margin-left:-4%;">
+
                 <div class="route-rows">
                   <div class="route-row boundary-row start" style="background-color: #fff;">
                     <div class="left">
@@ -94,134 +97,190 @@ $date_end = $result['date_end'];
                       <div class="title">Start: <?php echo $country_from ?></div>
                     </div>
                   </div>
-
-                  <div id="r1" class="draggable route-row stay-row  first" for="r1">
+                  <div class="left">
+                    <div class="start-end-dates"><?php echo $date_start ?></div>
+                  </div>
+                  <div id="r1" class="draggable route-row stay-row  first">
                     <div class="left">
-                      <div class="marker notranslate" for="r1">1</div>
+                      <div class="marker notranslate"></div>
                       <div class="line"></div>
                     </div>
                     <div class="content">
                       <div class="title"><?php echo $country_to ?></div>
                       <span class="line-hr"></span>
-                      <svg class="edit stay-icon" for="r1" title="Edit destination">
+                      <svg class="edit stay-icon" title="Edit destination">
                         <use xlink:href="#icon-edit"></use>
                       </svg>
                     </div>
                   </div>
+                  <?php
 
-                  <div class="route-row boundary-row end">
-                    <div class="left">
-                      <div class="marker"></div>
-                      <div class="line up"></div>
-                    </div>
-                    <div class="content">
-                      <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
-                    </div>
+                  // Attempt select query execution
+                  try {
+                    $sql = "SELECT * FROM events";
+
+                    $result = $pdo->prepare($sql);
+                    $result->execute();
+                    if ($result->rowCount() > 0) {
+
+                      while ($row = $result->fetch()) {
+                        // echo '<div class="left">';
+                        // echo '<div  class="draggable route-row stay-row  first" >';
+                        // echo '<div class="left">';
+                        // echo '<div class="marker notranslate" ></div>';
+                        // echo '<div class="line"></div>';
+                        // echo '</div>';
+                        // echo '<div class="content">';
+                        // echo '<div class="title">';
+                        // echo "<div>" . $row['title'] . "</div>";
+                        // echo '<div style="font-size:14px;color:#888; font-style:italic;">'  . date('Y-n-j', strtotime($row['start_event'])) . '</div>';
+
+                        // echo '</div>';
+                        // echo '<span class="line-hr"></span>';
+                        // echo '<svg class="edit stay-icon"   title="Edit destination">';
+                        // echo '<use xlink:href="#icon-edit"></use>';
+                        // echo '</svg>';
+                        // echo '</div>';
+                        // echo '</div>';
+                        // echo '</div>';
+
+                        echo "<div id='".$row['id']."' class='draggable route-row stay-row  first'><div class='left'><div class='marker notranslate'></div><div class='line'></div></div><div class='content' ><div class='title'>".$row['title']."</div>";
+                        
+                        echo '<div style="font-size:14px;color:#888; font-style:italic;">' . date('Y-n-j', strtotime($row['start_event'])) . '</div>';
+
+                        echo "<span class='line-hr'></span><svg class='edit stay-icon' for='".$row['id']."' title='Edit destination'><use xlink:href='#icon-edit'></use></svg></div></div>";
+                      }
+
+                      // Free result set
+                      unset($result);
+                    } else {
+                      echo "No records matching your query were found.";
+                    }
+                  } catch (PDOException $e) {
+                    die("ERROR: Could not able to execute $sql. " . $e->getMessage());
+                  }
+
+                  // Close connection
+                  unset($pdo);
+                  ?>
+                </div>
+                <div class="content">
+                  <div class="start-end-dates"><?php echo $date_end ?></div>
+                </div>
+                <div class="route-row boundary-row end">
+                  <div class="left">
+                    <div class="marker"></div>
+                    <div class="line up"></div>
+                  </div>
+                  <div class="content">
+                    <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
                   </div>
                 </div>
               </div>
-              <!-- Add destination -->
-              <div class="route-right-pane">
-                <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
-                <div class="clearfix" style="background-color: #fff;"></div>
+            </div>
+            <!-- Add destination -->
+            <div class="route-right-pane">
+              <button class="routeaddbtn add-destination cta-button large">Add destination</button>
+              <form action="calendar.php"><button class="cta-button large">Change dates</button></form>
+              <div class="clearfix" style="background-color: #fff;"></div>
 
-                <div class="dest-rail active" style="display: block;">
-                  <div class="card" style="width: 450px;">
-                    <div class="card-body" id="reccard" style="width: 440px;">
-                      <h5 class="card-title">Recommendations</h5>
-                      <p class="card-text" style="width: 350px;">
-                        <table style="width:90%">
-                          <?php
-                          include("includes/dbh.inc.php");
-                          $user = $_SESSION['userUid'];
-                          $sql = "select idUsers from users where uidUsers like '$user'";
-                          $result = $conn->query($sql);
-                          $row = $result->fetch_all();
-                          $userid = $row[0][0];
-                          // echo ($userid);
+              <div class="dest-rail active" style="display: block;">
+                <div class="card" style="width: 400px;">
+                  <div class="card-body" id="reccard" style="width: 440px;">
+                    <h5 class="card-title">Recommendations</h5>
+                    <p class="card-text" style="width: 350px;">
+                      <table style="width:90%">
+                        <?php
+                        include("includes/dbh.inc.php");
+                        $user = $_SESSION['userUid'];
+                        $sql = "select idUsers from users where uidUsers like '$user'";
+                        $result = $conn->query($sql);
+                        $row = $result->fetch_all();
+                        $userid = $row[0][0];
+                        // echo ($userid);
 
-                          $sql = "SELECT recommendation.name_place, user_recommendation.place_id FROM `recommendation` 
+                        $sql = "SELECT recommendation.name_place, user_recommendation.place_id FROM `recommendation` 
                                   inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
                                   where user_recommendation.user_id like '$userid'";
 
-                          $result = $conn->query($sql);
-                          $row = $result->fetch_all();
-                          $_SESSION["result_arr"] = $row;
-                          echo "<br>";
-                          $rownum = count($row);
-                          $num = 1;
+                        $result = $conn->query($sql);
+                        $row = $result->fetch_all();
+                        $_SESSION["result_arr"] = $row;
+                        echo "<br>";
+                        $rownum = count($row);
+                        $num = 1;
 
-                          for ($i = 0; $i < $rownum; $i++) {
-                            // echo $row[$i][1]."<br>";
-                            $k = $row[$i][0];
-                            $j = $row[$i][1];
-                            echo "<form>
+                        for ($i = 0; $i < $rownum; $i++) {
+                          // echo $row[$i][1]."<br>";
+                          $k = $row[$i][0];
+                          $j = $row[$i][1];
+                          echo "<form>
                             <input type='hidden' id='copying' name='custId' value=$k>
                                 </form>";
-                            echo "<tr><th>$num. $k</th><th><a href='delete_recommendations.php?id=$j'><button onclick()='delete_recommendations.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
+                          echo "<tr><th>$num. $k</th><th><a href='delete_recommendations.php?id=$j'><button onclick()='delete_recommendations.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
                             </tr>";
 
-                            $num++;
-                          }
-                          $conn->close();
-                          ?>
-                        </table>
-                      </p>
-                    </div>
+                          $num++;
+                        }
+                        $conn->close();
+                        ?>
+                      </table>
+                    </p>
                   </div>
-
                 </div>
-              </div>
-            </div>
 
-          </div>
-
-          <div class="layer1 edit-pane" style="z-index: 100;">
-            <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
-              <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
-                <span id="ui-id-16" class="ui-dialog-title">Edit destination</span>
-                <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Cancel edit">
-                  <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
-                  <span class="ui-button-icon-space"> </span>
-                </button>
-              </div>
-
-              <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
-                <input type="text" class="flat ui-autocomplete-input" name="search" id="dest-search" placeholder="Start typing..." autocomplete="off" title="Edit destination">
-              </div>
-
-              <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
-                <div class="ui-dialog-buttonset">
-                  <button type="button" style="left: 30%;" class="editsavebtn cta-button large" title="Save edit">Save</button>
-                  <button type="button" style="left: 40%; background-color:red;" class="editremobtn cta-button large" title="Remove destination">Remove</button>
-                </div>
               </div>
             </div>
           </div>
 
-          <div class="dialog-container add-pane" style="z-index: 1002;">
-            <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
-              <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
-                <span class="ui-dialog-title">Add destination</span>
-                <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="">
-                  <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
-                  <span class="ui-button-icon-space"></span>
-                </button>
-              </div>
+        </div>
 
-              <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
-                <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
-              </div>
+        <div class="layer1 edit-pane" style="z-index: 100;">
+          <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
+            <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
+              <span id="ui-id-16" class="ui-dialog-title">Edit destination</span>
+              <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Cancel edit">
+                <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+                <span class="ui-button-icon-space"> </span>
+              </button>
+            </div>
 
-              <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
-                <div class="ui-dialog-buttonset">
-                  <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
-                </div>
+            <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
+              <input type="text" class="flat ui-autocomplete-input" name="search" id="dest-search" placeholder="Start typing..." autocomplete="off" title="Edit destination">
+            </div>
+
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+              <div class="ui-dialog-buttonset">
+                <button type="button" style="left: 30%;" class="editsavebtn cta-button large" title="Save edit">Save</button>
+                <button type="button" style="left: 40%; background-color:red;" class="editremobtn cta-button large" title="Remove destination">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-container add-pane" style="z-index: 1002;">
+          <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
+            <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
+              <span class="ui-dialog-title">Add destination</span>
+              <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="">
+                <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+                <span class="ui-button-icon-space"></span>
+              </button>
+            </div>
+
+            <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
+              <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
+            </div>
+
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
+              <div class="ui-dialog-buttonset">
+                <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
     </div>
   </main>
@@ -254,13 +313,7 @@ $date_end = $result['date_end'];
   <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
-  <script src="assets/js/checklist.js"></script>
-  <script src="assets/js/weather.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
-  <script>
-    var CITY = "<?php echo $_SESSION['country_to'] ?>";
-    getWeatherData(CITY);
-  </script>
   <script type="text/javascript" src="assets/js/addroute.js"></script>
 
 </body>

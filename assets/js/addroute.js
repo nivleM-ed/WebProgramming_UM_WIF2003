@@ -3,7 +3,6 @@ $(document).ready(function () {
   var count;
   var itemId;
 
-
   $(".routeaddbtn").click(function () {
     arrsize = $(".route-main-pane .stay-row .marker").length;
     console.log(arrsize);
@@ -36,6 +35,16 @@ $(document).ready(function () {
     removeRoute();
     $(".add-pane input[type='text']").val(null);
     $(".add-pane").fadeOut(300);
+
+    $.ajax({
+			url:'calendar/insert.php',
+			type:'post',
+			data:{type:"route",title:value},
+			success:function(response){
+				console.log(value);
+				window.location.reload();
+			}
+		});
   });
 
   editRoute();
@@ -56,8 +65,18 @@ $(document).ready(function () {
     $("#" + itemId + " .title").text(value);
     $(".edit-pane").fadeOut(300);
     $(".edit-pane input[type='text']").val("");
-  });
+    console.log(value);
 
+    $.ajax({
+			url:'calendar/update.php',
+			type:'post',
+			data:{id:itemId,type:"route",title:value},
+			success:function(response){
+				console.log(id);
+				window.location.reload();
+			}
+		});
+  });
 
   $(".ui-icon-closethick").click(function () {
     $(".edit-pane").fadeOut(300);
@@ -67,10 +86,18 @@ $(document).ready(function () {
     $(".editremobtn").click(function () {
       $(".edit-pane").fadeOut(300);
       $("div[id*='" + itemId + "']").remove();
+      
+      console.log(itemId);
+        
+      $.ajax({
+        url:'calendar/delete.php',
+        type:'post',
+        data:{id:itemId},
+        success:function(response){
+          console.log(itemId + " deleted");
+          window.location.reload();
+        }
+      });
     });
-
   }
-
-
-
 });

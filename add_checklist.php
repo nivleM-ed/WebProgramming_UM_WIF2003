@@ -2,8 +2,6 @@
 session_start();
     include 'includes/dbh_pdo.php'; // Database connection
 
-
-
     if($_POST['type']=="add-checklist"){
         try {
         $value = $_POST['value'];
