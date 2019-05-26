@@ -504,3 +504,17 @@ svg.stay-icon {
   justify-content: flex-end;
   padding: 0 5px;
 }
+
+.start-end-dates {
+  height: 36px;
+  border-radius: 100px;
+  background-color: #333;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.78;
+  text-align: center;
+  color: #fff;
+  display: inline-block;
+  padding: 2px 25px;
+}
+

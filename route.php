@@ -9,22 +9,24 @@ $query = "SELECT * FROM journey WHERE user_id = $user_id";
 $stmt = mysqli_query($conn, $query);
 $result = mysqli_fetch_assoc($stmt);
 
+
 $country_from = $result['place_from'];
 $country_to = $result['place_to'];
 $date_start = $result['date_start'];
 $date_end = $result['date_end'];
 ?>
+
+
 <head>
   <title>Plan It</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!--CSS-->
-  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/menu.css">
-  <link rel="stylesheet" href="assets/css/calender.css">
   <link rel="stylesheet" href="assets/css/route.css">
-  <link rel="stylesheet" href="route.css">
+  <link rel="stylesheet" href="assets/css/route_full.css">
   <!--Google API Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
@@ -35,62 +37,6 @@ $date_end = $result['date_end'];
   <!--Boostrap CDN-->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
-<style>
-/* Outer */
-.popup {
-	width:100%;
-	height:100%;
-	display:none;
-	position:fixed;
-	top:0px;
-	left:0px;
-  z-index:999;
-	background:rgba(0,0,0,0.75);
-}
-
-/* Inner */
-.popup-inner {
-	max-width:700px;
-	width:90%;
-	padding:40px;
-	position:absolute;
-	top:50%;
-	left:50%;
-	-webkit-transform:translate(-50%, -50%);
-	transform:translate(-50%, -50%);
-	box-shadow:0px 2px 6px rgba(0,0,0,1);
-	border-radius:3px;
-	background:#fff;
-}
-
-/* Close Button */
-.popup-close {
-	width:30px;
-	height:30px;
-	padding-top:4px;
-	display:inline-block;
-	position:absolute;
-	top:0px;
-	right:0px;
-	transition:ease 0.25s all;
-	-webkit-transform:translate(50%, -50%);
-	transform:translate(50%, -50%);
-	border-radius:1000px;
-	background:rgba(0,0,0,0.8);
-	font-family:Arial, Sans-Serif;
-	font-size:20px;
-	text-align:center;
-	line-height:100%;
-	color:#fff;
-}
-
-.popup-close:hover {
-	-webkit-transform:translate(50%, -50%) rotate(180deg);
-	transform:translate(50%, -50%) rotate(180deg);
-	background:rgba(0,0,0,1);
-	text-decoration:none;
-}
-</style>
 
 <body>
   <!-- Header -->
@@ -105,68 +51,245 @@ $date_end = $result['date_end'];
     </nav>
   </header>
 
-  <!-- Banner -->
-  <section id="banner">
-    <div>
-      <h1 style="margin-top:-10%;">Weather Forecast</h1>
-      <section class="wrapper" style="margin-top:-10%; margin-bottom:-10%">
-        <div class="container" style="padding: 10px; margin: auto; background-color:aliceblue; border-radius:1rem">
-          <div class="container">
-            <canvas id="myChart" style="border-style: hidden;"></canvas>
-          </div>
-          <div class="container">
-            <table style="margin-top:10px">
-              <tr id="dates">
-                <td>Date</td>
-              </tr>
-              <tr id="weather">
-                <td>Weather</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-  </section>
-
   <main>
     <nav id="nav-top">
       <ul>
-        <li><a href="calender.php" class="active" style="text-decoration: none">Calender</a></li>
-        <li><a href="route.php" style="text-decoration: none">Route</a></li>
+        <li><a href="route.php" class="active" style="text-decoration: none">Route</a></li>
+        <li><a href="weather.php" style="text-decoration: none">Weather</a></li>
         <li><a href="recommendation.php" style="text-decoration: none">Recommendation</a></li>
         <li><a href="checklist.php" style="text-decoration: none">Checklist</a></li>
+        <li><a href="calendar.php" style="text-decoration: none">Calendar</a></li>
       </ul>
     </nav>
-    <!-- Two -->
-    <section>
+  </main>
+
+  <main>
+    <svg xmlns:xlink="http://www.w3.org/1999/xlink" style="display: none;">
+      <symbol viewBox="0 0 24 24" id="icon-desktop-reorder" width="100%" height="100%">
+        <path d="m6.938 3 5.624 6.5h-3.214v8.125h-4.821v-8.125h-3.215z"></path>
+        <path d="m17.062 21 5.626-6.5h-3.215v-8.125h-4.821v8.125h-3.214z"></path>
+      </symbol>
+      <symbol viewBox="0 0 24 24" id="icon-edit" width="100%" height="100%">
+        <path d="M3,17.25V21h3.75L17.811,9.94l-3.75-3.75L3,17.25z M20.71,7.04c0.392-0.39,0.392-1.02,0-1.41l-2.34-2.34
+          c-0.392-0.39-1.021-0.39-1.41,0l-1.83,1.83l3.75,3.75L20.71,7.04z"></path>
+      </symbol>
+      <symbol viewBox="0 0 24 24" id="icon-reorder" width="100%" height="100%">
+        <path d="M3,15h18v-2H3V15z M3,19h18v-2H3V19z M3,11h18V9H3V11z M3,5v2h18V5H3z"></path>
+      </symbol>
+    </svg>
+
+    <div id="planContent" class="plan-content" style="background-color: #fff;">
+      <div id="resultpageContent" class="resultpage-content">
+        <div id="overview" class="tab-content active">
+          <div id="overviewRoutePane" class="overview-route-pane">
+            <div id="route" style="background-color: #fff;">
+            <h2 class="edit-route-title">View / Edit route</h2>
+              <div class="route-main-pane" style="background-color: #fff; overflow-y: scroll;
+min-width: 200px; height: 500px; margin-left:-4%;">
+                
+                <div class="route-rows">
+                  <div class="route-row boundary-row start" style="background-color: #fff;">
+                    <div class="left">
+                      <div class="marker"></div>
+                      <div class="line down"></div>
+                    </div>
+
+                    <div class="content">
+                      <div class="title">Start: <?php echo $country_from ?></div>
+                    </div>
+                  </div>
+                  <div class="left">
+                  <div class="start-end-dates"><?php  echo $date_start ?></div></div>
+                  <div id="r1" class="draggable route-row stay-row  first" >
+                    <div class="left">
+                      <div class="marker notranslate" ></div>
+                      <div class="line"></div>
+                    </div>
+                    <div class="content">
+                      <div class="title"><?php  echo $country_to ?></div>
+                      <span class="line-hr"></span>
+                      <svg class="edit stay-icon"  title="Edit destination">
+                        <use xlink:href="#icon-edit"></use>
+                      </svg>
+                    </div>
+                  </div>
+                  <?php
+/* Attempt MySQL server connection. Assuming you are running MySQL
+server with default setting (user 'root' with no password) */
+try{
+    $pdo = new PDO("mysql:host=localhost;dbname=calendar2", "root", "aina1998");
+    // Set the PDO error mode to exception
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e){
+    die("ERROR: Could not connect. " . $e->getMessage());
+}
+ 
+// Attempt select query execution
+try{
+    $sql = "SELECT * FROM events";   
+  
+    $result = $pdo->query($sql);
+    if($result->rowCount() > 0){
+      
+        while($row = $result->fetch()){
+          echo '<div class="left">';
+          echo '<div  class="draggable route-row stay-row  first" >';
+          echo '<div class="left">';
+            echo '<div class="marker notranslate" ></div>';
+            echo '<div class="line"></div>';
+          echo '</div>';
+          echo '<div class="content">';
+            echo '<div class="title">';
+                echo "<div>" . $row['title'] . "</div>";
+                echo '<div style="font-size:14px;color:#888; font-style:italic;">'  . date('Y-n-j', strtotime($row['start_event'])) . '</div>';
+                 
+              
+
+        echo '</div>';
+        echo'<span class="line-hr"></span>';
+                      echo '<svg class="edit stay-icon"   title="Edit destination">';
+                        echo '<use xlink:href="#icon-edit"></use>';
+                      echo '</svg>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+
+        }
+        
+        // Free result set
+        unset($result);
+        
+    } else{
+        echo "No records matching your query were found.";
+        
+    }
     
-      <div style="margin-top:5%;margin-right:2%; padding:25px; border-left:1px solid #f1f1f1;" class="route-right-pane">
-        <div class="clearfix" style="background-color: #fff;"></div>
-        <br>
-        <div class="dest-rail active" style="display: block;">
-          <div class="see-also">Trip recommendation:</div>
-          <ul style="list-style: none; padding: 0;">
-            <li>
-              <span class="tour-title">Get from recomendations.</span>&nbsp;
-            </li>
-          </ul>
+} catch(PDOException $e){
+    die("ERROR: Could not able to execute $sql. " . $e->getMessage());
+}
+ 
+// Close connection
+unset($pdo);
+?></div>
+                  <div class="content">
+                  <div class="start-end-dates"><?php  echo $date_end ?></div></div>
+                  <div class="route-row boundary-row end">
+                    <div class="left">
+                      <div class="marker"></div>
+                      <div class="line up"></div>
+                    </div>
+                    <div class="content">
+                      <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Add destination -->
+              <div class="route-right-pane">
+                <button class="routeaddbtn add-destination cta-button large"> + Add destination</button>
+                <div class="clearfix" style="background-color: #fff;"></div>
+                
+
+                <div class="dest-rail active" style="display: block;">
+                  <div class="card" style="width: 450px;">
+                    <div class="card-body" id="reccard" style="width: 440px;">
+                      <h5 class="card-title">Recommendations</h5>
+                      <p class="card-text" style="width: 350px;">
+                        <table style="width:90%">
+                          <?php
+                          include("includes/dbh.inc.php");
+                          $user = $_SESSION['userUid'];
+                          $sql = "select idUsers from users where uidUsers like '$user'";
+                          $result = $conn->query($sql);
+                          $row = $result->fetch_all();
+                          $userid = $row[0][0];
+                          // echo ($userid);
+
+                          $sql = "SELECT recommendation.name_place, user_recommendation.place_id FROM `recommendation` 
+                                  inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
+                                  where user_recommendation.user_id like '$userid'";
+
+                          $result = $conn->query($sql);
+                          $row = $result->fetch_all();
+                          $_SESSION["result_arr"] = $row;
+                          echo "<br>";
+                          $rownum = count($row);
+                          $num = 1;
+
+                          for ($i = 0; $i < $rownum; $i++) {
+                            // echo $row[$i][1]."<br>";
+                            $k = $row[$i][0];
+                            $j = $row[$i][1];
+                            echo "<form>
+                            <input type='hidden' id='copying' name='custId' value=$k>
+                                </form>";
+                            echo "<tr><th>$num. $k</th><th><a href='delete_recommendations.php?id=$j'><button onclick()='delete_recommendations.php?id=$j' style= 'height:30px; padding:3px; margin-top:15px;' type='button' class='btn btn-danger'>Remove</button></a></th>
+                            </tr>";
+
+                            $num++;
+                          }
+                          $conn->close();
+                          ?>
+                        </table>
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="layer1 edit-pane" style="z-index: 100;">
+            <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
+              <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
+                <span id="ui-id-16" class="ui-dialog-title">Edit destination</span>
+                <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="Cancel edit">
+                  <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+                  <span class="ui-button-icon-space"> </span>
+                </button>
+              </div>
+
+              <div id="ui-id-9" class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
+                <input type="text" class="flat ui-autocomplete-input" name="search" id="dest-search" placeholder="Start typing..." autocomplete="off" title="Edit destination">
+              </div>
+
+              <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+                <div class="ui-dialog-buttonset">
+                  <button type="button" style="left: 30%;" class="editsavebtn cta-button large" title="Save edit">Save</button>
+                  <button type="button" style="left: 40%; background-color:red;" class="editremobtn cta-button large" title="Remove destination">Remove</button>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dialog-container add-pane" style="z-index: 1002;">
+            <div class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front dlg-route-edit dlg-modify-boundary dlg-add-destination mediumx animated ui-dialog-buttons open" style="height: auto; width: 20%; margin: 10% auto; display: block;">
+              <div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix">
+                <span class="ui-dialog-title">Add destination</span>
+                <button type="button" class="ui-button ui-corner-all ui-widget ui-button-icon-only ui-dialog-titlebar-close" title="">
+                  <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+                  <span class="ui-button-icon-space"></span>
+                </button>
+              </div>
+
+              <div class="ui-dialog-content ui-widget-content" style="display: block; width: auto; min-height: 0px; max-height: none; height: auto; left: 20%;">
+                <input type="text" class="flat ui-autocomplete-input" name="search" placeholder="Start typing..." autocomplete="off">
+              </div>
+
+              <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="z-index: 1010;">
+                <div class="ui-dialog-buttonset">
+                  <button type="button" class="addtoplan cta-button large" style="left: 40%;">Add to plan</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      </div>
-      <br>
-      
-                    
-                    
-      <div class="content">
-      <div class="title">Start: <?php echo $country_from ?></div>
-      </div>
-      <div style="margin-right:27%;" id='calendar'></div>
-      
-      <div class="content">
-       <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
-                    </div> 
-    </section>
+    </div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -193,145 +316,19 @@ $date_end = $result['date_end'];
   <!--Skel.io skeleton framework-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js" integrity="sha256-3e+NvOq+D/yeJy1qrWpYkEUr6SlOCL5mHpc2nZfX74E=" crossorigin="anonymous"></script>
   <!--Own Scripts-->
+
   <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/checklist.js"></script>
-  <script src="assets/js/calendar.js"></script>
-  <script src="route.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      plugins: [ 'list' ],
-
-      header: {
-        left: '',
-        center: '',
-        right: ''
-      },
-
-      // customize the button names,
-      // otherwise they'd all just say "list"
-      views: {
-        listDay: { buttonText: 'listDay' },
-        listWeek: { buttonText: 'listWeek' }
-      },
-
-      defaultView: 'listYear',
-      defaultDate: '2019-04-12',
-      events: 'load.php',
-      navLinks: true, // can click day/week names to navigate views
-      editable: true,
-      eventLimit: true, // allow "more" link when too many events
-
-    events: 'load.php',
-    selectable:true,
-    selectHelper:true,
-    select: function(start, end, allDay)
-    {
-      var title = prompt("Enter Event Title");
-     if(title)
-     {
-      var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
-      var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
-      $.ajax({
-       url:"insert.php",
-       type:"POST",
-       data:{title:title, start:start, end:end},
-       success:function()
-       {
-        calendar.fullCalendar('refetchEvents');
-        alert("Added Successfully");
-       }
-      })
-     }
-    },
-    editable:true,
-    eventResize:function(event)
-    {
-     var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
-     var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
-     var title = event.title;
-     var id = event.id;
-     $.ajax({
-      url:"update.php",
-      type:"POST",
-      data:{title:title, start:start, end:end, id:id},
-      success:function(){
-       calendar.fullCalendar('refetchEvents');
-       alert('Event Update');
-      }
-     })
-    },
-
-    eventDrop:function(event)
-    {
-     var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
-     var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
-     var title = event.title;
-     var id = event.id;
-     $.ajax({
-      url:"update.php",
-      type:"POST",
-      data:{title:title, start:start, end:end, id:id},
-      success:function()
-      {
-       calendar.fullCalendar('refetchEvents');
-       alert("Event Updated");
-      }
-     });
-    },
-
-    eventClick:function(event)
-    {
-     if(confirm("Are you sure you want to remove it?"))
-     {
-      var id = event.id;
-      $.ajax({
-       url:"delete.php",
-       type:"POST",
-       data:{id:id},
-       success:function()
-       {
-        calendar.fullCalendar('refetchEvents');
-        alert("Event Removed");
-       }
-      })
-     }
-    },
-
-   });
-    calendar.render();
-  });
-
-</script>
-<script>
-$(function() {
-	//----- OPEN
-	$('[data-popup-open]').on('click', function(e) {
-		var targeted_popup_class = jQuery(this).attr('data-popup-open');
-		$('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
-
-		e.preventDefault();
-	});
-
-	//----- CLOSE
-	$('[data-popup-close]').on('click', function(e) {
-		var targeted_popup_class = jQuery(this).attr('data-popup-close');
-		$('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
-
-		e.preventDefault();
-	});
-});</script>
-
   <script src="assets/js/weather.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
   <script>
     var CITY = "<?php echo $_SESSION['country_to'] ?>";
     getWeatherData(CITY);
   </script>
+  <script type="text/javascript" src="assets/js/addroute.js"></script>
+
 </body>
 
 </html>

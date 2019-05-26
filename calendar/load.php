@@ -2,7 +2,7 @@
 
 //load.php
 
-$connect = new PDO('mysql:host=localhost;dbname=calendar2', 'root', 'aina1998');
+$connect = new PDO('mysql:host=localhost;dbname=loginsystem', 'root', 'aina1998');
 
 $data = array();
 

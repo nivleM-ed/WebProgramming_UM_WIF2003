@@ -1,0 +1,344 @@
+#checklist .cl-header{
+  height:90px;
+}
+
+#checklist .cl-header .contents {
+  top: 24px;
+  position: relative;
+}
+
+#checklist .cl-header .contents .header-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: #333;
+  float: left;
+  position: relative;
+}
+
+body {
+  font-family: 'Lato',sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#checklist .cl-header .contents button {
+  float: right;
+  width: 137px;
+}
+
+#checklist .header-btn.large {
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
+}
+
+#checklist  .header-btn {
+  background: #fa8c00;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  border: 0;
+  padding: 0 15px;
+  font-style: normal;
+  font-weight: 700;
+  outline: 0;
+  border-radius: 100px;
+  letter-spacing: 0;
+  transition: background-color .3s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css);
+
+
+#checklist .item-container {
+background: #fff;
+box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+border: solid 1px #f0eded;
+padding: 10px 0;
+position: relative;
+margin-bottom: 10px;
+}
+
+#checklist .item-box {
+width:100%;
+margin: auto;
+padding: 10px 20px 10px;
+overflow: hidden;
+}
+
+
+/*CHECKBOX*/
+.cl-cb{ display:none; }
+
+#checklist label div{
+width:23px;
+height:23px;
+display:inline-block;
+border:2px solid #ddd;
+text-align:center;
+line-height:20px;
+margin-right:6px;	
+border-radius:100px;
+cursor:pointer;
+float: none;
+}
+
+#checklist label{  	
+font-family: 'Lato',sans-serif;
+color: #333;
+font-size: 15px;
+cursor: pointer; 
+}
+
+#checklist label i{ 
+font-size:16px;	
+opacity:0; 
+}
+
+#checklist input:checked+label i{ 
+opacity:1; 
+}
+
+#checklist input:checked+label div{ 
+background:#3bddbd; 
+border:2px solid #3bddbd;
+color: #fff;
+}
+
+/* Style buttons */
+#checklist .side-btn {
+background-color: rgba(0, 0, 0, 0); /* Blue background */
+border: none; /* Remove borders */
+color: rgb(144, 144, 144); /* White text */
+font-size: 12px; /* Set a font size */
+cursor: pointer; /* Mouse pointer on hover */
+float:right;
+vertical-align: sub;
+padding-left: 10px;
+vertical-align: sub;
+font-family: 'Lato',sans-serif;
+}
+
+#checklist .edit-btn:before{
+content:"edit";
+}
+
+#checklist .remv-btn:before{
+content:"remove";
+}
+
+#checklist .side-btn:focus {outline:0;}
+
+#checklist .side-btn:hover {color:#333; font-weight: 200;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css);
+
+
+#checklist .modi-bg{
+display:none;
+background:rgb(0, 0, 0, 0.4);
+position:fixed;
+left:0;
+top:0;
+right:0;
+bottom:0;
+
+overflow:auto;
+z-index: 8;
+}
+
+#checklist .modi-box{
+margin: 10% auto;
+background: #ffffff;
+height: auto;
+width: 40%;
+display: block; 
+padding: 42px 30px 30px;  
+border: 1px solid #c5c5c5;
+z-index: 1;
+box-shadow: 0 2px 10px 0 rgba(0,0,0,0.4);
+}
+
+#checklist .modi-title {
+font-size: 26px;
+font-weight: 900;
+text-align: center;
+color: #333;
+margin-bottom: 20px;
+}
+
+#checklist .modi-container{
+margin-top: 15px;
+width: 100%;
+}
+
+#checklist .modi-input-title {
+font-size: 15px;
+font-weight: 700;
+margin-bottom: 8px;
+}
+
+#checklist .modi-input-field{
+border: 1px solid #ddd;
+background-color: #fff;
+height: 40px;
+box-shadow: none;
+font-size: 16px;
+padding: 0 16px;
+width: 100%;
+color: #333;
+outline: 0;
+}
+
+
+
+
+
+
+
+
+
+#checklist .modi-btn{
+margin: 15px;
+display: flex;
+justify-content: center;
+}
+
+#checklist .btn  {
+background: #fa8c00;
+color: #fff;
+width: 100px;
+height: 36px;
+
+text-align: center;
+cursor: pointer;
+border: 0;
+padding: 0 15px;
+font-weight: 700;
+border-radius: 100px;
+letter-spacing: 0;  
+font-size: 15px;
+outline: 0;
+}
+
+#checklist .modi-btn-cncl {
+background: #ddd;
+margin-left:5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* #rec-cl ul{
+padding:0;
+margin:0;
+list-style: none;
+}
+
+#rec-cl .see-also {
+font-size: 16px;
+font-weight: 700;
+margin-bottom: 17px;
+color: #333;
+}
+
+#rec-cl ul li:first-child {
+padding-top: 0;
+border-top: 0;
+}
+
+#rec-cl ul li {
+font-size: 15px;
+line-height: 1.5;
+padding: 13px 0 14px;
+border-top: 1px solid #dedede;
+} */
+
+
+
+
+
+
+
+a {
+text-decoration: none;
+color: inherit;
+}
+
+ul {
+list-style: none;
+padding: 0;
+}
+
+ul .inner{
+padding-left: 1em;
+overflow: hidden;
+display: none;
+}
+
+.show {
+display: block;
+}
+
+ul li{
+margin: .5em 0;
+}
+
+ul li a.toggle{
+width: 100%;
+display: block;
+border-radius: 0.15em;
+transition: background .3s ease;
+}
+ul li a:hover {
+background:rgb(0, 0, 0, 0.4);
+}
