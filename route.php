@@ -2,7 +2,9 @@
 <html>
 <?php
 session_start();
+include "includes/dbh_pdo.php";
 include "includes/dbh.inc.php";
+
 $user_id = $_SESSION['userId'];
 $query = "SELECT * FROM journey WHERE user_id = $user_id";
 $stmt = mysqli_query($conn, $query);
@@ -93,53 +95,34 @@ $date_end = $result['date_end'];
                     </div>
                   </div>
 
-
-                 <!--next--> 
-                 <?php  $SESSION['t']= array();  
-                  
-                  if(isset($_POST["title"])){
-                    $title = $_POST["title"];
-                    $start_event = $_POST["start"];
-                    $end_event = $_POST["end"];
-                    $sql = "INSERT INTO 'events' (title, start_event, end_event) VALUES ( '$title','$start_event','$end_event')";   // Use you own column name from login table
-                    $result = mysqli_query($sql,$conn);
-                  }                                
-                    
-                  $sql = "SELECT events.title, events.start_event FROM Events WHERE start_event BETWEEN '$date_start' AND '$date_end' ORDER BY start_event LIKE '$user_id'";  
+                  <?php
+                  $sql = "SELECT * FROM Events WHERE start_event BETWEEN '$date_start' AND '$date_end' ORDER BY start_event";  
                           
-                  $result = $conn->query($sql);
-                  $row = $result->fetch_all();
-                  $_SESSION["t"] = $row;
-                
-                  $rownum = count($row);
-                  $num = 1;
-                  for($i=0;$i<$rownum;$i++) {                                 
+                  $result = $pdo->prepare($sql);
+            $result->execute([$user_id]);
+
+            if ($result->rowCount() > 0) {
+                $count=1;
+              while ($row = $result->fetch()) {
+  // echo "<li checklist-id='" . $row['item_id'] . "'><a href='javascript:void(0);' onclick='doSomething(" . $row['item_id'] . ");'>" . $row['item_name'] . "</a></li>";                               
+                echo'<div id="r' . $count . '" class="draggable route-row stay-row  first">' ;
+                echo'<div class="left">' ;
+                echo'<div class="marker notranslate">' . $count . '</div>' ;
+                echo'<div class="line"></div>' ;
+                echo'</div>' ;
+                echo'<div class="content" >' ;
+                echo'<div class="title">' . $row['title'] . '</div>' ;
+                echo'<span class="line-hr"></span>' ;
+                echo'<svg class="edit stay-icon" id="'.$row['id']. '"for="r' . $count . '" title="Edit destination">' ;
+                echo'<use xlink:href="#icon-edit"></use>' ;
+                echo'</svg>' ;
+                echo'</div>';
+                echo'</div>  ';
+                $count++;
+              }                
+            }              
                   ?>
 
-                <div id="r1" class="draggable route-row stay-row  first" for="r1">
-                  <div class="left">
-                    <div class="marker notranslate" for="r1"><?php echo $num?></div>
-                    <div class="line"></div>
-                  </div>
-                                                         
-                  <div class="content">
-                    <div class="title">
-                    <?php 
-                    echo $row[$i][0]."<br>"; //title                    
-                    ?>
-                      <?php// echo $_SESSION['country_to']?></div>
-                    <span class="line-hr"></span>
-                    <svg class="edit stay-icon" for="r1" title="Edit destination">
-                      <use xlink:href="#icon-edit"></use>
-                    </svg>
-                  </div>
-                </div>
-                <?php
-               // echo  $num.". ",$row[$i][0]. "<br>";
-                $num++;
-              }
-              $conn->close();
-                ?>
 
                   <div class="route-row boundary-row end">
                     <div class="left">
@@ -274,12 +257,7 @@ $date_end = $result['date_end'];
     getWeatherData(CITY);
   </script>
   <script type="text/javascript" src="assets/js/addroute.js"></script>
-<script>
-function viewevent(){
-var val = "<?php echo json_encode() ?>";
-document.getElementByID("ev").innerHTML += val;
-}
-</script>
+
 </body>
 
 </html>
