@@ -55,17 +55,6 @@ if (isset($_POST['reset-request-submit'])) {
                     <a href="'.$url.'">'.$url.'</a></p>';
     $mail->AddAddress($userEmail);
     $mail->Send();
-    // $to = $userEmail;
-    // $subject = 'Reset your password for TripIt';
-    // $message = '<p>We received a password request, the link to reset your password is given below, you can ignore this email if you did not make the request.</p>';
-    // $message .= '<p>Here is your password reset link: </br>';
-    // $message .= '<a href="'.$url.'">'.$url.'</a></p>';
-
-    // $headers = "From: TripIt <tripit@gmail.com\r\n";
-    // $headers .= "Reply-To: tripit@gmail.com\r\n";
-    // $headers .= "Content-type: text/html\r\n";
-
-    // mail($to, $subject, $message, $headers);
 
     header("Location: ../reset-password.php?reset=success");
 
