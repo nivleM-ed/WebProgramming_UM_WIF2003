@@ -5,7 +5,7 @@ if (isset($_POST['reset-request-submit'])) {
     $selector = bin2hex(random_bytes(8));
     $token = random_bytes(32);
 
-    $url = "../create-new-password.php?selector=".$selector."&validator=".bin2hex($token);
+    $url = "localhost/WebProgramming_UM_WIF2003_Assignment/create-new-password.php?selector=".$selector."&validator=".bin2hex($token);
 
     $expires = date("U") + 2000;
 
@@ -38,7 +38,7 @@ if (isset($_POST['reset-request-submit'])) {
     mysqli_stmt_close($stmt);
     mysqli_close($conn);
 
-    require_once('../PHPMailer/PHPMailerAutoload.php');
+    include_once('../PHPMailer/PHPMailerAutoload.php');
     $mail = new PHPMailer();
     $mail->isSMTP();
     $mail->SMTPAuth = true;

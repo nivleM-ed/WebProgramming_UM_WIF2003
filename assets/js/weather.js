@@ -89,8 +89,6 @@ function getDataArr() {
             console.log(data);
         }
     });
-    // $.post("weather/add_weather.php", {date:dateArr, temp:weatherArrTemp, weather:skyArr});
-    // console.log(dateArr);
 }
 
 //taken from chart.js
