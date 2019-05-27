@@ -45,10 +45,8 @@ $(document).ready(function(){
 				window.location.reload();
 			}
 		});
-
   });	
 
-	
 	$(".edit-btn").click(function () {
 		$(".modi-edit").fadeIn(300);
 		id=$(this).attr('item-id');
@@ -58,7 +56,7 @@ $(document).ready(function(){
 
 	$(".modi-edit .modi-btn-cncl").click(function () {
 		$(".modi-edit").fadeOut(300);
-	});	
+	});
 
 	$(".modi-edit .modi-btn-save").click(function() {
 		var value = $(".modi-edit .modi-input-field:text").val();
@@ -76,6 +74,7 @@ $(document).ready(function(){
 			data:{type:type,id:id,value:value},
 			success:function(response){
 				console.log(type);
+				window.location.reload();
 			}
 		});
 	});
@@ -87,7 +86,6 @@ $(document).ready(function(){
 		if($(this).is(':checked')){
 			value=1;
 		}
-
 		console.log(value);
 
 		var type="check-checklist";
@@ -97,6 +95,7 @@ $(document).ready(function(){
 			data:{type:type,id:id,value:value},
 			success:function(response){
 				console.log("Checked/Unchecked");
+				window.location.reload();
 			}
 		});
 

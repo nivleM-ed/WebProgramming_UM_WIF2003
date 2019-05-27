@@ -107,17 +107,13 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                     </div>
                     <div class="content">
                       <div class="title"><?php echo $country_to ?></div>
-                      <span class="line-hr"></span>
-                      <svg class="edit stay-icon" title="Edit destination">
-                        <use xlink:href="#icon-edit"></use>
-                      </svg>
                     </div>
                   </div>
                   <?php
 
                   // Attempt select query execution
                   try {
-                    $sql = "SELECT * FROM events";
+                    $sql = "SELECT * FROM events WHERE user_id = '$user_id'";
 
                     $result = $pdo->prepare($sql);
                     $result->execute();
@@ -136,9 +132,6 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                   } catch (PDOException $e) {
                     die("ERROR: Could not able to execute $sql. " . $e->getMessage());
                   }
-
-                  // Close connection
-                  unset($pdo);
                   ?>
                 </div>
                 <div class="content">
@@ -150,7 +143,7 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                     <div class="line up"></div>
                   </div>
                   <div class="content">
-                    <div class="title" id="weather_country_to">End: <?php echo $country_to ?></div>
+                    <div class="title" id="weather_country_to">End: <?php echo $country_from ?></div>
                   </div>
                 </div>
               </div>
@@ -203,11 +196,9 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
-
         </div>
 
         <div class="layer1 edit-pane" style="z-index: 100;">
@@ -292,5 +283,4 @@ min-width: 200px; height: 500px; margin-left:-4%;">
   <script type="text/javascript" src="assets/js/addroute.js"></script>
 
 </body>
-
 </html>

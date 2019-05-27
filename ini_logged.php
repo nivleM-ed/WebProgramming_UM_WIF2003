@@ -14,6 +14,11 @@ $country_to = $result['place_to'];
 $date_start = $result['date_start'];
 $date_end = $result['date_end'];
 
+$_SESSION['country_from'] = $country_from;
+$_SESSION['country_to'] = $country_to;
+$_SESSION['date_start'] = $date_start;
+$_SESSION['date_end'] = $date_end;
+
 if(isset($_POST['update'])) {
   $country_from_new = $_POST['ori'];
   $country_to_new = $_POST['dest'];

@@ -74,10 +74,6 @@ session_start();
         $stmt = $pdo->prepare($query);
         $stmt->execute([$row["item_name"],$id,$user_id]);
 
-        // $query = "UPDATE checklist SET item_hide=1 WHERE item_id=?";
-        // $stmt = $pdo->prepare($query);
-        // $stmt->execute([$id]);
-
         } catch(PDOException $e) {
         echo $sql . "<br>" . $e->getMessage();
         }
