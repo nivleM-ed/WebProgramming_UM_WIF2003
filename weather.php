@@ -89,7 +89,7 @@ if(isset($_POST['update'])) {
       cursor: pointer;
       opacity: 1;
       position: relative;
-      bottom: -5px;
+      bottom: -50px;
       left: 28px;
       width: 250px;
       z-index: 10001;
@@ -99,8 +99,8 @@ if(isset($_POST['update'])) {
     .form-popup {
       display: none;
       position: absolute;
-      bottom: 335px;
-      left: 80px;
+      bottom: 295px;
+      left: 375px;
       border: 3px solid #f1f1f1;
       z-index: 1000;
     }
@@ -157,7 +157,9 @@ if(isset($_POST['update'])) {
     .myP {
       padding: 10px;
       border: 3px solid #f1f1f1;
+      margin-left: 900px;
       max-width: 250px;
+      background: #f6755e;
     }
   </style>
 </head>
@@ -211,7 +213,7 @@ if(isset($_POST['update'])) {
 
     <div class="container">
       <div>
-      <p><br></p>
+      <!-- <p><br></p> -->
       <p class="myP"><?php echo $country_from." TO ".$country_to ?></p>
       <p class="myP"><?php echo $date_start." TO ".$date_end ?></p>
       </div>

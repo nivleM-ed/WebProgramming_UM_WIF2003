@@ -45,17 +45,19 @@
         /* Inner */
         .popup-inner {
             max-width:700px;
-            width:90%;
+            max-height:500px;
+            width:100%;
+            height:100%;
             padding:40px;
             position:absolute;
-            top:50%;
+            top:57%;
             left:50%;
             -webkit-transform:translate(-50%, -50%);
             transform:translate(-50%, -50%);
             box-shadow:0px 2px 6px rgba(0,0,0,1);
             border-radius: 25px;
             background:#fff;
-            overflow:auto;
+            /* overflow:auto; */
             overflow: -moz-scrollbars-none;
             /* overflow: hidden; */
         }
@@ -111,7 +113,6 @@
 </head>
 
 <body>
-   
     <header id="header">
         <nav class="left">
             <a href="ini_logged.php" class="logo"><i class="far fa-map"></i>&nbsp;PlanIt</a>
@@ -254,16 +255,16 @@
                                     <!-- Card 1 pop up details -->
                                     <div class="popup" data-popup="popup-1">
                                         <div class="popup-inner">
-                                        <div class="card" style="width: 18rem;">
+                                        <div class="card" style="width: 20rem;">
                                             <img class="card-img-top" src=<?php echo $row[0][2] ?> alt="Card image cap" >
                                         </div>
                                             <h2><?php echo $row[0][0] ?></h2>
-                                            <p><strong>Description:</strong> </p>
-                                            <p id="description6" class="card-text"><?php echo($row[0][1]) ?></p>
-                                            <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[0][3]) ?></p>                                            
+                                            <p><strong>Description: </strong><?php echo($row[0][1]) ?> </p>
+                                            <!-- <p id="description6" class="card-text"><?php echo($row[0][1]) ?></p> -->
+                                            <p><strong>Activity: </strong><?php echo($row[0][3]) ?> </p>
+                                            <!-- <p><?php echo($row[0][3]) ?></p>                                             -->
                                             <a id="add" class="btn btn-primary"  onclick="adds1()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-1" href="#">Close</a></p>
+                                            <a class="btn btn-primary" data-popup-close="popup-1" href="#">Close</a>
                                             <a class="popup-close" data-popup-close="popup-1" href="#">x</a>
                                         </div>
                                     </div>
@@ -276,12 +277,12 @@
                                             <img class="card-img-top" src=<?php echo $row[1][2] ?> alt="Card image cap" >
                                         </div>
                                             <h2><?php echo $row[1][0] ?></h2>
-                                            <p><strong>Description:</strong> </p>
-                                            <p id="description6" class="card-text"><?php echo($row[1][1]) ?></p>
-                                            <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[1][3]) ?></p>                                            
+                                            <p><strong>Description: </strong><?php echo($row[1][1]) ?> </p>
+                                            <!-- <p id="description6" class="card-text"><?php echo($row[1][1]) ?></p> -->
+                                            <p><strong>Activity: </strong> <?php echo($row[1][3]) ?></p>
+                                            <!-- <p><?php echo($row[1][3]) ?></p>                                             -->
                                             <a id="add" class="btn btn-primary"  onclick="adds2()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-2" href="#">Close</a></p>
+                                            <a class="btn btn-primary" data-popup-close="popup-2" href="#">Close</a>
                                             <a class="popup-close" data-popup-close="popup-2" href="#">x</a>
                                         </div>
                                     </div>
@@ -294,12 +295,12 @@
                                             <img class="card-img-top" src=<?php echo $row[2][2] ?> alt="Card image cap" >
                                         </div>
                                             <h2><?php echo $row[2][0] ?></h2>
-                                            <p><strong>Description:</strong> </p>
-                                            <p id="description6" class="card-text"><?php echo($row[2][1]) ?></p>
-                                            <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[2][3]) ?></p>                                            
+                                            <p><strong>Description: </strong><?php echo($row[2][1]) ?> </p>
+                                            <!-- <p id="description6" class="card-text"><?php echo($row[2][1]) ?></p> -->
+                                            <p><strong>Activity: </strong><?php echo($row[2][3]) ?> </p>
+                                            <!-- <p><?php echo($row[2][3]) ?></p>                                             -->
                                             <a id="add" class="btn btn-primary"  onclick="adds3()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-3" href="#">Close</a></p>
+                                            <a class="btn btn-primary" data-popup-close="popup-3" href="#">Close</a>
                                             <a class="popup-close" data-popup-close="popup-3" href="#">x</a>
                                         </div>
                                     </div>
@@ -312,12 +313,12 @@
                                             <img class="card-img-top" src=<?php echo $row[3][2] ?> alt="Card image cap" >
                                         </div>
                                             <h2><?php echo $row[3][0] ?></h2>
-                                            <p><strong>Description:</strong> </p>
-                                            <p id="description6" class="card-text"><?php echo($row[3][1]) ?></p>
-                                            <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[3][3]) ?></p>                                            
+                                            <p><strong>Description: <?php echo($row[3][1]) ?></strong> </p>
+                                            <!-- <p id="description6" class="card-text"><?php echo($row[3][1]) ?></p> -->
+                                            <p><strong>Activity:</strong> <?php echo($row[3][3]) ?> </p>
+                                            <!-- <p><?php echo($row[3][3]) ?></p>                                             -->
                                             <a id="add" class="btn btn-primary"  onclick="adds4()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-4" href="#">Close</a></p>
+                                            <a class="btn btn-primary" data-popup-close="popup-4" href="#">Close</a>
                                             <a class="popup-close" data-popup-close="popup-4" href="#">x</a>
                                         </div>
                                     </div>
@@ -330,12 +331,12 @@
                                             <img class="card-img-top" src=<?php echo $row[4][2] ?> alt="Card image cap" >
                                         </div>
                                             <h2><?php echo $row[4][0] ?></h2>
-                                            <p><strong>Description:</strong> </p>
-                                            <p id="description6" class="card-text"><?php echo($row[4][1]) ?></p>
-                                            <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[4][3]) ?></p>
+                                            <p><strong>Description: </strong> <?php echo($row[4][1]) ?></p>
+                                            <!-- <p id="description6" class="card-text"><?php echo($row[4][1]) ?></p> -->
+                                            <p><strong>Activity: </strong> <?php echo($row[4][3]) ?></p>
+                                            <!-- <p><?php echo($row[4][3]) ?></p> -->
                                             <a id="add" class="btn btn-primary"  onclick="adds5()">Add to Checklist</a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-5" href="#">Close</a></p>
+                                            <a class="btn btn-primary" data-popup-close="popup-5" href="#">Close</a>
                                             <a class="popup-close" data-popup-close="popup-5" href="#">x</a>
                                         </div>
                                     </div>
@@ -349,13 +350,13 @@
                                         </div>
                                             <h2><?php echo $row[5][0] ?></h2>
                                             
-                                            <p><strong>Description:</strong> </p>
-                                            <p id="description6" class="card-text"><?php echo($row[5][1]) ?></p>
-                                            <p><strong>Activity:</strong> </p>
-                                            <p><?php echo($row[5][3]) ?></p>
+                                            <p><strong>Description: </strong> <?php echo($row[5][1]) ?></p>
+                                            <!-- <p id="description6" class="card-text"><?php echo($row[5][1]) ?></p> -->
+                                            <p><strong>Activity: </strong> <?php echo($row[5][3]) ?></p>
+                                            <!-- <p><?php echo($row[5][3]) ?></p> -->
                                             
                                             <a id="add" class="btn btn-primary"  onclick="adds6()">Add to Checklist<br></a>
-                                            <p><a class="btn btn-primary" data-popup-close="popup-6" href="#">Close</a></p>
+                                            <a class="btn btn-primary" data-popup-close="popup-6" href="#">Close</a>
                                             <a class="popup-close" data-popup-close="popup-6" href="#">x</a>
                                         </div>
                                     </div>

@@ -98,7 +98,7 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                     </div>
                   </div>
                   <div class="left">
-                    <div class="start-end-dates"><?php echo $date_start ?></div>
+                    <div class="start-end-dates">Start Date: <?php echo $date_start ?></div>
                   </div>
                   <div id="r1" class="draggable route-row stay-row  first">
                     <div class="left">
@@ -124,33 +124,10 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                     if ($result->rowCount() > 0) {
 
                       while ($row = $result->fetch()) {
-                        // echo '<div class="left">';
-                        // echo '<div  class="draggable route-row stay-row  first" >';
-                        // echo '<div class="left">';
-                        // echo '<div class="marker notranslate" ></div>';
-                        // echo '<div class="line"></div>';
-                        // echo '</div>';
-                        // echo '<div class="content">';
-                        // echo '<div class="title">';
-                        // echo "<div>" . $row['title'] . "</div>";
-                        // echo '<div style="font-size:14px;color:#888; font-style:italic;">'  . date('Y-n-j', strtotime($row['start_event'])) . '</div>';
-
-                        // echo '</div>';
-                        // echo '<span class="line-hr"></span>';
-                        // echo '<svg class="edit stay-icon"   title="Edit destination">';
-                        // echo '<use xlink:href="#icon-edit"></use>';
-                        // echo '</svg>';
-                        // echo '</div>';
-                        // echo '</div>';
-                        // echo '</div>';
-
                         echo "<div id='".$row['id']."' class='draggable route-row stay-row  first'><div class='left'><div class='marker notranslate'></div><div class='line'></div></div><div class='content' ><div class='title'>".$row['title']."</div>";
-                        
-                        echo '<div style="font-size:14px;color:#888; font-style:italic;">' . date('Y-n-j', strtotime($row['start_event'])) . '</div>';
-
+                        echo '<div style="padding-left:15px;font-size:14px;color:#888; font-style:italic;">' . date('Y-n-j', strtotime($row['start_event'])) . '</div>';
                         echo "<span class='line-hr'></span><svg class='edit stay-icon' for='".$row['id']."' title='Edit destination'><use xlink:href='#icon-edit'></use></svg></div></div>";
                       }
-
                       // Free result set
                       unset($result);
                     } else {
@@ -165,7 +142,7 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                   ?>
                 </div>
                 <div class="content">
-                  <div class="start-end-dates"><?php echo $date_end ?></div>
+                  <div class="start-end-dates">End Date: <?php echo $date_end ?></div>
                 </div>
                 <div class="route-row boundary-row end">
                   <div class="left">
@@ -197,7 +174,6 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                         $result = $conn->query($sql);
                         $row = $result->fetch_all();
                         $userid = $row[0][0];
-                        // echo ($userid);
 
                         $sql = "SELECT recommendation.name_place, user_recommendation.place_id FROM `recommendation` 
                                   inner join user_recommendation ON recommendation.place_id = user_recommendation.place_id
@@ -211,7 +187,6 @@ min-width: 200px; height: 500px; margin-left:-4%;">
                         $num = 1;
 
                         for ($i = 0; $i < $rownum; $i++) {
-                          // echo $row[$i][1]."<br>";
                           $k = $row[$i][0];
                           $j = $row[$i][1];
                           echo "<form>

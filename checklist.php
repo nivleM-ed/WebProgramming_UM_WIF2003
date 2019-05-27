@@ -92,7 +92,7 @@ $date_end = $result['date_end'];
                 } else {
                   echo '<input type="checkbox" class="cl-cb" item_id="' . $row['item_id'] . '" id="check' . $row['item_id'] . '"/>';
                 }
-                echo '<label for="check' . $row['item_id'] . '" item_id="' . $row['item_id'] . '"><div><i class="fa fa-check"></i></div>' . $row['item_name'] . '</label>';
+                echo '<label for="check' . $row['item_id'] . '" item_id="' . $row['item_id'] . '">' . $row['item_name'] . '</label>';
                 echo '<span class="edit-btn side-btn" item-id="' . $row['item_id'] . '"/></span> ';
                 echo '<span class="remv-btn side-btn" item-id="' . $row['item_id'] . '"/></span> </div></div>';
               }
@@ -100,10 +100,10 @@ $date_end = $result['date_end'];
             ?>
           </div>
 
-          <div id="rec-cl" style="background-color:none; width: 25%; display:block;">
+          <div id="rec-cl" style="background-color:none; width: 25%; display:block; border-style: solid">
             <ul class="accordion">
               <li>
-                <a class="toggle" href="javascript:void(0);" title="Click on the item to add it on your checklist!">Item Recommendation</a>
+                <a class="toggle" style="text-decoration:none;border:1px;" href="javascript:void(0);" title="Click on the item to add it on your checklist!">Item Recommendation</a>
                 <ul class="inner">
                   <?php
                   $query = "SELECT weather FROM weather";
@@ -124,7 +124,7 @@ $date_end = $result['date_end'];
 
                   if ($result->rowCount() > 0) {
                     while ($row = $result->fetch()) {
-                      echo "<li checklist-id='" . $row['item_id'] . "'><a href='javascript:void(0);' onclick='doSomething(" . $row['item_id'] . ");'>" . $row['item_name'] . "</a></li>";
+                      echo "<li checklist-id='" . $row['item_id'] . "'><a href='javascript:void(0);' style='text-decoration:none' onclick='addChecklist(" . $row['item_id'] . ");'>" . $row['item_name'] . "</a></li>";
                     }
                   }
                   ?>
@@ -146,7 +146,6 @@ $date_end = $result['date_end'];
               </div>
             </div>
           </div>
-
 
           <div class="modi-bg modi-add">
             <div class="modi-box">
@@ -195,7 +194,7 @@ $date_end = $result['date_end'];
     <script src="assets/js/checklist.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
     <script>
-      function doSomething(id) {
+      function addChecklist(id) {
         $("[checklist-id='" + id + "']").css("display", "none");
 
         var type = "addinto-checklist";
